@@ -29,8 +29,8 @@ QLabel {
     font-size: 14px;
     font-weight: bold;
     padding: 6px 8px;
-    background-color: #ecf0f1;
-    border: 1px solid #bdc3c7;
+    background-color: #e0f2fe;  /* 改为浅蓝色底色，清新的视觉效果 */
+    border: 1px solid #7dd3fc;  /* 边框颜色与底色协调 */
     border-radius: 6px;
     margin: 0px 0px;
     /* 遵循严格自适应布局原则，由容器控制宽度 */
@@ -86,6 +86,72 @@ QLineEdit:focus {
 
 QLineEdit:hover {
     border-color: #9ca3af;
+}
+
+/* === IP配置输入框 - 不同浅色系边框 === */
+/* IP地址输入框 - 浅蓝色边框 */
+#ip_address_input {
+    border: 2px solid #93c5fd;  /* 浅蓝色边框，代表主要IP配置 */
+}
+
+#ip_address_input:focus {
+    border-color: #3b82f6;  /* 聚焦时深蓝色 */
+}
+
+#ip_address_input:hover {
+    border-color: #60a5fa;  /* 悬停时中蓝色 */
+}
+
+/* 子网掩码输入框 - 浅绿色边框 */
+#subnet_mask_input {
+    border: 2px solid #86efac;  /* 浅绿色边框，代表网络配置 */
+}
+
+#subnet_mask_input:focus {
+    border-color: #10b981;  /* 聚焦时深绿色 */
+}
+
+#subnet_mask_input:hover {
+    border-color: #34d399;  /* 悬停时中绿色 */
+}
+
+/* 网关输入框 - 浅紫色边框 */
+#gateway_input {
+    border: 2px solid #c4b5fd;  /* 浅紫色边框，代表网关路由 */
+}
+
+#gateway_input:focus {
+    border-color: #8b5cf6;  /* 聚焦时深紫色 */
+}
+
+#gateway_input:hover {
+    border-color: #a78bfa;  /* 悬停时中紫色 */
+}
+
+/* 主DNS输入框 - 浅橙色边框 */
+#primary_dns_input {
+    border: 2px solid #fdba74;  /* 浅橙色边框，代表主DNS服务 */
+}
+
+#primary_dns_input:focus {
+    border-color: #f59e0b;  /* 聚焦时深橙色 */
+}
+
+#primary_dns_input:hover {
+    border-color: #fbbf24;  /* 悬停时中橙色 */
+}
+
+/* 备用DNS输入框 - 浅粉色边框 */
+#secondary_dns_input {
+    border: 2px solid #f9a8d4;  /* 浅粉色边框，代表备用DNS服务 */
+}
+
+#secondary_dns_input:focus {
+    border-color: #ec4899;  /* 聚焦时深粉色 */
+}
+
+#secondary_dns_input:hover {
+    border-color: #f472b6;  /* 悬停时中粉色 */
 }
 
 /* === 下拉框样式 - 浅蓝色文字，非黑底悬停 === */
@@ -159,35 +225,44 @@ QLineEdit:hover {
     padding: 4px;
 }
 
-/* === 状态徽章样式 - 圆角设计，颜色语义化 === */
+/* === 状态徽章样式 - 圆角边框设计，紧凑尺寸 === */
 #connection_status_badge {
-    background-color: #10b981;
-    color: white;
-    border-radius: 12px;
-    padding: 4px 12px;
-    font-size: 10px;
+    background-color: transparent;  /* 去除底色 */
+    color: #10b981;  /* 保留绿色文字，代表连接状态 */
+    border: 1px solid #10b981;  /* 细边框减少视觉重量 */
+    border-radius: 8px;  /* 减小圆角半径 */
+    padding: 2px 8px;  /* 紧凑内边距 */
+    font-size: 9px;  /* 减小字体尺寸 */
     font-weight: bold;
-    margin: 2px;
+    margin: 1px 2px;  /* 减小外边距 */
+    min-width: 50px;  /* 减小最小宽度 */
+    text-align: center;  /* 文字居中对齐 */
 }
 
 #ip_mode_badge {
-    background-color: #f59e0b;
-    color: white;
-    border-radius: 12px;
-    padding: 4px 12px;
-    font-size: 10px;
+    background-color: transparent;  /* 去除底色 */
+    color: #f59e0b;  /* 保留橙色文字，代表IP模式 */
+    border: 1px solid #f59e0b;  /* 细边框减少视觉重量 */
+    border-radius: 8px;  /* 减小圆角半径 */
+    padding: 2px 8px;  /* 紧凑内边距 */
+    font-size: 9px;  /* 减小字体尺寸 */
     font-weight: bold;
-    margin: 2px;
+    margin: 1px 2px;  /* 减小外边距 */
+    min-width: 50px;  /* 减小最小宽度 */
+    text-align: center;  /* 文字居中对齐 */
 }
 
 #link_speed_badge {
-    background-color: #6366f1;
-    color: white;
-    border-radius: 12px;
-    padding: 4px 12px;
-    font-size: 10px;
+    background-color: transparent;  /* 去除底色 */
+    color: #6366f1;  /* 保留紫色文字，代表网卡速率 */
+    border: 1px solid #6366f1;  /* 细边框减少视觉重量 */
+    border-radius: 8px;  /* 减小圆角半径 */
+    padding: 2px 8px;  /* 紧凑内边距 */
+    font-size: 9px;  /* 减小字体尺寸 */
     font-weight: bold;
-    margin: 2px;
+    margin: 1px 2px;  /* 减小外边距 */
+    min-width: 50px;  /* 减小最小宽度 */
+    text-align: center;  /* 文字居中对齐 */
 }
 
 /* === 通用按钮基类样式 === */
@@ -387,7 +462,7 @@ QPushButton:disabled {
 /* === IP配置容器 - 智能组件缩放，严格宽度控制 === */
 #ip_config_frame {
     background-color: white;
-    border: 2px solid #e5e7eb;
+    border: 2px solid #fed7aa;  /* 改为更淡的橙色边框，柔和的视觉效果 */
     border-radius: 12px;
     padding: 8px;
     margin: 1px 0px;
