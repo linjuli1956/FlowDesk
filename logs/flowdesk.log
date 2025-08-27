@@ -1,0 +1,10 @@
+2025-08-27 22:06:35 - flowdesk - INFO - 测试日志记录器: flowdesk
+2025-08-27 22:06:35 - flowdesk.services.network - INFO - 测试日志记录器: flowdesk.services.network
+2025-08-27 22:06:35 - flowdesk.services.hardware - INFO - 测试日志记录器: flowdesk.services.hardware
+2025-08-27 22:06:35 - flowdesk.services.rdp - INFO - 测试日志记录器: flowdesk.services.rdp
+2025-08-27 22:06:35 - flowdesk.services.system_tray - INFO - 测试日志记录器: flowdesk.services.system_tray
+2025-08-27 22:06:41 - flowdesk - INFO - 测试日志记录器: flowdesk
+2025-08-27 22:06:41 - flowdesk.services.network - INFO - 测试日志记录器: flowdesk.services.network
+2025-08-27 22:06:41 - flowdesk.services.hardware - INFO - 测试日志记录器: flowdesk.services.hardware
+2025-08-27 22:06:41 - flowdesk.services.rdp - INFO - 测试日志记录器: flowdesk.services.rdp
+2025-08-27 22:06:41 - flowdesk.services.system_tray - INFO - 测试日志记录器: flowdesk.services.system_tray

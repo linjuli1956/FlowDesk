@@ -27,6 +27,7 @@ from PyQt5.QtGui import QIcon, QCloseEvent
 
 from ..utils.resource_path import resource_path
 from ..utils.logger import get_logger
+from .tabs.network_config_tab import NetworkConfigTab
 
 
 class MainWindow(QMainWindow):
@@ -59,8 +60,8 @@ class MainWindow(QMainWindow):
         # 创建用户界面
         self.setup_ui()
         
-        # 应用样式表（通过objectName）
-        self.apply_styles()
+        # 加载并应用样式表
+        self.load_and_apply_styles()
         
         # 居中显示窗口
         self.center_window()
@@ -129,21 +130,24 @@ class MainWindow(QMainWindow):
     
     def create_tab_placeholders(self):
         """
-        创建四个Tab页面的占位符
+        创建四个Tab页面
         
-        为四个主要功能模块创建空白的Tab页面，
-        后续将替换为实际的功能页面组件。
+        创建网络配置实际页面和其他三个功能模块的占位符页面。
+        网络配置Tab使用NetworkConfigTab组件，其他Tab暂时使用占位符。
         """
-        # Tab页面配置 - 按照UI设计规范的顺序
-        tab_configs = [
-            ("网络配置", "network_config_tab", "网络适配器管理和IP配置"),
+        # 创建网络配置Tab页面（实际功能页面）
+        self.network_config_tab = NetworkConfigTab()
+        self.tab_widget.addTab(self.network_config_tab, "网络配置")
+        
+        # 其他Tab页面配置 - 暂时使用占位符
+        other_tab_configs = [
             ("网络工具", "network_tools_tab", "网络诊断和系统工具"),
             ("远程桌面", "rdp_tab", "远程桌面连接管理"),
             ("硬件信息", "hardware_tab", "硬件监控和系统信息")
         ]
         
-        # 创建每个Tab页面
-        for tab_name, object_name, description in tab_configs:
+        # 创建其他Tab页面的占位符
+        for tab_name, object_name, description in other_tab_configs:
             # 创建Tab页面容器
             tab_widget = QWidget()
             tab_widget.setObjectName(object_name)
@@ -167,21 +171,53 @@ class MainWindow(QMainWindow):
             # 将Tab页面添加到Tab控件
             self.tab_widget.addTab(tab_widget, tab_name)
         
-        # 默认选中第一个Tab
+        # 默认选中第一个Tab（网络配置）
         self.tab_widget.setCurrentIndex(0)
     
-    def apply_styles(self):
+    def load_and_apply_styles(self):
         """
-        应用样式表
+        加载并应用外置QSS样式表
         
-        通过设置objectName来应用外置QSS样式表。
+        从qss目录加载样式文件并应用到整个应用程序。
         禁止样式重复，统一使用外置样式管理（UI四大铁律）。
         """
-        # 主窗口已设置objectName为"main_window"
-        # Tab控件已设置objectName为"main_tab_widget"
-        # 各Tab页面已设置对应的objectName
-        # 样式将通过外置QSS文件应用，这里不设置内联样式
-        pass
+        try:
+            # 构建QSS文件路径
+            qss_dir = os.path.join(os.path.dirname(__file__), "qss")
+            
+            # 加载样式文件路径
+            main_qss_path = os.path.join(qss_dir, "main_window.qss")
+            network_qss_path = os.path.join(qss_dir, "network_config_tab.qss")
+            tray_dialog_qss_path = os.path.join(qss_dir, "tray_exit_dialog.qss")
+            
+            # 合并所有样式内容
+            combined_styles = ""
+            
+            # 加载主窗口样式（如果存在）
+            if os.path.exists(main_qss_path):
+                with open(main_qss_path, 'r', encoding='utf-8') as f:
+                    combined_styles += f.read() + "\n"
+                    
+            # 加载网络配置Tab样式
+            if os.path.exists(network_qss_path):
+                with open(network_qss_path, 'r', encoding='utf-8') as f:
+                    combined_styles += f.read() + "\n"
+                    
+            # 加载托盘退出对话框样式
+            if os.path.exists(tray_dialog_qss_path):
+                with open(tray_dialog_qss_path, 'r', encoding='utf-8') as f:
+                    combined_styles += f.read() + "\n"
+            
+            # 应用合并后的样式到整个应用程序
+            if combined_styles:
+                QApplication.instance().setStyleSheet(combined_styles)
+                self.logger.info("QSS样式表加载成功")
+            else:
+                self.logger.warning("未找到QSS样式文件")
+                
+        except Exception as e:
+            self.logger.error(f"加载QSS样式表失败: {e}")
+            # 样式加载失败不影响程序运行，继续执行
     
     def center_window(self):
         """

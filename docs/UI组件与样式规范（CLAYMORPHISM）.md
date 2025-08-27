@@ -1,6 +1,6 @@
 # FlowDesk UI组件与样式规范（卡片式彩色按钮风格）
 
-> **设计风格更新**：基于用户UI截图分析，从Claymorphism改为卡片式彩色按钮设计
+> **设计风格更新**：  Claymorphism 设计风格
 
 ## 1. 核心原则
 - ✅ 唯一外置 QSS：所有样式集中于 `src/flowdesk/ui/qss/main_pyqt5.qss`。

@@ -1,0 +1,94 @@
+/*
+托盘退出确认对话框样式文件
+实现语义化彩色渐变按钮设计
+
+设计原则：
+1. 语义化颜色：退出按钮红色、最小化按钮绿色、取消按钮蓝色
+2. 渐变效果：所有按钮使用渐变色提升视觉效果
+3. 悬停状态：鼠标悬停时颜色加深，提供清晰反馈
+4. 统一尺寸：按钮固定尺寸，确保界面整齐
+*/
+
+/* === 托盘退出对话框主容器 === */
+#tray_exit_dialog {
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+}
+
+/* === 提示消息标签 === */
+#tray_exit_message {
+    color: #2c3e50;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+    background-color: transparent;
+}
+
+/* === 通用按钮基类样式 === */
+#tray_exit_dialog QPushButton {
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    min-height: 16px;
+    min-width: 80px;
+}
+
+#tray_exit_dialog QPushButton:hover {
+    transform: translateY(-1px);
+}
+
+#tray_exit_dialog QPushButton:pressed {
+    transform: translateY(1px);
+}
+
+/* === 最小化按钮 - 绿色渐变（安全操作） === */
+#tray_exit_no_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #34d399, stop:1 #10b981);
+}
+
+#tray_exit_no_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #10b981, stop:1 #059669);
+}
+
+#tray_exit_no_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #059669, stop:1 #047857);
+}
+
+/* === 取消按钮 - 蓝色渐变（中性操作） === */
+#tray_exit_cancel_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #60a5fa, stop:1 #3b82f6);
+}
+
+#tray_exit_cancel_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #3b82f6, stop:1 #2563eb);
+}
+
+#tray_exit_cancel_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2563eb, stop:1 #1d4ed8);
+}
+
+/* === 退出按钮 - 红色渐变（危险操作） === */
+#tray_exit_yes_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f87171, stop:1 #ef4444);
+}
+
+#tray_exit_yes_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #ef4444, stop:1 #dc2626);
+}
+
+#tray_exit_yes_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #dc2626, stop:1 #b91c1c);
+}

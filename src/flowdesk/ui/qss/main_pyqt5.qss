@@ -46,11 +46,12 @@ QWidget {
     border: 1px solid rgba(255,255,255,0.3);
     border-radius: 16px;
     margin-top: -1px;
-    /* Claymorphism 阴影效果 */
-    box-shadow: 
-        inset 2px 2px 5px rgba(255,255,255,0.8),
-        inset -2px -2px 5px rgba(0,0,0,0.1),
-        0 4px 15px rgba(0,0,0,0.1);
+    /* Claymorphism 边框效果 - 使用Qt支持的边框和渐变属性 */
+    border: 2px solid rgba(255,255,255,0.4);
+    /* 使用渐变模拟内阴影效果 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.95), stop:0.1 rgba(245,247,250,0.9), 
+                stop:0.9 rgba(245,247,250,0.9), stop:1 rgba(235,240,245,0.85));
 }
 
 #main_tab_widget::tab-bar {
@@ -70,10 +71,10 @@ QWidget {
     border-top-right-radius: 12px;
     min-width: 90px;
     font-weight: 500;
-    /* 内凹阴影效果 */
-    box-shadow: 
-        inset 1px 1px 3px rgba(255,255,255,0.8),
-        inset -1px -1px 3px rgba(0,0,0,0.05);
+    /* 内凹效果 - 使用渐变和边框替代阴影 */
+    border: 1px solid rgba(200,205,210,0.3);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(235,240,245,0.8), stop:1 rgba(245,250,255,0.9));
 }
 
 #main_tab_widget QTabBar::tab:selected {
@@ -81,19 +82,19 @@ QWidget {
                 stop:0 rgba(255,255,255,0.95), stop:1 rgba(248,250,252,0.95));
     border-bottom: none;
     color: --text-primary;
-    /* 突出阴影效果 */
-    box-shadow: 
-        2px 2px 8px rgba(0,0,0,0.1),
-        -2px -2px 8px rgba(255,255,255,0.9),
-        inset 1px 1px 2px rgba(255,255,255,0.9);
+    /* 突出效果 - 使用边框和渐变 */
+    border: 2px solid rgba(255,255,255,0.6);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.95), stop:1 rgba(250,252,255,0.9));
 }
 
 #main_tab_widget QTabBar::tab:hover:!selected {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
                 stop:0 rgba(255,255,255,0.8), stop:1 rgba(245,247,250,0.8));
-    box-shadow: 
-        1px 1px 5px rgba(0,0,0,0.08),
-        -1px -1px 5px rgba(255,255,255,0.9);
+    /* 悬停效果 - 使用边框变化 */
+    border: 1px solid rgba(255,255,255,0.5);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(250,252,255,0.9), stop:1 rgba(245,248,252,0.85));
 }
 
 /* ===== Tab页面内容样式 ===== */
@@ -125,33 +126,33 @@ QPushButton {
     font-size: 9pt;
     min-width: 80px;
     min-height: 32px;
-    /* Claymorphism 阴影效果 */
-    box-shadow: 
-        3px 3px 8px rgba(0,0,0,0.15),
-        -3px -3px 8px rgba(255,255,255,0.9),
-        inset 1px 1px 2px rgba(255,255,255,0.8);
+    /* Claymorphism 效果 - 使用边框和渐变替代阴影 */
+    border: 2px solid rgba(255,255,255,0.4);
+    /* 使用多层渐变模拟立体效果 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.9), stop:0.5 rgba(248,250,252,0.85), stop:1 rgba(240,245,250,0.8));
 }
 
 QPushButton:hover {
-    /* 悬停时增强阴影效果 */
-    box-shadow: 
-        4px 4px 12px rgba(0,0,0,0.2),
-        -4px -4px 12px rgba(255,255,255,0.95),
-        inset 1px 1px 3px rgba(255,255,255,0.9);
+    /* 悬停时增强效果 - 使用更亮的渐变 */
+    border: 2px solid rgba(255,255,255,0.6);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.95), stop:0.5 rgba(252,254,255,0.9), stop:1 rgba(245,250,255,0.85));
 }
 
 QPushButton:pressed {
-    /* 按下时内凹效果 */
-    box-shadow: 
-        inset 2px 2px 6px rgba(0,0,0,0.2),
-        inset -2px -2px 6px rgba(255,255,255,0.8);
+    /* 按下时内凹效果 - 使用反向渐变 */
+    border: 2px solid rgba(200,205,210,0.4);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(230,235,240,0.8), stop:1 rgba(245,250,255,0.9));
 }
 
 QPushButton:disabled {
     opacity: 0.4;
-    box-shadow: 
-        1px 1px 3px rgba(0,0,0,0.05),
-        -1px -1px 3px rgba(255,255,255,0.5);
+    /* 禁用状态 - 使用淡化的边框和渐变 */
+    border: 1px solid rgba(220,225,230,0.3);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(240,245,250,0.6), stop:1 rgba(250,252,255,0.7));
 }
 
 /* ===== Claymorphism 彩色按钮样式 - 柔和渐变色 ===== */
@@ -300,18 +301,18 @@ QLineEdit, QTextEdit, QPlainTextEdit {
     padding: 8px 12px;
     color: --text-primary;
     selection-background-color: rgba(116, 181, 249, 0.3);
-    /* 内凹效果 */
-    box-shadow: 
-        inset 2px 2px 4px rgba(0,0,0,0.1),
-        inset -2px -2px 4px rgba(255,255,255,0.9);
+    /* 内凹效果 - 使用内边框和渐变 */
+    border: 2px solid rgba(220,225,230,0.4);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(240,245,250,0.9), stop:1 rgba(250,255,255,0.95));
 }
 
 QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
     border: 2px solid rgba(116, 181, 249, 0.6);
-    box-shadow: 
-        inset 2px 2px 4px rgba(0,0,0,0.1),
-        inset -2px -2px 4px rgba(255,255,255,0.9),
-        0 0 8px rgba(116, 181, 249, 0.3);
+    /* 焦点效果 - 使用彩色边框和渐变 */
+    border: 2px solid rgba(116, 181, 249, 0.6);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(245,250,255,0.95), stop:1 rgba(240,248,255,0.9));
 }
 
 QLineEdit::placeholder, QTextEdit::placeholder, QPlainTextEdit::placeholder {
@@ -327,18 +328,18 @@ QComboBox {
     padding: 8px 12px;
     color: --text-primary;
     min-width: 120px;
-    /* 内凹效果 */
-    box-shadow: 
-        inset 2px 2px 4px rgba(0,0,0,0.1),
-        inset -2px -2px 4px rgba(255,255,255,0.9);
+    /* 内凹效果 - 使用边框和渐变 */
+    border: 2px solid rgba(220,225,230,0.4);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(240,245,250,0.9), stop:1 rgba(250,255,255,0.95));
 }
 
 QComboBox:focus {
     border: 2px solid rgba(116, 181, 249, 0.6);
-    box-shadow: 
-        inset 2px 2px 4px rgba(0,0,0,0.1),
-        inset -2px -2px 4px rgba(255,255,255,0.9),
-        0 0 8px rgba(116, 181, 249, 0.3);
+    /* 焦点效果 - 使用彩色边框 */
+    border: 2px solid rgba(116, 181, 249, 0.6);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(245,250,255,0.95), stop:1 rgba(240,248,255,0.9));
 }
 
 QComboBox::drop-down {
@@ -407,11 +408,10 @@ QWidget[class="card"] {
     border: 1px solid rgba(255,255,255,0.3);
     border-radius: 16px;
     margin: 6px;
-    /* Claymorphism 阴影效果 */
-    box-shadow: 
-        4px 4px 12px rgba(0,0,0,0.1),
-        -4px -4px 12px rgba(255,255,255,0.9),
-        inset 1px 1px 2px rgba(255,255,255,0.8);
+    /* Claymorphism 卡片效果 - 使用边框和渐变 */
+    border: 2px solid rgba(255,255,255,0.5);
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+                stop:0 rgba(255,255,255,0.9), stop:0.5 rgba(250,252,255,0.85), stop:1 rgba(245,248,252,0.8));
 }
 
 QGroupBox {
@@ -422,11 +422,10 @@ QGroupBox {
     margin-top: 12px;
     padding-top: 12px;
     font-weight: 500;
-    /* 卡片阴影效果 */
-    box-shadow: 
-        3px 3px 8px rgba(0,0,0,0.08),
-        -3px -3px 8px rgba(255,255,255,0.9),
-        inset 1px 1px 2px rgba(255,255,255,0.7);
+    /* 卡片效果 - 使用边框和渐变 */
+    border: 1px solid rgba(255,255,255,0.4);
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.85), stop:1 rgba(248,252,255,0.8));
 }
 
 QGroupBox::title {

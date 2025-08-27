@@ -1,0 +1,464 @@
+/*
+网络配置Tab页面样式文件
+实现卡片式布局 + 彩色渐变按钮设计
+
+设计原则：
+1. 禁止样式重复：通用基类样式定义一次，专用样式通过objectName扩展
+2. 智能组件缩放：输入框可拉伸，按钮固定尺寸，容器自适应
+3. 渐变色按钮：语义化颜色设计，提升用户体验
+4. 特殊交互效果：下拉框浅蓝色文字，悬停状态变化
+*/
+
+/* === 网络配置Tab页面主容器 === */
+#network_config_tab {
+    background-color: #f8f9fa;
+    border: none;
+}
+
+/* === 通用标签样式 === */
+QLabel {
+    color: #2c3e50;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 2px;
+}
+
+/* === 标题标签样式 === */
+#ip_info_title, #network_mgmt_title, #extra_ip_title {
+    color: #34495e;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 12px;
+    background-color: #ecf0f1;
+    border: 1px solid #bdc3c7;
+    border-radius: 6px;
+    margin: 2px 0px;
+}
+
+#extra_ip_title {
+    background-color: #fdf2f8;
+    border-color: #f8bbd9;
+    color: #be185d;
+}
+
+/* === 配置标签样式 === */
+#config_label {
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-weight: bold;
+    color: #374151;
+    min-width: 80px;
+}
+
+/* === 当前网卡标签样式 === */
+#current_adapter_label {
+    background-color: #e0f2fe;
+    border: 1px solid #81d4fa;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: #0277bd;
+    margin: 8px 0px;
+}
+
+/* === 通用输入框样式 === */
+QLineEdit {
+    background-color: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #374151;
+    min-height: 16px;
+}
+
+QLineEdit:focus {
+    border-color: #3b82f6;
+    background-color: #fefefe;
+}
+
+QLineEdit:hover {
+    border-color: #9ca3af;
+}
+
+/* === 下拉框样式 - 浅蓝色文字，非黑底悬停 === */
+#adapter_combo {
+    background-color: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #3b82f6;
+    min-height: 16px;
+}
+
+#adapter_combo:hover {
+    border-color: #60a5fa;
+    background-color: #f8fafc;
+}
+
+#adapter_combo:focus {
+    border-color: #2563eb;
+}
+
+/* 下拉框下拉列表样式 */
+#adapter_combo QAbstractItemView {
+    background-color: white;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    selection-background-color: #dbeafe;
+    selection-color: #1d4ed8;
+    color: #3b82f6;
+    padding: 4px;
+}
+
+#adapter_combo QAbstractItemView::item {
+    padding: 6px 12px;
+    border: none;
+    color: #3b82f6;
+}
+
+#adapter_combo QAbstractItemView::item:hover {
+    background-color: #eff6ff;
+    color: #1e40af;
+}
+
+#adapter_combo QAbstractItemView::item:selected {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+/* === IP信息展示容器 - 可选中文字但不可编辑 === */
+#ip_info_display {
+    background-color: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 11px;
+    color: #3b82f6;
+    line-height: 1.4;
+}
+
+#ip_info_display:focus {
+    border-color: #60a5fa;
+}
+
+/* === 状态徽章容器 === */
+#status_badges_frame {
+    background-color: transparent;
+    border: none;
+    padding: 4px;
+}
+
+/* === 状态徽章样式 - 圆角设计，颜色语义化 === */
+#connection_status_badge {
+    background-color: #10b981;
+    color: white;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: bold;
+    margin: 2px;
+}
+
+#ip_mode_badge {
+    background-color: #f59e0b;
+    color: white;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: bold;
+    margin: 2px;
+}
+
+#link_speed_badge {
+    background-color: #6366f1;
+    color: white;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 10px;
+    font-weight: bold;
+    margin: 2px;
+}
+
+/* === 通用按钮基类样式 === */
+QPushButton {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    min-height: 16px;
+    min-width: 80px;
+}
+
+QPushButton:hover {
+    transform: translateY(-1px);
+}
+
+QPushButton:pressed {
+    transform: translateY(1px);
+}
+
+QPushButton:disabled {
+    background: #9ca3af;
+    color: #6b7280;
+}
+
+/* === 刷新按钮 - 蓝色渐变 === */
+#refresh_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #60a5fa, stop:1 #3b82f6);
+}
+
+#refresh_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #3b82f6, stop:1 #2563eb);
+}
+
+#refresh_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2563eb, stop:1 #1d4ed8);
+}
+
+/* === 启用网卡按钮 - 绿色渐变 === */
+#enable_adapter_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #34d399, stop:1 #10b981);
+}
+
+#enable_adapter_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #10b981, stop:1 #059669);
+}
+
+#enable_adapter_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #059669, stop:1 #047857);
+}
+
+/* === 禁用网卡按钮 - 红色渐变 === */
+#disable_adapter_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f87171, stop:1 #ef4444);
+}
+
+#disable_adapter_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #ef4444, stop:1 #dc2626);
+}
+
+#disable_adapter_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #dc2626, stop:1 #b91c1c);
+}
+
+/* === 设置静态IP按钮 - 橙色渐变 === */
+#set_static_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #fbbf24, stop:1 #f59e0b);
+}
+
+#set_static_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f59e0b, stop:1 #d97706);
+}
+
+#set_static_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #d97706, stop:1 #b45309);
+}
+
+/* === 设置DHCP按钮 - 橙色渐变 === */
+#set_dhcp_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #fbbf24, stop:1 #f59e0b);
+}
+
+#set_dhcp_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f59e0b, stop:1 #d97706);
+}
+
+#set_dhcp_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #d97706, stop:1 #b45309);
+}
+
+/* === 复制信息按钮 - 蓝色渐变 === */
+#copy_info_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #60a5fa, stop:1 #3b82f6);
+}
+
+#copy_info_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #3b82f6, stop:1 #2563eb);
+}
+
+#copy_info_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #2563eb, stop:1 #1d4ed8);
+}
+
+/* === 确定修改IP按钮 - 绿色渐变 === */
+#apply_config_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #34d399, stop:1 #10b981);
+    min-width: 120px;
+    padding: 12px 20px;
+}
+
+#apply_config_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #10b981, stop:1 #059669);
+}
+
+#apply_config_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #059669, stop:1 #047857);
+}
+
+/* === 添加选中IP按钮 - 绿色渐变 === */
+#add_selected_ip_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #34d399, stop:1 #10b981);
+}
+
+#add_selected_ip_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #10b981, stop:1 #059669);
+}
+
+#add_selected_ip_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #059669, stop:1 #047857);
+}
+
+/* === 删除选中IP按钮 - 红色渐变 === */
+#remove_selected_ip_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f87171, stop:1 #ef4444);
+}
+
+#remove_selected_ip_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #ef4444, stop:1 #dc2626);
+}
+
+#remove_selected_ip_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #dc2626, stop:1 #b91c1c);
+}
+
+/* === 添加额外IP按钮 - 紫色渐变 === */
+#add_extra_ip_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #a78bfa, stop:1 #8b5cf6);
+}
+
+#add_extra_ip_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #8b5cf6, stop:1 #7c3aed);
+}
+
+#add_extra_ip_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #7c3aed, stop:1 #6d28d9);
+}
+
+/* === IP配置容器 === */
+#ip_config_frame {
+    background-color: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 8px 0px;
+}
+
+#ip_config_frame::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 5px 0 5px;
+}
+
+/* === 额外IP列表 - 支持悬停和选中状态变化 === */
+#extra_ip_list {
+    background-color: white;
+    border: 2px solid #f8bbd9;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 11px;
+    color: #374151;
+    alternate-background-color: #fef7ff;
+}
+
+#extra_ip_list::item {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    margin: 1px;
+}
+
+#extra_ip_list::item:hover {
+    background-color: #fdf2f8;
+    color: #be185d;
+}
+
+#extra_ip_list::item:selected {
+    background-color: #f3e8ff;
+    color: #7c2d12;
+    border: 1px solid #c084fc;
+}
+
+#extra_ip_list::item:selected:hover {
+    background-color: #e879f9;
+    color: white;
+}
+
+/* === 滚动条样式优化 === */
+QScrollBar:vertical {
+    background-color: #f3f4f6;
+    width: 12px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #d1d5db;
+    border-radius: 6px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #9ca3af;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    border: none;
+    background: none;
+}
+
+QScrollBar:horizontal {
+    background-color: #f3f4f6;
+    height: 12px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: #d1d5db;
+    border-radius: 6px;
+    min-width: 20px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: #9ca3af;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    border: none;
+    background: none;
+}
