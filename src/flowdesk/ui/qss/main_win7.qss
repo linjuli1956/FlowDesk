@@ -1,0 +1,552 @@
+/*
+FlowDesk 主样式表 - Windows 7 兼容版本
+基于卡片式彩色按钮设计，针对Win7系统优化
+
+=== 面向新手的样式表说明 ===
+
+什么是QSS？
+QSS (Qt Style Sheets) 是Qt框架的样式表系统，类似于网页开发中的CSS。
+它允许我们定义界面组件的外观，包括颜色、字体、边框、背景等视觉属性。
+
+为什么需要Win7兼容版本？
+Windows 7系统的Qt渲染引擎对某些CSS3特性支持有限，比如：
+- 复杂的border-radius圆角效果
+- box-shadow阴影效果  
+- 高级的渐变和动画
+因此我们创建了这个简化版本，确保在Win7上也能正常显示。
+
+样式表的组织结构：
+1. 全局样式：定义整个应用的基础字体和通用属性
+2. 组件样式：为每种UI组件（按钮、输入框等）定义专门的外观
+3. 状态样式：定义组件在不同状态下的外观（悬停、按下、禁用等）
+4. 主题颜色：使用颜色变量实现统一的配色方案
+
+颜色变量系统：
+所有颜色都使用 --变量名 的形式定义，这样可以：
+- 统一管理整个应用的配色方案
+- 方便切换主题（浅色/深色）
+- 确保视觉一致性
+- 便于维护和修改
+
+Win7兼容性调整：
+- 移除部分高级CSS3特性
+- 简化圆角和阴影效果
+- 优化渲染性能
+- 保持视觉一致性
+*/
+
+/* ===== 全局样式 ===== 
+   作用：为整个应用程序设置基础的字体和文字大小
+   
+   字体选择说明：
+   - "Microsoft YaHei"：微软雅黑，现代中文字体，清晰易读
+   - "SimSun"：宋体，Win7系统默认中文字体，作为备选
+   - Arial：英文无衬线字体，国际通用
+   - sans-serif：无衬线字体族，最终备选
+   
+   字体大小9pt适合桌面应用，既不会太小影响阅读，也不会太大占用空间
+*/
+* {
+    font-family: "Microsoft YaHei", "SimSun", Arial, sans-serif;
+    font-size: 9pt;
+}
+
+/* ===== 主窗口样式 ===== 
+   作用：定义FlowDesk主窗口的基础外观
+   
+   #main_window：主窗口容器，设置整体背景色和文字颜色
+   #central_widget：Qt主窗口的中央控件，承载所有Tab页面内容
+   
+   使用颜色变量的好处：
+   - 统一配色方案，确保视觉一致性
+   - 便于主题切换（浅色/深色模式）
+   - 集中管理颜色，修改时只需改变变量定义
+*/
+#main_window {
+    background-color: --background-primary;
+    color: --text-primary;
+}
+
+#central_widget {
+    background-color: --background-primary;
+}
+
+/* ===== Tab控件样式 ===== 
+   作用：定义四个主要功能Tab页面的外观和布局
+   
+   QTabWidget是Qt的标签页控件，包含以下部分：
+   - tab-bar：标签栏，显示"网络配置"、"网络工具"等标签
+   - pane：内容面板，显示每个Tab的具体内容
+   
+   ::pane伪状态：定义Tab内容区域的样式
+   - border-radius: 4px 提供轻微圆角，Win7兼容
+   - margin-top: -1px 让内容区域与标签栏无缝连接
+*/
+#main_tab_widget {
+    background-color: --background-primary;
+    border: none;
+}
+
+#main_tab_widget::pane {
+    border: 1px solid --border-color;
+    background-color: --background-secondary;
+    border-radius: 4px;
+    margin-top: -1px;
+}
+
+#main_tab_widget::tab-bar {
+    alignment: center;
+}
+
+/* ===== Tab标签样式 - Win7简化版本 =====
+   作用：定义Tab标签的外观，包括普通、选中、悬停三种状态
+   
+   QTabBar::tab：单个标签的基础样式
+   - padding: 6px 16px 提供合适的内边距，让文字不贴边
+   - border-bottom: none 移除底边框，与内容区域融合
+   - border-radius: 3px Win7兼容的小圆角
+   - min-width: 70px 确保标签有最小宽度，避免文字挤压
+   
+   :selected伪状态：当前选中的标签
+   - border-bottom: 2px solid 底部加粗边框表示选中状态
+   
+   :hover:!selected伪状态：鼠标悬停但未选中的标签
+   - 提供视觉反馈，提升用户体验
+*/
+#main_tab_widget QTabBar::tab {
+    background-color: --tab-inactive;
+    color: --text-primary;
+    border: 1px solid --border-color;
+    border-bottom: none;
+    padding: 6px 16px;
+    margin-right: 1px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    min-width: 70px;
+}
+
+#main_tab_widget QTabBar::tab:selected {
+    background-color: --tab-active;
+    border-bottom: 2px solid --tab-border;
+    color: --text-primary;
+}
+
+#main_tab_widget QTabBar::tab:hover:!selected {
+    background-color: --menu-hover;
+}
+
+/* ===== Tab页面内容样式 =====
+   作用：定义四个主要功能Tab页面的内容区域样式
+   
+   四个主要Tab页面：
+   - network_config_tab：网络配置页面
+   - network_tools_tab：网络工具页面  
+   - rdp_tab：远程桌面页面
+   - hardware_tab：硬件信息页面
+   
+   占位符标签说明：
+   在开发阶段，每个Tab显示占位符文本，提示该功能正在开发中
+   - border: 2px dashed 虚线边框表示这是临时内容
+   - padding: 30px 充足的内边距让文字居中显示
+   - color: --text-secondary 次要文字颜色，降低视觉重要性
+*/
+#network_config_tab, #network_tools_tab, #rdp_tab, #hardware_tab {
+    background-color: --background-secondary;
+    border-radius: 4px;
+}
+
+/* Tab页面占位符标签 - 开发阶段的临时内容 */
+#network_config_tab_placeholder,
+#network_tools_tab_placeholder,
+#rdp_tab_placeholder,
+#hardware_tab_placeholder {
+    color: --text-secondary;
+    font-size: 11pt;
+    background-color: transparent;
+    border: 2px dashed --border-color;
+    border-radius: 4px;
+    padding: 30px;
+    margin: 15px;
+}
+
+/* ===== 按钮基础样式 - Win7优化 =====
+   作用：定义所有按钮的基础外观和交互状态
+   
+   QPushButton基础样式：
+   - border-radius: 3px Win7兼容的小圆角，避免过于现代的设计
+   - font-weight: bold 粗体文字增强可读性和重要性
+   - min-width/min-height 最小尺寸保护，确保按钮不会太小
+   - color: --text-inverse 反色文字（通常是白色），与彩色背景形成对比
+   
+   交互状态说明：
+   :hover - 鼠标悬停时的样式，提供视觉反馈
+   :pressed - 鼠标按下时的样式，模拟物理按钮被按下的效果
+   :disabled - 按钮禁用时的样式，降低透明度表示不可用
+*/
+QPushButton {
+    border: 1px solid --border-color;
+    border-radius: 3px;
+    padding: 6px 12px;
+    font-weight: bold;
+    color: --text-inverse;
+    min-width: 50px;
+    min-height: 20px;
+}
+
+QPushButton:hover {
+    border: 1px solid --btn-blue;
+}
+
+QPushButton:pressed {
+    background-color: --btn-blue-pressed;
+}
+
+QPushButton:disabled {
+    color: --text-secondary;
+    background-color: --background-tertiary;
+}
+
+/* ===== 彩色按钮样式 - Win7兼容版本 ===== */
+
+/* 蓝色按钮 */
+QPushButton[class="btn-blue"], #tray_exit_cancel_btn {
+    background-color: --btn-blue;
+    border: 1px solid --btn-blue-hover;
+}
+
+QPushButton[class="btn-blue"]:hover, #tray_exit_cancel_btn:hover {
+    background-color: --btn-blue-hover;
+}
+
+QPushButton[class="btn-blue"]:pressed, #tray_exit_cancel_btn:pressed {
+    background-color: --btn-blue-pressed;
+}
+
+/* 绿色按钮 */
+QPushButton[class="btn-green"], #tray_exit_no_btn {
+    background-color: --btn-green;
+    border: 1px solid --btn-green-hover;
+}
+
+QPushButton[class="btn-green"]:hover, #tray_exit_no_btn:hover {
+    background-color: --btn-green-hover;
+}
+
+QPushButton[class="btn-green"]:pressed, #tray_exit_no_btn:pressed {
+    background-color: --btn-green-pressed;
+}
+
+/* 红色按钮 */
+QPushButton[class="btn-red"], #tray_exit_yes_btn {
+    background-color: --btn-red;
+    border: 1px solid --btn-red-hover;
+}
+
+QPushButton[class="btn-red"]:hover, #tray_exit_yes_btn:hover {
+    background-color: --btn-red-hover;
+}
+
+QPushButton[class="btn-red"]:pressed, #tray_exit_yes_btn:pressed {
+    background-color: --btn-red-pressed;
+}
+
+/* 橙色按钮 */
+QPushButton[class="btn-orange"] {
+    background-color: --btn-orange;
+    border: 1px solid --btn-orange-hover;
+}
+
+QPushButton[class="btn-orange"]:hover {
+    background-color: --btn-orange-hover;
+}
+
+QPushButton[class="btn-orange"]:pressed {
+    background-color: --btn-orange-pressed;
+}
+
+/* 紫色按钮 */
+QPushButton[class="btn-purple"] {
+    background-color: --btn-purple;
+    border: 1px solid --btn-purple-hover;
+}
+
+QPushButton[class="btn-purple"]:hover {
+    background-color: --btn-purple-hover;
+}
+
+QPushButton[class="btn-purple"]:pressed {
+    background-color: --btn-purple-pressed;
+}
+
+/* 青色按钮 */
+QPushButton[class="btn-cyan"] {
+    background-color: --btn-cyan;
+    border: 1px solid --btn-cyan-hover;
+}
+
+QPushButton[class="btn-cyan"]:hover {
+    background-color: --btn-cyan-hover;
+}
+
+QPushButton[class="btn-cyan"]:pressed {
+    background-color: --btn-cyan-pressed;
+}
+
+/* ===== 输入框样式 ===== */
+QLineEdit, QTextEdit, QPlainTextEdit {
+    background-color: --input-background;
+    border: 1px solid --input-border;
+    border-radius: 2px;
+    padding: 4px 6px;
+    color: --text-primary;
+    selection-background-color: --btn-blue;
+}
+
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+    border: 2px solid --input-border-focus;
+}
+
+/* ===== 下拉框样式 ===== */
+QComboBox {
+    background-color: --input-background;
+    border: 1px solid --input-border;
+    border-radius: 2px;
+    padding: 4px 6px;
+    color: --text-primary;
+    min-width: 80px;
+}
+
+QComboBox:focus {
+    border: 2px solid --input-border-focus;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 16px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: --input-background;
+    border: 1px solid --border-color;
+    selection-background-color: --btn-blue;
+    selection-color: --text-inverse;
+}
+
+/* ===== 标签样式 ===== */
+QLabel {
+    color: --text-primary;
+    background-color: transparent;
+}
+
+QLabel[class="title"] {
+    font-size: 11pt;
+    font-weight: bold;
+    color: --text-primary;
+}
+
+QLabel[class="subtitle"] {
+    font-size: 9pt;
+    color: --text-secondary;
+}
+
+/* ===== 状态徽章样式 - Win7简化版本 ===== */
+QLabel[class="badge"] {
+    border-radius: 8px;
+    padding: 3px 6px;
+    font-size: 8pt;
+    font-weight: bold;
+    color: --text-inverse;
+}
+
+QLabel[class="badge-connected"] {
+    background-color: --badge-connected;
+}
+
+QLabel[class="badge-disconnected"] {
+    background-color: --badge-disconnected;
+}
+
+QLabel[class="badge-dhcp"] {
+    background-color: --badge-dhcp;
+}
+
+QLabel[class="badge-static"] {
+    background-color: --badge-static;
+}
+
+/* ===== 卡片容器样式 ===== */
+QWidget[class="card"] {
+    background-color: --card-background;
+    border: 1px solid --card-border;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+QGroupBox {
+    background-color: --card-background;
+    border: 1px solid --card-border;
+    border-radius: 4px;
+    margin-top: 8px;
+    padding-top: 8px;
+    font-weight: bold;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 8px;
+    padding: 0 6px 0 6px;
+    color: --text-primary;
+}
+
+/* ===== 系统托盘对话框样式 ===== */
+#tray_exit_dialog {
+    background-color: --dialog-background;
+    border: 1px solid --dialog-border;
+    border-radius: 4px;
+}
+
+#tray_exit_message {
+    color: --text-primary;
+    font-size: 10pt;
+    background-color: transparent;
+}
+
+/* ===== 菜单样式 ===== */
+QMenu {
+    background-color: --menu-background;
+    border: 1px solid --border-color;
+    padding: 2px;
+}
+
+QMenu::item {
+    background-color: transparent;
+    padding: 4px 16px;
+    color: --text-primary;
+}
+
+QMenu::item:selected {
+    background-color: --menu-hover;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: --menu-separator;
+    margin: 2px 4px;
+}
+
+/* ===== 滚动条样式 - Win7简化版本 ===== */
+QScrollBar:vertical {
+    background-color: --background-primary;
+    width: 10px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: --border-color;
+    min-height: 16px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: --text-secondary;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar:horizontal {
+    background-color: --background-primary;
+    height: 10px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: --border-color;
+    min-width: 16px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: --text-secondary;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+/* ===== 表格样式 ===== */
+QTableWidget, QTableView {
+    background-color: --background-secondary;
+    alternate-background-color: --background-tertiary;
+    gridline-color: --border-color;
+    border: 1px solid --border-color;
+}
+
+QTableWidget::item, QTableView::item {
+    padding: 6px;
+    border: none;
+}
+
+QTableWidget::item:selected, QTableView::item:selected {
+    background-color: --btn-blue;
+    color: --text-inverse;
+}
+
+QHeaderView::section {
+    background-color: --tab-inactive;
+    color: --text-primary;
+    padding: 6px;
+    border: 1px solid --border-color;
+    font-weight: bold;
+}
+
+/* ===== 进度条样式 ===== */
+QProgressBar {
+    background-color: --background-tertiary;
+    border: 1px solid --border-color;
+    text-align: center;
+    color: --text-primary;
+}
+
+QProgressBar::chunk {
+    background-color: --btn-blue;
+}
+
+/* ===== 复选框和单选框样式 ===== */
+QCheckBox, QRadioButton {
+    color: --text-primary;
+    spacing: 6px;
+}
+
+QCheckBox::indicator, QRadioButton::indicator {
+    width: 14px;
+    height: 14px;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 1px solid --border-color;
+    background-color: --input-background;
+}
+
+QCheckBox::indicator:checked {
+    border: 1px solid --btn-blue;
+    background-color: --btn-blue;
+}
+
+QRadioButton::indicator:unchecked {
+    border: 1px solid --border-color;
+    background-color: --input-background;
+    border-radius: 7px;
+}
+
+QRadioButton::indicator:checked {
+    border: 1px solid --btn-blue;
+    background-color: --btn-blue;
+    border-radius: 7px;
+}
+
+/* ===== 工具提示样式 ===== */
+QToolTip {
+    background-color: --text-primary;
+    color: --text-inverse;
+    border: 1px solid --border-color;
+    padding: 3px 6px;
+    font-size: 8pt;
+}

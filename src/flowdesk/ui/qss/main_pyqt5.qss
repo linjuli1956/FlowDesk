@@ -1,0 +1,602 @@
+/*
+FlowDesk 主样式表 - Windows 10/11
+基于卡片式彩色按钮设计，实现UI截图的视觉效果
+
+UI四大铁律实现：
+🚫 禁止样式重复 - 统一的基类样式 + objectName定制
+🔄 严格自适应布局 - 支持布局管理器的响应式设计
+📏 最小宽度保护 - 设置合理的最小尺寸
+⚙️ 智能组件缩放 - 灵活的尺寸策略
+
+颜色方案：基于UI截图分析的语义化颜色系统
+*/
+
+/* ===== 全局样式 ===== */
+* {
+    font-family: "Microsoft YaHei UI", "Segoe UI", Arial, sans-serif;
+    font-size: 9pt;
+}
+
+/* Claymorphism 全局效果 */
+QWidget {
+    background-color: transparent;
+}
+
+/* ===== 主窗口样式 - Claymorphism ===== */
+#main_window {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+                stop:0 #f0f2f5, stop:0.5 #e8ebf0, stop:1 #dde1e7);
+    color: --text-primary;
+}
+
+#central_widget {
+    background: transparent;
+    border-radius: 16px;
+}
+
+/* ===== Tab控件样式 - Claymorphism ===== */
+#main_tab_widget {
+    background: transparent;
+    border: none;
+}
+
+#main_tab_widget::pane {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.9), stop:1 rgba(245,247,250,0.9));
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 16px;
+    margin-top: -1px;
+    /* Claymorphism 阴影效果 */
+    box-shadow: 
+        inset 2px 2px 5px rgba(255,255,255,0.8),
+        inset -2px -2px 5px rgba(0,0,0,0.1),
+        0 4px 15px rgba(0,0,0,0.1);
+}
+
+#main_tab_widget::tab-bar {
+    alignment: center;
+}
+
+/* Tab标签样式 - Claymorphism */
+#main_tab_widget QTabBar::tab {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.6), stop:1 rgba(240,242,245,0.6));
+    color: --text-primary;
+    border: 1px solid rgba(255,255,255,0.4);
+    border-bottom: none;
+    padding: 10px 24px;
+    margin-right: 3px;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    min-width: 90px;
+    font-weight: 500;
+    /* 内凹阴影效果 */
+    box-shadow: 
+        inset 1px 1px 3px rgba(255,255,255,0.8),
+        inset -1px -1px 3px rgba(0,0,0,0.05);
+}
+
+#main_tab_widget QTabBar::tab:selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.95), stop:1 rgba(248,250,252,0.95));
+    border-bottom: none;
+    color: --text-primary;
+    /* 突出阴影效果 */
+    box-shadow: 
+        2px 2px 8px rgba(0,0,0,0.1),
+        -2px -2px 8px rgba(255,255,255,0.9),
+        inset 1px 1px 2px rgba(255,255,255,0.9);
+}
+
+#main_tab_widget QTabBar::tab:hover:!selected {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.8), stop:1 rgba(245,247,250,0.8));
+    box-shadow: 
+        1px 1px 5px rgba(0,0,0,0.08),
+        -1px -1px 5px rgba(255,255,255,0.9);
+}
+
+/* ===== Tab页面内容样式 ===== */
+#network_config_tab, #network_tools_tab, #rdp_tab, #hardware_tab {
+    background-color: --background-secondary;
+    border-radius: 8px;
+}
+
+/* Tab页面占位符标签 */
+#network_config_tab_placeholder,
+#network_tools_tab_placeholder,
+#rdp_tab_placeholder,
+#hardware_tab_placeholder {
+    color: --text-secondary;
+    font-size: 12pt;
+    background-color: transparent;
+    border: 2px dashed --border-color;
+    border-radius: 8px;
+    padding: 40px;
+    margin: 20px;
+}
+
+/* ===== Claymorphism 按钮基础样式 ===== */
+QPushButton {
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    padding: 12px 20px;
+    font-weight: 500;
+    font-size: 9pt;
+    min-width: 80px;
+    min-height: 32px;
+    /* Claymorphism 阴影效果 */
+    box-shadow: 
+        3px 3px 8px rgba(0,0,0,0.15),
+        -3px -3px 8px rgba(255,255,255,0.9),
+        inset 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+QPushButton:hover {
+    /* 悬停时增强阴影效果 */
+    box-shadow: 
+        4px 4px 12px rgba(0,0,0,0.2),
+        -4px -4px 12px rgba(255,255,255,0.95),
+        inset 1px 1px 3px rgba(255,255,255,0.9);
+}
+
+QPushButton:pressed {
+    /* 按下时内凹效果 */
+    box-shadow: 
+        inset 2px 2px 6px rgba(0,0,0,0.2),
+        inset -2px -2px 6px rgba(255,255,255,0.8);
+}
+
+QPushButton:disabled {
+    opacity: 0.4;
+    box-shadow: 
+        1px 1px 3px rgba(0,0,0,0.05),
+        -1px -1px 3px rgba(255,255,255,0.5);
+}
+
+/* ===== Claymorphism 彩色按钮样式 - 柔和渐变色 ===== */
+
+/* 退出对话框按钮样式 - 直接使用objectName选择器 */
+
+/* 取消按钮 - 蓝色渐变（主要操作） */
+#tray_exit_cancel_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #F0F7FF, stop:1 #E1EFFF);
+    color: #4A7BA7;
+    border: 1px solid #D1E7FF;
+}
+
+#tray_exit_cancel_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #E1EFFF, stop:1 #D1E7FF);
+}
+
+#tray_exit_cancel_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #D1E7FF, stop:1 #C1DFFF);
+}
+
+/* 最小化按钮 - 绿色渐变（成功操作） */
+#tray_exit_no_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #F0F9F0, stop:1 #E1F5E1);
+    color: #4A7C59;
+    border: 1px solid #D1F1D1;
+}
+
+#tray_exit_no_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #E1F5E1, stop:1 #D1F1D1);
+}
+
+#tray_exit_no_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #D1F1D1, stop:1 #C1EDC1);
+}
+
+/* 退出按钮 - 红色渐变（危险操作） */
+#tray_exit_yes_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFF5F5, stop:1 #FFE9E9);
+    color: #B85450;
+    border: 1px solid #FFDDDD;
+}
+
+#tray_exit_yes_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFE9E9, stop:1 #FFDDDD);
+}
+
+#tray_exit_yes_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFDDDD, stop:1 #FFD1D1);
+}
+
+/* 通用彩色按钮样式 - 用于其他地方的按钮 */
+QPushButton[class="btn-blue"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #F0F7FF, stop:1 #E1EFFF);
+    color: #4A7BA7;
+    border: 1px solid #D1E7FF;
+}
+
+QPushButton[class="btn-blue"]:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #E1EFFF, stop:1 #D1E7FF);
+}
+
+QPushButton[class="btn-blue"]:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #D1E7FF, stop:1 #C1DFFF);
+}
+
+QPushButton[class="btn-green"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #F0F9F0, stop:1 #E1F5E1);
+    color: #4A7C59;
+    border: 1px solid #D1F1D1;
+}
+
+QPushButton[class="btn-green"]:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #E1F5E1, stop:1 #D1F1D1);
+}
+
+QPushButton[class="btn-green"]:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #D1F1D1, stop:1 #C1EDC1);
+}
+
+QPushButton[class="btn-red"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFF5F5, stop:1 #FFE9E9);
+    color: #B85450;
+    border: 1px solid #FFDDDD;
+}
+
+QPushButton[class="btn-red"]:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFE9E9, stop:1 #FFDDDD);
+}
+
+QPushButton[class="btn-red"]:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #FFDDDD, stop:1 #FFD1D1);
+}
+
+/* 橙色按钮 - 警告/工具操作（静态IP、DHCP） */
+QPushButton[class="btn-orange"] {
+    background: --btn-orange;
+    color: --btn-orange-text;
+    border: 1px solid --btn-orange-border;
+}
+
+QPushButton[class="btn-orange"]:hover {
+    background: --btn-orange-hover;
+}
+
+QPushButton[class="btn-orange"]:pressed {
+    background: --btn-orange-pressed;
+}
+
+/* 紫色按钮 - 特殊功能（Win11自动登录、计算机名） */
+QPushButton[class="btn-purple"] {
+    background: --btn-purple;
+    color: --btn-purple-text;
+    border: 1px solid --btn-purple-border;
+}
+
+QPushButton[class="btn-purple"]:hover {
+    background: --btn-purple-hover;
+}
+
+QPushButton[class="btn-purple"]:pressed {
+    background: --btn-purple-pressed;
+}
+
+/* 青色按钮 - 网络相关工具 */
+QPushButton[class="btn-cyan"] {
+    background: --btn-cyan;
+    color: --btn-cyan-text;
+    border: 1px solid --btn-cyan-border;
+}
+
+QPushButton[class="btn-cyan"]:hover {
+    background: --btn-cyan-hover;
+}
+
+QPushButton[class="btn-cyan"]:pressed {
+    background: --btn-cyan-pressed;
+}
+
+/* ===== Claymorphism 输入框样式 ===== */
+QLineEdit, QTextEdit, QPlainTextEdit {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.8), stop:1 rgba(248,250,252,0.8));
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 10px;
+    padding: 8px 12px;
+    color: --text-primary;
+    selection-background-color: rgba(116, 181, 249, 0.3);
+    /* 内凹效果 */
+    box-shadow: 
+        inset 2px 2px 4px rgba(0,0,0,0.1),
+        inset -2px -2px 4px rgba(255,255,255,0.9);
+}
+
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+    border: 2px solid rgba(116, 181, 249, 0.6);
+    box-shadow: 
+        inset 2px 2px 4px rgba(0,0,0,0.1),
+        inset -2px -2px 4px rgba(255,255,255,0.9),
+        0 0 8px rgba(116, 181, 249, 0.3);
+}
+
+QLineEdit::placeholder, QTextEdit::placeholder, QPlainTextEdit::placeholder {
+    color: --input-placeholder;
+}
+
+/* ===== Claymorphism 下拉框样式 ===== */
+QComboBox {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.8), stop:1 rgba(248,250,252,0.8));
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 10px;
+    padding: 8px 12px;
+    color: --text-primary;
+    min-width: 120px;
+    /* 内凹效果 */
+    box-shadow: 
+        inset 2px 2px 4px rgba(0,0,0,0.1),
+        inset -2px -2px 4px rgba(255,255,255,0.9);
+}
+
+QComboBox:focus {
+    border: 2px solid rgba(116, 181, 249, 0.6);
+    box-shadow: 
+        inset 2px 2px 4px rgba(0,0,0,0.1),
+        inset -2px -2px 4px rgba(255,255,255,0.9),
+        0 0 8px rgba(116, 181, 249, 0.3);
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 20px;
+}
+
+QComboBox::down-arrow {
+    image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0iIzY2NjY2NiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+);
+}
+
+QComboBox QAbstractItemView {
+    background-color: --input-background;
+    border: 1px solid --border-color;
+    border-radius: 4px;
+    selection-background-color: --btn-blue;
+    selection-color: --text-inverse;
+}
+
+/* ===== 标签样式 ===== */
+QLabel {
+    color: --text-primary;
+    background-color: transparent;
+}
+
+QLabel[class="title"] {
+    font-size: 12pt;
+    font-weight: bold;
+    color: --text-primary;
+}
+
+QLabel[class="subtitle"] {
+    font-size: 10pt;
+    color: --text-secondary;
+}
+
+/* ===== 状态徽章样式 ===== */
+QLabel[class="badge"] {
+    border-radius: 12px;
+    padding: 4px 8px;
+    font-size: 8pt;
+    font-weight: bold;
+    color: --text-inverse;
+}
+
+QLabel[class="badge-connected"] {
+    background-color: --badge-connected;
+}
+
+QLabel[class="badge-disconnected"] {
+    background-color: --badge-disconnected;
+}
+
+QLabel[class="badge-dhcp"] {
+    background-color: --badge-dhcp;
+}
+
+QLabel[class="badge-static"] {
+    background-color: --badge-static;
+}
+
+/* ===== Claymorphism 卡片容器样式 ===== */
+QWidget[class="card"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.9), stop:1 rgba(245,247,250,0.9));
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 16px;
+    margin: 6px;
+    /* Claymorphism 阴影效果 */
+    box-shadow: 
+        4px 4px 12px rgba(0,0,0,0.1),
+        -4px -4px 12px rgba(255,255,255,0.9),
+        inset 1px 1px 2px rgba(255,255,255,0.8);
+}
+
+QGroupBox {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.9), stop:1 rgba(245,247,250,0.9));
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 14px;
+    margin-top: 12px;
+    padding-top: 12px;
+    font-weight: 500;
+    /* 卡片阴影效果 */
+    box-shadow: 
+        3px 3px 8px rgba(0,0,0,0.08),
+        -3px -3px 8px rgba(255,255,255,0.9),
+        inset 1px 1px 2px rgba(255,255,255,0.7);
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 10px;
+    padding: 0 8px 0 8px;
+    color: --text-primary;
+}
+
+/* ===== 系统托盘对话框样式 ===== */
+#tray_exit_dialog {
+    background-color: --dialog-background;
+    border: 1px solid --dialog-border;
+    border-radius: 8px;
+}
+
+#tray_exit_message {
+    color: --text-primary;
+    font-size: 11pt;
+    background-color: transparent;
+}
+
+/* ===== 菜单样式 ===== */
+QMenu {
+    background-color: --menu-background;
+    border: 1px solid --border-color;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+QMenu::item {
+    background-color: transparent;
+    padding: 6px 20px;
+    border-radius: 3px;
+    color: --text-primary;
+}
+
+QMenu::item:selected {
+    background-color: --menu-hover;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: --menu-separator;
+    margin: 4px 8px;
+}
+
+/* ===== 滚动条样式 ===== */
+QScrollBar:vertical {
+    background-color: --background-primary;
+    width: 12px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: --border-color;
+    border-radius: 6px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: --text-secondary;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar:horizontal {
+    background-color: --background-primary;
+    height: 12px;
+    border-radius: 6px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: --border-color;
+    border-radius: 6px;
+    min-width: 20px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: --text-secondary;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+/* ===== 表格样式 ===== */
+QTableWidget, QTableView {
+    background-color: --background-secondary;
+    alternate-background-color: --background-tertiary;
+    gridline-color: --border-color;
+    border: 1px solid --border-color;
+    border-radius: 4px;
+}
+
+QTableWidget::item, QTableView::item {
+    padding: 8px;
+    border: none;
+}
+
+QTableWidget::item:selected, QTableView::item:selected {
+    background-color: --btn-blue;
+    color: --text-inverse;
+}
+
+QHeaderView::section {
+    background-color: --tab-inactive;
+    color: --text-primary;
+    padding: 8px;
+    border: 1px solid --border-color;
+    font-weight: bold;
+}
+
+/* ===== 进度条样式 ===== */
+QProgressBar {
+    background-color: --background-tertiary;
+    border: 1px solid --border-color;
+    border-radius: 4px;
+    text-align: center;
+    color: --text-primary;
+}
+
+QProgressBar::chunk {
+    background-color: --btn-blue;
+    border-radius: 3px;
+}
+
+/* ===== 复选框和单选框样式 ===== */
+QCheckBox, QRadioButton {
+    color: --text-primary;
+    spacing: 8px;
+}
+
+QCheckBox::indicator, QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+}
+
+QCheckBox::indicator:unchecked {
+    border: 2px solid --border-color;
+    background-color: --input-background;
+    border-radius: 3px;
+}
+
+QCheckBox::indicator:checked {
+    border: 2px solid --btn-blue;
+    background-color: --btn-blue;
+    border-radius: 3px;
+}
+
+QRadioButton::indicator:unchecked {
+    border: 2px solid --border-color;
+    background-color: --input-background;
+    border-radius: 8px;
+}
+
+QRadioButton::indicator:checked {
+    border: 2px solid --btn-blue;
+    background-color: --btn-blue;
+    border-radius: 8px;
+}
+
+/* ===== 工具提示样式 ===== */
+QToolTip {
+    background-color: --text-primary;
+    color: --text-inverse;
+    border: 1px solid --border-color;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 9pt;
+}
