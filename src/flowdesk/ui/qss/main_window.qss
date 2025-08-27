@@ -26,14 +26,17 @@
     border: none;
 }
 
-/* === Tab选项卡栏 - 玻璃态效果 === */
+/* === Tab选项卡栏 - 紧凑型玻璃态效果 === */
 #main_tab_widget::pane {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
         stop:0 rgba(255, 255, 255, 0.9), 
         stop:1 rgba(248, 250, 252, 0.8));
-    border: 2px solid rgba(226, 232, 240, 0.6);
-    border-radius: 16px;
-    margin-top: 8px;
+    border: 1px solid rgba(226, 232, 240, 0.6);
+    border-radius: 8px;
+    margin-top: 2px;  /* 减少顶部边距 */
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-bottom: 0px;
 }
 
 /* === Tab选项卡按钮 - CLAYMORPHISM设计 === */
@@ -43,38 +46,36 @@
 
 #main_tab_widget QTabBar::tab {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 rgba(255, 255, 255, 0.7),
-        stop:1 rgba(241, 245, 249, 0.6));
-    border: 1px solid rgba(203, 213, 225, 0.5);
-    border-radius: 12px;
-    padding: 12px 24px;
-    margin: 4px 2px;
-    font-size: 13px;
+        stop:0 rgba(255, 255, 255, 0.8),
+        stop:1 rgba(248, 250, 252, 0.7));
+    border: 1px solid rgba(203, 213, 225, 0.4);
+    border-radius: 6px;
+    padding: 6px 16px;  /* 减少内边距 */
+    margin: 1px 1px;    /* 减少外边距 */
+    font-size: 12px;    /* 减小字体 */
     font-weight: 600;
     color: #475569;
-    min-width: 80px;
+    min-width: 60px;    /* 减少最小宽度 */
+    max-height: 28px;   /* 限制最大高度 */
     
-    /* CLAYMORPHISM阴影效果 */
+    /* 简化阴影效果 */
     box-shadow: 
-        0 4px 6px rgba(0, 0, 0, 0.05),
-        0 1px 3px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        0 2px 4px rgba(0, 0, 0, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 /* === Tab选项卡悬停状态 === */
 #main_tab_widget QTabBar::tab:hover {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 rgba(255, 255, 255, 0.85),
-        stop:1 rgba(248, 250, 252, 0.75));
+        stop:0 rgba(255, 255, 255, 0.9),
+        stop:1 rgba(248, 250, 252, 0.8));
     border-color: rgba(148, 163, 184, 0.6);
     color: #334155;
-    transform: translateY(-1px);
     
-    /* 增强阴影效果 */
+    /* 简化悬停阴影效果 */
     box-shadow: 
-        0 6px 12px rgba(0, 0, 0, 0.08),
-        0 2px 4px rgba(0, 0, 0, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.7);
+        0 3px 6px rgba(0, 0, 0, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 /* === Tab选项卡选中状态 === */

@@ -141,11 +141,12 @@ class NetworkConfigTab(QWidget):
         包括网络管理标题、IP配置输入区域、额外IP管理等。
         输入框支持智能缩放，标签固定尺寸。
         """
-        # 网络管理标题
+        # 网络管理标题 - 遵循严格自适应布局原则
         self.network_mgmt_title = QLabel("⚙️ 网络管理")
         self.network_mgmt_title.setObjectName("network_mgmt_title")
+        self.network_mgmt_title.setWordWrap(True)   # 启用文字换行，避免内容被截断
         
-        # IP配置容器
+        # IP配置容器 - 遵循严格自适应布局原则
         self.ip_config_frame = QGroupBox()
         self.ip_config_frame.setObjectName("ip_config_frame")
         
@@ -188,23 +189,25 @@ class NetworkConfigTab(QWidget):
         self.apply_config_btn = QPushButton("✅ 确定修改IP")
         self.apply_config_btn.setObjectName("apply_config_btn")
         
-        # 额外IP管理区域
-        self.extra_ip_title = QLabel("📝 当前额外IP管理")
+        # 额外IP管理标题 - 遵循严格自适应布局原则
+        self.extra_ip_title = QLabel("🔍 当前额外IP管理")
         self.extra_ip_title.setObjectName("extra_ip_title")
+        self.extra_ip_title.setWordWrap(True)   # 启用文字换行，避免内容被截断
         
-        # 额外IP列表容器 - 支持滚动和多选
+        # 额外IP列表容器 - 支持滚动和多选，遵循严格自适应布局原则
         self.extra_ip_list = QListWidget()
         self.extra_ip_list.setObjectName("extra_ip_list")
         self.extra_ip_list.setToolTip("额外IP地址列表，可多选进行批量操作")
+        self.extra_ip_list.setMinimumHeight(100)  # 设置最小高度，保证内容可见性
         
-        # 额外IP操作按钮组
-        self.add_selected_ip_btn = QPushButton("➕ 添加选中IP")
+        # 额外IP操作按钮组 - 缩短文字内容减少按钮宽度
+        self.add_selected_ip_btn = QPushButton("➕ 添加选中")
         self.add_selected_ip_btn.setObjectName("add_selected_ip_btn")
         
-        self.remove_selected_ip_btn = QPushButton("➖ 删除选中IP")
+        self.remove_selected_ip_btn = QPushButton("➖ 删除选中")
         self.remove_selected_ip_btn.setObjectName("remove_selected_ip_btn")
         
-        self.add_extra_ip_btn = QPushButton("🆕 添加额外IP")
+        self.add_extra_ip_btn = QPushButton("🆕 添加IP")
         self.add_extra_ip_btn.setObjectName("add_extra_ip_btn")
 
     def _setup_layouts(self):
@@ -218,8 +221,8 @@ class NetworkConfigTab(QWidget):
         """
         # 主布局：水平分栏（左300px + 右340px）
         main_layout = QHBoxLayout(self)
-        main_layout.setContentsMargins(8, 8, 8, 8)  # 设置边距
-        main_layout.setSpacing(12)  # 设置左右分栏间距
+        main_layout.setContentsMargins(4, 8, 2, 8)  # 最小化左右边距，极致压缩空白区域
+        main_layout.setSpacing(0)   # 设置左右分栏间距为0，最小化中间空白区域
         
         # 左侧布局区域
         left_layout = self._create_left_layout()
@@ -228,11 +231,12 @@ class NetworkConfigTab(QWidget):
         left_widget.setMinimumWidth(300)  # 最小宽度保护
         left_widget.setMaximumWidth(300)  # 固定宽度，不随窗口缩放
         
-        # 右侧布局区域
+        # 右侧布局区域 - 严格控制宽度防止溢出
         right_layout = self._create_right_layout()
         right_widget = QWidget()
         right_widget.setLayout(right_layout)
-        right_widget.setMinimumWidth(340)  # 最小宽度保护
+        right_widget.setMinimumWidth(340)  # 最小宽度保护（UI四大铁律）
+        right_widget.setMaximumWidth(340)  # 最大宽度限制，防止在660px窗口中溢出
         
         # 添加到主布局
         main_layout.addWidget(left_widget)
@@ -246,7 +250,7 @@ class NetworkConfigTab(QWidget):
         合理分配空间，确保在533px高度内不会产生遮挡。
         """
         layout = QVBoxLayout()
-        layout.setSpacing(8)
+        layout.setSpacing(4)  # 减少左侧内部控件间距
         
         # 第一行：网卡选择 + 刷新按钮
         top_row_layout = QHBoxLayout()
@@ -294,14 +298,14 @@ class NetworkConfigTab(QWidget):
         使用FormLayout实现标签和输入框的对齐。
         """
         layout = QVBoxLayout()
-        layout.setSpacing(8)
+        layout.setSpacing(4)  # 减少右侧内部控件间距
         
         # 网络管理标题
         layout.addWidget(self.network_mgmt_title)
         
         # IP配置区域
         ip_config_layout = QFormLayout(self.ip_config_frame)
-        ip_config_layout.setSpacing(8)
+        ip_config_layout.setSpacing(8)  # 增加表单内部间距，提高输入框之间的垂直间距
         ip_config_layout.addRow(self.ip_address_label, self.ip_address_input)
         ip_config_layout.addRow(self.subnet_mask_label, self.subnet_mask_input)
         ip_config_layout.addRow(self.gateway_label, self.gateway_input)
