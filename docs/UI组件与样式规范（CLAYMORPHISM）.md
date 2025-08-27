@@ -1,4 +1,4 @@
-# FlowDesk UI组件与样式规范（卡片式彩色按钮风格）
+# FlowDesk UI组件与样式规范
 
 > **设计风格更新**：  Claymorphism 设计风格
 
@@ -181,7 +181,7 @@ QTabBar::tab:selected {
   - 按钮：`Minimum, Fixed` 或 `Preferred, Fixed`
   - 下拉与输入：`Preferred, Fixed`，必要时放入伸缩容器。
 
-## 11. 硬件监控显示（卡片式设计）
+## 11. 硬件监控显示（卡片式彩色按钮风格）
 - **信息卡片**：`cpu_info_card`、`gpu_info_card`、`memory_info_card`等
 - **数值显示**：根据阈值应用阶梯颜色策略
   - 温度：蓝色（<50°C）→ 绿色（50-70°C）→ 橙色（70-85°C）→ 红色（>85°C）

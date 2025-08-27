@@ -83,13 +83,13 @@ class MainWindow(QMainWindow):
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
         
-        # 设置窗口尺寸 - 严格按照UI设计规范
-        self.setFixedSize(660, 645)  # 固定窗口大小，防止用户调整
+        # 设置窗口尺寸 - 实现自适应布局（UI四大铁律）
         self.setMinimumSize(660, 645)  # 最小尺寸保护（UI四大铁律）
+        self.resize(660, 645)  # 默认尺寸，但允许用户调整
         
-        # 设置窗口属性
+        # 设置窗口属性 - 支持调整大小
         self.setWindowFlags(Qt.Window | Qt.WindowCloseButtonHint | 
-                           Qt.WindowMinimizeButtonHint)  # 只显示关闭和最小化按钮
+                           Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint)  # 支持最大化和调整大小
         
         # 设置objectName用于QSS样式表选择器
         self.setObjectName("main_window")
