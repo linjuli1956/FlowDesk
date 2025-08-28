@@ -22,6 +22,8 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QFont
 
+from ..widgets.validators import IPAddressValidator, SubnetMaskValidator, DNSValidator
+
 
 class NetworkConfigTab(QWidget):
     """
@@ -61,6 +63,7 @@ class NetworkConfigTab(QWidget):
         # 初始化UI组件
         self._init_ui()
         self._setup_layouts()
+        self._setup_validators()
         self._connect_signals()
         self._apply_size_policies()
 
@@ -357,6 +360,45 @@ class NetworkConfigTab(QWidget):
         layout.addLayout(extra_ip_btn_layout)
         
         return layout
+
+    def _setup_validators(self):
+        """
+        为网络配置输入框设置实时验证器
+        
+        作用说明：
+        这个方法负责为右侧的五个网络配置输入框设置对应的实时验证器，
+        实现"实时禁止"无效输入的功能。每个输入框都配置了专门的验证器，
+        确保用户只能输入符合网络参数规范的内容。
+        
+        验证器配置：
+        - IP地址输入框：IPAddressValidator - 验证IPv4地址格式
+        - 子网掩码输入框：SubnetMaskValidator - 验证子网掩码格式（支持点分十进制和CIDR）
+        - 网关输入框：IPAddressValidator - 验证网关IP地址格式
+        - 主DNS输入框：DNSValidator - 验证DNS服务器IP地址格式
+        - 备用DNS输入框：DNSValidator - 验证备用DNS服务器IP地址格式
+        
+        设计原则：
+        - 遵循面向对象封装原则，将验证逻辑封装在独立的验证器类中
+        - 实现代码复用，IP地址和DNS地址使用相同的验证器
+        - 确保UI层零业务逻辑，验证逻辑完全委托给验证器类
+        """
+        # 创建验证器实例
+        # IP地址验证器：用于IP地址和网关输入框
+        ip_validator = IPAddressValidator()
+        
+        # 子网掩码验证器：专门处理子网掩码格式
+        subnet_mask_validator = SubnetMaskValidator()
+        
+        # DNS验证器：用于主DNS和备用DNS输入框
+        dns_validator = DNSValidator()
+        
+        # 为输入框设置对应的验证器
+        # 这些验证器会在用户输入时实时工作，阻止无效字符的输入
+        self.ip_address_input.setValidator(ip_validator)
+        self.subnet_mask_input.setValidator(subnet_mask_validator)
+        self.gateway_input.setValidator(ip_validator)  # 网关也是IP地址，复用IP验证器
+        self.primary_dns_input.setValidator(dns_validator)
+        self.secondary_dns_input.setValidator(dns_validator)
 
     def _apply_size_policies(self):
         """
