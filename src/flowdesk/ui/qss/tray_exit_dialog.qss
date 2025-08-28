@@ -38,11 +38,15 @@
 }
 
 #tray_exit_dialog QPushButton:hover {
-    transform: translateY(-1px);
+    /* Qt不支持transform，使用margin模拟悬停上移效果 */
+    margin-top: -1px;
+    margin-bottom: 1px;
 }
 
 #tray_exit_dialog QPushButton:pressed {
-    transform: translateY(1px);
+    /* Qt不支持transform，使用margin模拟按下下移效果 */
+    margin-top: 1px;
+    margin-bottom: -1px;
 }
 
 /* === 最小化按钮 - 绿色渐变（安全操作） === */

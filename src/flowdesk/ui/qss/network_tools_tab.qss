@@ -1,0 +1,81 @@
+/*
+=== 网络工具Tab专用样式表 ===
+文件: network_tools_tab.qss
+作用: 定义网络工具页面的专用样式，包括ping、tracert、端口扫描等工具的UI样式
+
+设计原则:
+- 遵循Claymorphism设计风格
+- 严格自适应布局，避免固定宽度
+- 工具类UI注重功能性和可读性
+- 与主样式文件协调统一
+*/
+
+/* === 网络工具Tab容器样式 === */
+#network_tools_tab {
+    background: transparent;
+    padding: 0px;
+    margin: 0px;
+}
+
+/* === 工具按钮组样式 === */
+#tools_button_group QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f8fafc, stop:1 #e2e8f0);
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    min-height: 20px;
+    margin: 2px;
+}
+
+#tools_button_group QPushButton:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #e0f2fe, stop:1 #bae6fd);
+    border-color: #0ea5e9;
+    color: #0c4a6e;
+}
+
+#tools_button_group QPushButton:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #cffafe, stop:1 #a7f3d0);
+    margin-top: 1px;
+    margin-bottom: -1px;
+}
+
+/* === 命令输出区域样式 === */
+#command_output_area {
+    background-color: #1e293b;
+    border: 1px solid #475569;
+    border-radius: 6px;
+    color: #e2e8f0;
+    font-family: "Consolas", "Monaco", monospace;
+    font-size: 12px;
+    padding: 8px;
+    selection-background-color: #3b82f6;
+}
+
+/* === 输入参数区域样式 === */
+#params_input_group QLineEdit {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #334155;
+    min-height: 16px;
+}
+
+#params_input_group QLineEdit:focus {
+    border-color: #3b82f6;
+    background-color: #ffffff;
+}
+
+/* === 进度指示器样式 === */
+#progress_indicator {
+    color: #059669;
+    font-size: 12px;
+    font-weight: 600;
+}

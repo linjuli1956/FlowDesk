@@ -26,15 +26,15 @@ UI四大铁律：
 # 导入主窗口 - 当前阶段只需要主窗口
 from .main_window import MainWindow
 
-# 导入样式管理器 - UI必需
-from .styles import StylesheetManager, ColorScheme
+# 导入颜色方案 - UI必需
+from .styles import ColorScheme
 
 # 其他组件将在后续开发阶段逐步添加
 # from .tabs import *
-# from .dialogs import *  
 # from .widgets import *
+# from .dialogs import *
 
 __all__ = [
     'MainWindow',
-    'StylesheetManager', 'ColorScheme'
+    'ColorScheme'
 ]

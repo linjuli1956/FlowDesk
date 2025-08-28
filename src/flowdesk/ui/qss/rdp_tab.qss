@@ -1,0 +1,108 @@
+/*
+=== 远程桌面Tab专用样式表 ===
+文件: rdp_tab.qss
+作用: 定义远程桌面管理页面的专用样式，包括连接列表、连接配置、历史记录等UI样式
+
+设计原则:
+- 遵循Claymorphism设计风格
+- 严格自适应布局，避免固定宽度
+- 连接管理UI注重安全性和易用性
+- 与主样式文件协调统一
+*/
+
+/* === 远程桌面Tab容器样式 === */
+#rdp_tab {
+    background: transparent;
+    padding: 0px;
+    margin: 0px;
+}
+
+/* === 连接列表样式 === */
+#rdp_connection_list {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    selection-background-color: #dbeafe;
+    selection-color: #1e40af;
+    font-size: 13px;
+    padding: 4px;
+}
+
+#rdp_connection_list::item {
+    padding: 8px 12px;
+    border-radius: 6px;
+    margin: 1px;
+}
+
+#rdp_connection_list::item:hover {
+    background-color: #f1f5f9;
+}
+
+#rdp_connection_list::item:selected {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* === 连接配置表单样式 === */
+#rdp_config_form QLabel {
+    color: #374151;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 0px;
+}
+
+#rdp_config_form QLineEdit {
+    background-color: #f9fafb;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #111827;
+    min-height: 16px;
+}
+
+#rdp_config_form QLineEdit:focus {
+    border-color: #3b82f6;
+    background-color: #ffffff;
+}
+
+/* === 连接按钮样式 === */
+#rdp_connect_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #10b981, stop:1 #059669);
+    border: 1px solid #047857;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: white;
+    min-height: 18px;
+    min-width: 100px;
+}
+
+#rdp_connect_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #34d399, stop:1 #10b981);
+}
+
+#rdp_connect_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #059669, stop:1 #047857);
+    margin-top: 1px;
+    margin-bottom: -1px;
+}
+
+/* === 历史记录区域样式 === */
+#rdp_history_area {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px;
+}
+
+#rdp_history_list {
+    background: transparent;
+    border: none;
+    font-size: 12px;
+    color: #64748b;
+}

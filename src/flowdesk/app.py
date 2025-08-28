@@ -27,7 +27,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flowdesk.ui.main_window import MainWindow
 from flowdesk.services.system_tray_service import SystemTrayService
-from flowdesk.ui.styles.stylesheet_manager import StylesheetManager
+from flowdesk.services.stylesheet_service import StylesheetService
 from flowdesk.utils.resource_path import resource_path
 from flowdesk.utils.logger import setup_logging, get_logger
 
@@ -61,7 +61,7 @@ class FlowDeskApplication:
         # 初始化核心组件
         self.main_window = None
         self.tray_service = None
-        self.stylesheet_manager = None
+        self.stylesheet_service = None
         
     def initialize_components(self):
         """
@@ -73,9 +73,9 @@ class FlowDeskApplication:
         3. 系统托盘服务 - 提供托盘图标和菜单功能
         """
         try:
-            # 创建并应用样式表管理器
-            self.stylesheet_manager = StylesheetManager()
-            self.stylesheet_manager.apply_stylesheet(self.app)
+            # 创建并应用新的样式表管理服务
+            self.stylesheet_service = StylesheetService()
+            self.stylesheet_service.apply_stylesheets(self.app)
             self.logger.info("样式表加载完成")
             
             # 创建主窗口实例

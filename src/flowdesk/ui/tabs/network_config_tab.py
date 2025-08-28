@@ -146,9 +146,10 @@ class NetworkConfigTab(QWidget):
         self.network_mgmt_title.setObjectName("network_mgmt_title")
         self.network_mgmt_title.setWordWrap(True)   # 启用文字换行，避免内容被截断
         
-        # IP配置容器 - 遵循严格自适应布局原则
+        # IP配置容器 - 遵循严格自适应布局原则，设置最小高度适应间距
         self.ip_config_frame = QGroupBox()
         self.ip_config_frame.setObjectName("ip_config_frame")
+        self.ip_config_frame.setMinimumHeight(280)  # 设置最小高度确保间距显示
         
         # IP配置输入框组 - 支持智能缩放
         self.ip_address_label = QLabel("IP地址：")
@@ -303,24 +304,40 @@ class NetworkConfigTab(QWidget):
         # 网络管理标题
         layout.addWidget(self.network_mgmt_title)
         
-        # IP配置区域
-        ip_config_layout = QFormLayout(self.ip_config_frame)
-        ip_config_layout.setSpacing(8)  # 增加表单内部间距，提高输入框之间的垂直间距
-        ip_config_layout.addRow(self.ip_address_label, self.ip_address_input)
-        ip_config_layout.addRow(self.subnet_mask_label, self.subnet_mask_input)
-        ip_config_layout.addRow(self.gateway_label, self.gateway_input)
-        ip_config_layout.addRow(self.primary_dns_label, self.primary_dns_input)
-        ip_config_layout.addRow(self.secondary_dns_label, self.secondary_dns_input)
+        # IP配置区域 - 使用QVBoxLayout确保间距生效
+        ip_config_layout = QVBoxLayout(self.ip_config_frame)
+        ip_config_layout.setSpacing(8)  # 设置容器间距
+        
+        # 创建5行表单，每行使用QHBoxLayout
+        for i, (label, input_widget) in enumerate([
+            (self.ip_address_label, self.ip_address_input),
+            (self.subnet_mask_label, self.subnet_mask_input), 
+            (self.gateway_label, self.gateway_input),
+            (self.primary_dns_label, self.primary_dns_input),
+            (self.secondary_dns_label, self.secondary_dns_input)
+        ]):
+            # 创建每行的水平布局
+            row_layout = QHBoxLayout()
+            row_layout.addWidget(label)
+            row_layout.addWidget(input_widget, 1)  # 输入框拉伸
+            
+            # 添加到垂直布局，每行之间添加间距
+            ip_config_layout.addLayout(row_layout)
+            if i < 4:  # 前4行后面添加间距
+                ip_config_layout.addSpacing(20)  # 20px垂直间距，确保明显的视觉分离
+        
+        # 添加更大的垂直间距，将当前网卡和按钮向下移动
+        ip_config_layout.addSpacing(24)
         
         # 当前网卡显示
-        ip_config_layout.addRow(self.current_adapter_label)
+        ip_config_layout.addWidget(self.current_adapter_label)
         
         # 确定修改按钮 - 居中对齐
         btn_layout = QHBoxLayout()
         btn_layout.addStretch()
         btn_layout.addWidget(self.apply_config_btn)
         btn_layout.addStretch()
-        ip_config_layout.addRow(btn_layout)
+        ip_config_layout.addLayout(btn_layout)
         
         layout.addWidget(self.ip_config_frame)
         

@@ -3,9 +3,32 @@
 > **设计风格更新**：  Claymorphism 设计风格
 
 ## 1. 核心原则
-- ✅ 唯一外置 QSS：所有样式集中于 `src/flowdesk/ui/qss/main_pyqt5.qss`。
-- ❌ 禁止任何内联样式：禁止 `setStyleSheet()` 与内联片段。
-- ❌ 禁止 `!important`：通过选择器特异性与结构化命名解决优先级。
+
+### 🚫 禁止样式重复
+- ✅ 模块化QSS管理：通过 `StylesheetService` 统一管理多个QSS文件
+- ✅ 按顺序合并样式：主样式文件 + 各Tab专用样式文件
+- ❌ 禁止任何内联样式：禁止 `setStyleSheet()` 与内联片段
+- ❌ 禁止 `!important`：通过选择器特异性与结构化命名解决优先级
+
+### 📁 QSS文件组织结构
+```
+src/flowdesk/ui/qss/
+├── main_pyqt5.qss           # 主样式文件：全局变量、通用组件
+├── network_config_tab.qss   # 网络配置Tab专用样式
+├── network_tools_tab.qss    # 网络工具Tab专用样式
+├── rdp_tab.qss              # 远程桌面Tab专用样式
+├── hardware_tab.qss         # 硬件信息Tab专用样式
+└── tray_exit_dialog.qss     # 托盘对话框样式
+```
+
+### 🔧 StylesheetService 使用方式
+```python
+# 在 app.py 中使用
+from flowdesk.services.stylesheet_service import StylesheetService
+
+stylesheet_service = StylesheetService()
+stylesheet_service.apply_stylesheets(app)
+```
 
 ## 2. 命名与选择器规范
 - objectName 命名：`<scope>_<widget>_<role>`（蛇形命名），示例：`home_tab_connect_btn`。

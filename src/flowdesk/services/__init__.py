@@ -19,8 +19,9 @@
 - 提供统一的错误处理和进度反馈机制
 - 支持异步操作和任务取消
 """
-# 导入核心服务 - 当前阶段只需要系统托盘服务
+# 导入核心服务 - 当前阶段需要系统托盘服务和样式表服务
 from .system_tray_service import SystemTrayService
+from .stylesheet_service import StylesheetService
 
 # 其他服务将在后续开发阶段逐步添加
 # from .base_service import BaseService
@@ -30,5 +31,6 @@ from .system_tray_service import SystemTrayService
 # from .settings_service import SettingsService
 
 __all__ = [
-    'SystemTrayService'
+    'SystemTrayService',
+    'StylesheetService'
 ]

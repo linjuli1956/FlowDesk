@@ -1,12 +1,16 @@
 /*
-网络配置Tab页面样式文件
-实现卡片式布局 + 彩色渐变按钮设计
+网络配置Tab页面样式文件 - 专门为网络设置界面设计的视觉样式
 
-设计原则：
-1. 禁止样式重复：通用基类样式定义一次，专用样式通过objectName扩展
-2. 智能组件缩放：输入框可拉伸，按钮固定尺寸，容器自适应
-3. 渐变色按钮：语义化颜色设计，提升用户体验
-4. 特殊交互效果：下拉框浅蓝色文字，悬停状态变化
+功能说明：
+• 定义网络配置Tab中所有组件的外观和交互效果
+• 实现Claymorphism设计风格，提供现代化的用户界面
+• 为不同类型的输入框使用不同颜色的边框，便于用户区分和识别
+• 遵循StylesheetService模块化管理原则，与主样式文件分离
+
+设计理念：
+• 语义化颜色：IP地址(蓝色)、子网掩码(绿色)、网关(紫色)、DNS(橙色/粉色)
+• 自适应布局：组件尺寸随窗口大小自动调整，保证在不同分辨率下都能正常显示
+• 交互反馈：悬停和聚焦状态下的颜色变化，提升用户体验
 */
 
 /* === 网络配置Tab页面主容器 === */
@@ -34,7 +38,7 @@ QLabel {
     border-radius: 6px;
     margin: 0px 0px;
     /* 遵循严格自适应布局原则，由容器控制宽度 */
-    word-wrap: break-word;  /* 长文本自动换行，避免水平溢出 */
+    /* Qt不支持word-wrap，使用QLabel的自动换行功能 */
 }
 
 #extra_ip_title {
@@ -43,15 +47,17 @@ QLabel {
     color: #be185d;
 }
 
-/* === 配置标签样式 === */
+/* === 配置标签样式 - 增加高度和内边距，添加外边距增强间距 === */
 #config_label {
     background-color: white;
     border: 1px solid #d1d5db;
     border-radius: 4px;
-    padding: 4px 8px;
+    padding: 8px 12px;  /* 增加内边距，提高标签高度 */
     font-weight: bold;
     color: #374151;
     min-width: 80px;
+    min-height: 24px;  /* 设置最小高度 */
+    margin: 4px 0px;  /* 添加上下外边距，进一步增强垂直间距 */
 }
 
 /* === 当前网卡标签样式 - 减少高度，文字加粗浅色底色 === */
@@ -68,15 +74,16 @@ QLabel {
     line-height: 1.2;  /* 减少行高压缩空间 */
 }
 
-/* === 通用输入框样式 === */
+/* === 通用输入框样式 - 适中高度和内边距，平衡美观与空间利用 === */
 QLineEdit {
     background-color: white;
-    border: 2px solid #e5e7eb;
+    border: 1px solid #e5e7eb;  /* 减少边框宽度从2px到1px */
     border-radius: 6px;
-    padding: 6px 8px;
-    font-size: 12px;
+    padding: 8px 12px;  /* 适中内边距：8px，平衡高度与舒适度 */
+    font-size: 13px;  /* 保持13px字体大小 */
     color: #374151;
-    min-height: 16px;
+    min-height: 22px;  /* 微调增加高度：20px → 22px */
+    margin: 3px 0px;  /* 保持3px上下外边距 */
 }
 
 QLineEdit:focus {
@@ -92,6 +99,8 @@ QLineEdit:hover {
 /* IP地址输入框 - 浅蓝色边框 */
 #ip_address_input {
     border: 2px solid #93c5fd;  /* 浅蓝色边框，代表主要IP配置 */
+    padding: 8px 12px;  /* 与通用样式保持一致 */
+    min-height: 22px;  /* 与通用样式保持一致 */
 }
 
 #ip_address_input:focus {
@@ -105,6 +114,8 @@ QLineEdit:hover {
 /* 子网掩码输入框 - 浅绿色边框 */
 #subnet_mask_input {
     border: 2px solid #86efac;  /* 浅绿色边框，代表网络配置 */
+    padding: 8px 12px;  /* 与通用样式保持一致 */
+    min-height: 22px;  /* 与通用样式保持一致 */
 }
 
 #subnet_mask_input:focus {
@@ -118,6 +129,8 @@ QLineEdit:hover {
 /* 网关输入框 - 浅紫色边框 */
 #gateway_input {
     border: 2px solid #c4b5fd;  /* 浅紫色边框，代表网关路由 */
+    padding: 8px 12px;  /* 与通用样式保持一致 */
+    min-height: 22px;  /* 与通用样式保持一致 */
 }
 
 #gateway_input:focus {
@@ -131,6 +144,8 @@ QLineEdit:hover {
 /* 主DNS输入框 - 浅橙色边框 */
 #primary_dns_input {
     border: 2px solid #fdba74;  /* 浅橙色边框，代表主DNS服务 */
+    padding: 8px 12px;  /* 与通用样式保持一致 */
+    min-height: 22px;  /* 与通用样式保持一致 */
 }
 
 #primary_dns_input:focus {
@@ -144,6 +159,8 @@ QLineEdit:hover {
 /* 备用DNS输入框 - 浅粉色边框 */
 #secondary_dns_input {
     border: 2px solid #f9a8d4;  /* 浅粉色边框，代表备用DNS服务 */
+    padding: 8px 12px;  /* 与通用样式保持一致 */
+    min-height: 22px;  /* 与通用样式保持一致 */
 }
 
 #secondary_dns_input:focus {
@@ -278,11 +295,15 @@ QPushButton {
 }
 
 QPushButton:hover {
-    transform: translateY(-1px);
+    /* Qt不支持transform，使用margin模拟悬停上移效果 */
+    margin-top: -1px;
+    margin-bottom: 1px;
 }
 
 QPushButton:pressed {
-    transform: translateY(1px);
+    /* Qt不支持transform，使用margin模拟按下下移效果 */
+    margin-top: 1px;
+    margin-bottom: -1px;
 }
 
 QPushButton:disabled {

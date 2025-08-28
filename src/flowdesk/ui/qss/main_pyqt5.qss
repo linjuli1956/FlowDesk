@@ -599,3 +599,6 @@ QToolTip {
     padding: 4px 8px;
     font-size: 9pt;
 }
+
+/* ===== 主样式文件结束 ===== */
+/* 所有Tab专用样式已移至各自的QSS文件中管理，遵循StylesheetService模块化设计原则 */

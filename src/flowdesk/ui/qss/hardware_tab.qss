@@ -1,0 +1,118 @@
+/*
+=== 硬件监控Tab专用样式表 ===
+文件: hardware_tab.qss
+作用: 定义硬件监控页面的专用样式，包括CPU、内存、GPU、温度等硬件信息显示UI样式
+
+设计原则:
+- 遵循Claymorphism设计风格
+- 严格自适应布局，避免固定宽度
+- 监控UI注重数据可读性和实时性
+- 与主样式文件协调统一
+*/
+
+/* === 硬件监控Tab容器样式 === */
+#hardware_tab {
+    background: transparent;
+    padding: 0px;
+    margin: 0px;
+}
+
+/* === 硬件信息卡片样式 === */
+#hardware_info_card {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 8px;
+}
+
+/* === 硬件标题样式 === */
+#hardware_title {
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 0px 0px 8px 0px;
+    border-bottom: 2px solid #e5e7eb;
+    margin-bottom: 12px;
+}
+
+/* === 硬件数值显示样式 === */
+#hardware_value_label {
+    color: #374151;
+    font-size: 24px;
+    font-weight: 600;
+    padding: 4px 0px;
+}
+
+/* === 硬件单位标签样式 === */
+#hardware_unit_label {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 400;
+    padding: 2px 0px;
+}
+
+/* === 进度条样式 === */
+#hardware_progress_bar {
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
+
+#hardware_progress_bar::chunk {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop:0 #10b981, stop:0.5 #34d399, stop:1 #6ee7b7);
+    border-radius: 6px;
+    margin: 1px;
+}
+
+/* === 温度警告样式 === */
+#temp_warning {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #fef3c7, stop:1 #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    color: #92400e;
+    font-weight: 600;
+    padding: 8px 12px;
+}
+
+#temp_critical {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #fee2e2, stop:1 #fecaca);
+    border: 1px solid #ef4444;
+    border-radius: 6px;
+    color: #991b1b;
+    font-weight: 700;
+    padding: 8px 12px;
+}
+
+/* === 刷新按钮样式 === */
+#hardware_refresh_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #3b82f6, stop:1 #1d4ed8);
+    border: 1px solid #1e40af;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    min-height: 16px;
+    min-width: 80px;
+}
+
+#hardware_refresh_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #60a5fa, stop:1 #3b82f6);
+}
+
+#hardware_refresh_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #1d4ed8, stop:1 #1e3a8a);
+    margin-top: 1px;
+    margin-bottom: -1px;
+}
