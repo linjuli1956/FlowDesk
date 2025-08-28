@@ -19,16 +19,8 @@
 - 数据验证和错误提示
 """
 
-from .rdp_connect_dialog import RdpConnectDialog
-from .add_ip_dialog import AddIpDialog
-from .user_management_dialog import UserManagementDialog
-from .float_window_settings_dialog import FloatWindowSettingsDialog
-from .confirm_dialog import ConfirmDialog
+from .add_ip_dialog import AddIPDialog
 
 __all__ = [
-    'RdpConnectDialog',
-    'AddIpDialog',
-    'UserManagementDialog', 
-    'FloatWindowSettingsDialog',
-    'ConfirmDialog'
+    'AddIPDialog'
 ]

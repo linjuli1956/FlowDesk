@@ -64,6 +64,7 @@ class StylesheetService:
             "rdp_tab.qss",              # 远程桌面Tab专用样式
             "hardware_tab.qss",         # 硬件信息Tab专用样式
             "tray_exit_dialog.qss",     # 托盘退出对话框样式
+            "add_ip_dialog.qss",        # 添加IP对话框专用样式
             "main_window.qss",          # 主窗口特定样式
         ]
         
@@ -109,6 +110,7 @@ class StylesheetService:
                 combined_styles += f"\n/* ===== 样式文件: {filename} ===== */\n"
                 combined_styles += content + "\n"
                 
+                
                 loaded_files.append(filename)
                 self.logger.debug(f"样式文件加载成功: {filename}")
                 
@@ -119,6 +121,8 @@ class StylesheetService:
                     raise
         
         self.logger.info(f"样式表合并完成，已加载文件: {', '.join(loaded_files)}")
+        
+        
         return combined_styles
     
     def apply_stylesheets(self, app: QApplication) -> None:

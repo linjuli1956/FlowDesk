@@ -23,6 +23,7 @@ from PyQt5.QtCore import Qt, pyqtSignal, QSize
 from PyQt5.QtGui import QFont
 
 from ..widgets.validators import IPAddressValidator, SubnetMaskValidator, DNSValidator
+from ..dialogs import AddIPDialog
 
 
 class NetworkConfigTab(QWidget):
@@ -490,13 +491,87 @@ class NetworkConfigTab(QWidget):
 
     def _show_add_ip_dialog(self):
         """
-        显示添加额外IP对话框
+        显示添加额外IP地址对话框
         
-        这里只是占位方法，实际的对话框实现会在dialogs模块中。
-        遵循分层架构：UI组件各司其职。
+        作用说明：
+        当用户点击"添加IP"按钮时，弹出专用的IP地址配置对话框。
+        该对话框提供标准化的IP地址和子网掩码输入界面，集成了
+        实时输入验证功能，确保用户只能输入有效的网络参数。
+        
+        设计特点：
+        - 使用模态对话框，确保用户专注于IP配置输入
+        - 集成QValidator实时验证，防止无效输入
+        - 通过信号槽机制处理用户输入结果
+        - 遵循面向对象设计，对话框逻辑完全封装
+        
+        交互流程：
+        1. 创建AddIPDialog实例并显示
+        2. 用户在对话框中输入IP地址和子网掩码
+        3. 实时验证确保输入格式正确
+        4. 用户点击确定后，对话框发射ip_added信号
+        5. 处理信号，将新IP信息传递给服务层
         """
-        # TODO: 实现添加IP对话框
-        pass
+        # 创建添加IP对话框实例，设置当前窗口为父窗口确保正确的模态行为
+        dialog = AddIPDialog(self)
+        
+        # 连接对话框的ip_added信号到处理方法
+        # 当用户成功添加IP时，对话框会发射此信号携带IP配置数据
+        dialog.ip_added.connect(self._handle_ip_added)
+        
+        # 显示模态对话框
+        # exec_()方法会阻塞程序执行，直到对话框被关闭
+        # 返回值指示用户是点击了确定(QDialog.Accepted)还是取消(QDialog.Rejected)
+        result = dialog.exec_()
+        
+        # 注意：这里不需要手动处理返回值，因为ip_added信号已经处理了确定的情况
+        # 如果用户取消或关闭对话框，不会有任何操作，这是期望的行为
+
+    def _handle_ip_added(self, ip_address: str, subnet_mask: str):
+        """
+        处理添加IP对话框的确认操作
+        
+        作用说明：
+        当用户在添加IP对话框中输入有效的IP配置并点击确定时，此方法负责
+        将新的IP配置直接添加到右侧的额外IP列表中。新添加的IP会显示在
+        列表的第一位，确保用户能够立即看到刚刚添加的内容。
+        
+        这个方法体现了UI层的直接响应性设计原则：用户的操作应该立即在
+        界面上得到反馈，而不需要等待后端处理。同时，它也会将IP配置
+        信息传递给服务层进行实际的网络配置操作。
+        
+        参数说明：
+            ip_address (str): 用户输入的IP地址（如：192.168.1.100）
+            subnet_mask (str): 用户输入的子网掩码（如：255.255.255.0或/24）
+        
+        处理逻辑：
+        1. 格式化IP地址和子网掩码为标准显示格式
+        2. 创建新的列表项并添加到额外IP列表的第一位
+        3. 设置复选框状态，允许用户后续选择操作
+        4. 同时发射信号给服务层进行实际的网络配置
+        """
+        # 格式化IP配置为标准显示格式
+        # 统一使用 "IP地址 / 子网掩码" 的格式显示
+        ip_config_text = f"{ip_address} / {subnet_mask}"
+        
+        # 创建新的列表项用于显示额外IP
+        # QListWidgetItem封装了列表项的数据和显示属性
+        new_item = QListWidgetItem(ip_config_text)
+        new_item.setFlags(new_item.flags() | Qt.ItemIsUserCheckable)  # 设置可勾选
+        new_item.setCheckState(Qt.Unchecked)  # 默认未选中状态
+        
+        # 将新项目插入到列表的第一位（索引0）
+        # 这确保了最新添加的IP配置总是显示在最顶部，用户可以立即看到
+        self.extra_ip_list.insertItem(0, new_item)
+        
+        # 自动滚动到列表顶部，确保新添加的项目在可视区域内
+        self.extra_ip_list.scrollToTop()
+        
+        # 获取当前选择的网卡名称，用于服务层处理
+        current_adapter = self.adapter_combo.currentText()
+        
+        # 同时发射信号给服务层进行实际的网络配置操作
+        # 这保持了UI层与服务层的解耦，UI负责界面更新，服务层负责业务逻辑
+        self.add_extra_ip.emit(current_adapter, ip_config_text)
 
     def _remove_selected_ips(self):
         """

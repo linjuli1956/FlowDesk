@@ -64,11 +64,11 @@ class MainWindow(QMainWindow):
         # 创建用户界面
         self.setup_ui()
         
-        # 初始化服务层并连接信号槽
+        # 初始化服务
         self.initialize_services()
         
-        # 加载并应用样式表
-        self.load_and_apply_styles()
+        # 样式表已由StylesheetService在app.py中统一加载和应用
+        # 移除此处调用避免覆盖完整的合并样式表
         
         # 居中显示窗口
         self.center_window()
@@ -659,48 +659,15 @@ class MainWindow(QMainWindow):
     
     def load_and_apply_styles(self):
         """
-        加载并应用外置QSS样式表
+        样式表加载已由StylesheetService统一管理
         
-        从qss目录加载样式文件并应用到整个应用程序。
-        禁止样式重复，统一使用外置样式管理（UI四大铁律）。
+        此方法已废弃，样式表加载统一由StylesheetService处理，
+        避免重复setStyleSheet调用导致的样式覆盖问题。
         """
-        try:
-            # 构建QSS文件路径
-            qss_dir = os.path.join(os.path.dirname(__file__), "qss")
-            
-            # 加载样式文件路径
-            main_qss_path = os.path.join(qss_dir, "main_window.qss")
-            network_qss_path = os.path.join(qss_dir, "network_config_tab.qss")
-            tray_dialog_qss_path = os.path.join(qss_dir, "tray_exit_dialog.qss")
-            
-            # 合并所有样式内容
-            combined_styles = ""
-            
-            # 加载主窗口样式（如果存在）
-            if os.path.exists(main_qss_path):
-                with open(main_qss_path, 'r', encoding='utf-8') as f:
-                    combined_styles += f.read() + "\n"
-                    
-            # 加载网络配置Tab样式
-            if os.path.exists(network_qss_path):
-                with open(network_qss_path, 'r', encoding='utf-8') as f:
-                    combined_styles += f.read() + "\n"
-                    
-            # 加载托盘退出对话框样式
-            if os.path.exists(tray_dialog_qss_path):
-                with open(tray_dialog_qss_path, 'r', encoding='utf-8') as f:
-                    combined_styles += f.read() + "\n"
-            
-            # 应用合并后的样式到整个应用程序
-            if combined_styles:
-                QApplication.instance().setStyleSheet(combined_styles)
-                self.logger.info("QSS样式表加载成功")
-            else:
-                self.logger.warning("未找到QSS样式文件")
-                
-        except Exception as e:
-            self.logger.error(f"加载QSS样式表失败: {e}")
-            # 样式加载失败不影响程序运行，继续执行
+        # 样式表加载已在app.py中通过StylesheetService统一处理
+        # 移除此处的重复加载逻辑，避免覆盖StylesheetService的完整样式
+        self.logger.info("样式表加载由StylesheetService统一管理，跳过重复加载")
+        pass
     
     def center_window(self):
         """

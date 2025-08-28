@@ -1,0 +1,142 @@
+/*
+FlowDesk 添加IP对话框专用样式表
+遵循Claymorphism设计风格，按钮使用渐变色
+
+作用说明：
+本样式表专门为AddIPDialog对话框提供视觉样式定义。采用Claymorphism
+设计理念，通过渐变色、圆角边框、阴影效果等元素创造出现代化的
+玻璃拟态效果。确保对话框界面与主应用保持一致的设计语言。
+
+设计原则：
+- 遵循UI四大铁律，避免样式重复，通过objectName实现精确控制
+- 使用渐变色按钮体现Claymorphism风格特点
+- 保持良好的对比度和可读性
+- 支持悬停和按下状态的视觉反馈
+*/
+
+/* ===========================================
+   对话框主体样式 - Claymorphism基础效果
+   =========================================== */
+QDialog#add_ip_dialog {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(245, 247, 250, 0.95),
+        stop:1 rgba(235, 240, 245, 0.90)
+    );
+    border: 1px solid rgba(200, 210, 220, 0.3);
+    border-radius: 16px;
+}
+
+/* ===========================================
+   标签样式 - 清晰的文本展示
+   =========================================== */
+QLabel#dialog_label {
+    color: #2c3e50;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0px;
+    background: transparent;
+}
+
+/* ===========================================
+   输入框样式 - Claymorphism输入体验
+   =========================================== */
+QLineEdit#dialog_ip_input,
+QLineEdit#dialog_mask_input {
+    border: 2px solid rgba(52, 152, 219, 0.2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #2c3e50;
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(255, 255, 255, 0.8),
+        stop:1 rgba(248, 250, 252, 0.9)
+    );
+    selection-background-color: rgba(52, 152, 219, 0.3);
+}
+
+QLineEdit#dialog_ip_input:focus,
+QLineEdit#dialog_mask_input:focus {
+    border: 2px solid rgba(52, 152, 219, 0.6);
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(255, 255, 255, 0.95),
+        stop:1 rgba(248, 250, 252, 0.95)
+    );
+}
+
+/* ===========================================
+   确定按钮 - Claymorphism绿色渐变 (高特异性选择器)
+   =========================================== */
+QDialog#add_ip_dialog QPushButton#dialog_ok_button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    min-width: 80px;
+    min-height: 16px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #2ecc71, stop:0.5 #27ae60, stop:1 #229954);
+    border: 1px solid #22995440;
+}
+
+QDialog#add_ip_dialog QPushButton#dialog_ok_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #34d37a, stop:0.5 #2eb86a, stop:1 #27a25d);
+    border: 1px solid #27a25d80;
+}
+
+QDialog#add_ip_dialog QPushButton#dialog_ok_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #1e8449, stop:0.5 #196f3d, stop:1 #145a32);
+    border: 1px solid #145a32cc;
+}
+
+QPushButton#dialog_ok_button:disabled {
+    background: qlineargradient(
+        x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(149, 165, 166, 0.6),
+        stop:1 rgba(127, 140, 141, 0.6)
+    );
+    color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(127, 140, 141, 0.3);
+}
+
+/* ===========================================
+   取消按钮 - Claymorphism红色渐变 (高特异性选择器)
+   =========================================== */
+QDialog#add_ip_dialog QPushButton#dialog_cancel_button {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: white;
+    min-width: 80px;
+    min-height: 16px;
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #e74c3c, stop:0.5 #c0392b, stop:1 #a93226);
+    border: 1px solid #a9322640;
+}
+
+QDialog#add_ip_dialog QPushButton#dialog_cancel_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #f05646, stop:0.5 #ca4335, stop:1 #b33c30);
+    border: 1px solid #b33c3080;
+}
+
+QDialog#add_ip_dialog QPushButton#dialog_cancel_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #c0392b, stop:0.5 #a93226, stop:1 #942c21);
+    border: 1px solid #942c21cc;
+}
+
+/* ===========================================
+   按钮组容器样式
+   =========================================== */
+QDialogButtonBox#dialog_button_box {
+    background: transparent;
+}
