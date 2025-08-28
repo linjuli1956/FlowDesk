@@ -89,6 +89,7 @@ class NetworkConfigTab(QWidget):
         self.adapter_combo.setObjectName("adapter_combo")
         self.adapter_combo.setToolTip("选择要配置的网络适配器")
         
+        
         # 刷新按钮 - 固定尺寸，不随窗口缩放
         self.refresh_btn = QPushButton("🔄 刷新")
         self.refresh_btn.setObjectName("refresh_btn")
@@ -103,6 +104,7 @@ class NetworkConfigTab(QWidget):
         self.ip_info_display.setObjectName("ip_info_display")
         self.ip_info_display.setReadOnly(True)  # 只读模式，支持文字选择和复制
         self.ip_info_display.setToolTip("网卡详细信息，可选中文字并使用Ctrl+C复制")
+        self.ip_info_display.setText("请选择网络适配器以查看详细信息...")  # 设置初始提示文本
         
         # 状态徽章容器 - 放置在IP信息容器底部
         self.status_badges_frame = QFrame()
@@ -265,8 +267,10 @@ class NetworkConfigTab(QWidget):
         # IP信息展示容器 - 占据主要空间（315px）
         layout.addWidget(self.ip_info_display, 1)  # 拉伸因子1，随窗口高度调整
         
-        # 状态徽章区域
+        # 状态徽章区域 - 调整布局避免重叠
         badges_layout = QHBoxLayout(self.status_badges_frame)
+        badges_layout.setContentsMargins(0, 0, 0, 0)  # 移除容器边距
+        badges_layout.setSpacing(0)  # 减少徽章间距，让网速徽章往前移
         badges_layout.addWidget(self.connection_status_badge)
         badges_layout.addWidget(self.ip_mode_badge)
         badges_layout.addWidget(self.link_speed_badge)
@@ -465,33 +469,97 @@ class NetworkConfigTab(QWidget):
 
     # === 公共接口方法：供服务层调用更新UI ===
     
-    def update_adapter_list(self, adapters):
+    def update_adapter_list(self, adapter_names):
         """
-        更新网卡列表
+        更新网卡下拉框列表
+        
+        这个方法负责将服务层传递的网卡名称列表更新到UI下拉框中。
+        遵循项目架构原则，所有样式控制通过QSS文件管理，
+        此方法只负责数据更新，不涉及任何样式设置。
         
         Args:
-            adapters (list): 网卡名称列表
+            adapter_names (list): 网卡名称列表，包含完整的网卡描述信息
         """
+        # 清空现有的下拉框项目，准备加载新的网卡列表
         self.adapter_combo.clear()
-        self.adapter_combo.addItems(adapters)
+        
+        # 将网卡名称列表添加到下拉框中
+        # 下拉列表的显示效果完全由QSS样式文件控制
+        self.adapter_combo.addItems(adapter_names)
 
-    def update_ip_info(self, info_text):
+    def update_ip_info_display(self, formatted_info):
         """
-        更新IP信息显示
+        更新IP信息展示区域的核心显示逻辑
+        
+        这个方法负责将服务层传递的格式化网卡信息显示在右侧的信息展示区域。
+        采用面向对象的设计原则，将UI更新逻辑封装在独立方法中，确保界面
+        显示与数据状态的实时同步。这是解决"IP信息展示容器不更新"问题的
+        关键UI组件更新方法。
+        
+        功能特点：
+        1. 接收主窗口传递的完整格式化信息
+        2. 直接更新文本显示组件的内容
+        3. 确保用户能够看到最新的网卡配置信息
+        4. 支持实时刷新，响应网卡选择和刷新操作
         
         Args:
-            info_text (str): 格式化的IP信息文本
+            formatted_info (str): 经过格式化处理的网卡详细信息文本，
+                                包含IP地址、子网掩码、网关、DNS等完整配置
         """
-        self.ip_info_display.setPlainText(info_text)
+        # 直接更新文本显示组件，确保信息的实时同步
+        # 这里使用setText方法完全替换现有内容，避免信息累积或残留
+        self.ip_info_display.setText(formatted_info)
+        
+        # 确保文本显示区域滚动到顶部，便于用户查看完整信息
+        # 这提供了更好的用户体验，特别是在信息较长时
+        cursor = self.ip_info_display.textCursor()
+        cursor.movePosition(cursor.Start)
+        self.ip_info_display.setTextCursor(cursor)
+
+    def update_status_badge(self, status_text, is_connected):
+        """
+        更新网卡连接状态徽章的显示内容和样式
+        
+        该方法负责根据网卡的实际连接状态，动态更新状态徽章的显示效果。
+        通过改变徽章的文本内容和CSS类名，实现图形化的状态区分，替代纯文本显示。
+        
+        设计理念：
+        - 使用图形化徽章替代纯文本，提升视觉识别度
+        - 通过QSS样式表实现不同状态的背景色和文字色
+        - 支持动态切换连接和断开状态的显示样式
+        
+        Args:
+            status_text (str): 状态显示文本，如"已连接"、"未连接"
+            is_connected (bool): 连接状态标识，True表示已连接，False表示未连接
+        """
+        # 更新状态徽章的显示文本，去除emoji图标，使用纯文本
+        # 图形化效果通过QSS背景色实现，而非文本图标
+        clean_text = status_text.replace("🔗 ", "").strip()
+        self.connection_status_badge.setText(clean_text)
+        
+        # 根据连接状态设置不同的样式类名
+        # 已连接：绿色背景徽章；未连接：灰色背景徽章
+        if is_connected:
+            self.connection_status_badge.setObjectName("status_badge_connected")
+        else:
+            self.connection_status_badge.setObjectName("status_badge_disconnected")
+        
+        # 强制刷新样式，确保objectName变更立即生效
+        # 调用style().unpolish()和style().polish()确保样式重新应用
+        self.connection_status_badge.style().unpolish(self.connection_status_badge)
+        self.connection_status_badge.style().polish(self.connection_status_badge)
 
     def update_status_badges(self, connection_status, ip_mode, link_speed):
         """
-        更新状态徽章显示
+        更新多个状态徽章的批量显示方法
+        
+        该方法用于一次性更新所有状态徽章的显示内容，
+        包括连接状态、IP配置模式、链路速度等关键网络参数。
         
         Args:
-            connection_status (str): 连接状态
-            ip_mode (str): IP模式
-            link_speed (str): 链路速度
+            connection_status (str): 连接状态描述
+            ip_mode (str): IP配置模式（如DHCP、静态IP）
+            link_speed (str): 网络链路速度
         """
         self.connection_status_badge.setText(f"🔗 {connection_status}")
         self.ip_mode_badge.setText(f"🌐 {ip_mode}")
@@ -499,16 +567,16 @@ class NetworkConfigTab(QWidget):
 
     def update_ip_config_inputs(self, config_data):
         """
-        更新IP配置输入框
+        更新IP配置输入框的显示内容
         
         Args:
-            config_data (dict): IP配置数据
+            config_data (dict): IP配置数据字典，包含各项网络配置参数
         """
         self.ip_address_input.setText(config_data.get('ip_address', ''))
         self.subnet_mask_input.setText(config_data.get('subnet_mask', ''))
         self.gateway_input.setText(config_data.get('gateway', ''))
-        self.primary_dns_input.setText(config_data.get('primary_dns', ''))
-        self.secondary_dns_input.setText(config_data.get('secondary_dns', ''))
+        self.primary_dns_input.setText(config_data.get('dns_primary', ''))
+        self.secondary_dns_input.setText(config_data.get('dns_secondary', ''))
 
     def update_current_adapter_label(self, adapter_name):
         """

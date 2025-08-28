@@ -171,15 +171,17 @@ QLineEdit:hover {
     border-color: #f472b6;  /* 悬停时中粉色 */
 }
 
-/* === 下拉框样式 - 浅蓝色文字，非黑底悬停 === */
+/* === 下拉框样式 - 极致紧凑宽度设计，遵循UI四大铁律的最小宽度保护原则 === */
 #adapter_combo {
     background-color: white;
     border: 2px solid #e5e7eb;
     border-radius: 6px;
-    padding: 6px 8px;
-    font-size: 12px;
-    color: #3b82f6;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: #3b82f6;  /* 浅蓝色文字提供良好的视觉对比度 */
     min-height: 16px;
+    min-width: 160px;  /* 极致压缩最小宽度，在保证可读性前提下最大化节省空间 */
+    max-width: 200px;  /* 进一步压缩最大宽度，严格控制组件占用空间 */
 }
 
 #adapter_combo:hover {
@@ -191,7 +193,7 @@ QLineEdit:hover {
     border-color: #2563eb;
 }
 
-/* 下拉框下拉列表样式 */
+/* 下拉框下拉列表样式 - 自动调整宽度以完整显示长网卡名称 */
 #adapter_combo QAbstractItemView {
     background-color: white;
     border: 1px solid #d1d5db;
@@ -200,6 +202,9 @@ QLineEdit:hover {
     selection-color: #1d4ed8;
     color: #3b82f6;
     padding: 4px;
+    /* 关键设置：使下拉列表能够根据内容自动调整宽度 */
+    min-width: 320px;  /* 减少最小宽度，优化界面布局 */
+    max-width: 480px;  /* 减少最大宽度，避免界面过宽 */
 }
 
 #adapter_combo QAbstractItemView::item {
@@ -235,51 +240,105 @@ QLineEdit:hover {
     background-color: #fefefe;
 }
 
-/* === 状态徽章容器 === */
+/* === 状态徽章容器 - 网卡状态信息的布局管理组件 === */
+/*
+ * 功能说明：作为状态徽章组的容器，负责管理多个状态徽章的整体布局和排列
+ * 设计理念：采用靠左对齐的布局策略，提供清晰的信息层级和阅读顺序
+ * 架构原则：遵循依赖倒置原则，容器不依赖具体徽章实现，只负责布局管理
+ * 布局特性：支持徽章的水平排列，通过弹性布局适应不同数量的状态信息
+ */
 #status_badges_frame {
-    background-color: transparent;
-    border: none;
-    padding: 4px;
+    background-color: transparent;  /* 透明背景避免干扰徽章本身的视觉效果 */
+    border: none;  /* 去除边框，保持容器的隐形特性 */
+    padding: 0px;  /* 移除内边距，让徽章更靠左 */
+    /* 通过QHBoxLayout实现靠左对齐，第一个徽章从容器左侧开始排列 */
 }
 
-/* === 状态徽章样式 - 圆角边框设计，紧凑尺寸 === */
+/* === 状态徽章基础样式 - 网卡状态可视化显示组件 === */
+/* 
+ * 功能说明：为网卡状态信息提供统一的视觉化徽章显示
+ * 设计理念：采用透明背景+彩色边框的轻量化设计，减少视觉噪音
+ * 架构原则：遵循单一职责原则，每个徽章专门负责一种状态信息的展示
+ * 自适应特性：通过最小宽度保护确保内容可读性，同时支持内容自适应
+ */
+#connection_status_badge, #status_badge_connected, #status_badge_disconnected, #ip_mode_badge, #link_speed_badge {
+    /* 徽章基类样式 - 定义所有通用属性，避免重复 */
+    background-color: transparent;  /* 透明背景设计，统一的轻量化风格 */
+    border: 1px solid #6b7280;  /* 默认灰色边框，由子类覆盖颜色 */
+    border-radius: 8px;  /* 适度圆角设计，平衡现代感与可读性 */
+    padding: 4px 10px;  /* 紧凑内边距，保持简洁的视觉效果 */
+    font-size: 10px;  /* 适中字体尺寸，确保在小屏幕上的可读性 */
+    font-weight: bold;  /* 粗体字重增强信息传达效果 */
+    margin: 2px 3px;  /* 徽章间距，避免视觉拥挤同时保持紧凑布局 */
+    min-width: 70px;  /* 增加宽度确保"1.0 Gbps"等长文本完整显示 */
+    text-align: center;  /* 文字居中对齐，提供专业的视觉平衡感 */
+    color: #6b7280;  /* 默认灰色文字，由子类覆盖颜色 */
+}
+
+/* === 已连接状态徽章 - 网络连接成功状态的视觉化指示器 === */
+/*
+ * 功能说明：专门用于显示网卡已成功连接到网络的状态信息
+ * 设计理念：使用绿色语义化配色，直观传达"正常/成功"的状态含义
+ * 架构原则：继承基础徽章样式，通过颜色差异化实现状态区分（开闭原则）
+ * 交互特性：提供足够的视觉反馈，让用户快速识别网络连接状态
+ */
+#status_badge_connected {
+    /* 只定义与基类不同的专用属性，避免样式重复 */
+    color: #10b981;  /* 绿色文字配色，遵循通用的"成功/正常"色彩语义 */
+    border-color: #10b981;  /* 绿色边框与文字颜色呼应，形成统一的视觉识别 */
+}
+
+/* === 未连接状态徽章 - 网络断开或异常状态的视觉化指示器 === */
+/*
+ * 功能说明：专门用于显示网卡未连接或网络异常的状态信息
+ * 设计理念：使用灰色中性配色，传达"非活跃/等待"的状态含义
+ * 架构原则：与已连接徽章形成对比，通过统一的样式规范实现状态差异化
+ * 用户体验：提供清晰的视觉区分，帮助用户快速识别需要处理的网络问题
+ */
+#status_badge_disconnected {
+    /* 只定义与基类不同的专用属性，避免样式重复 */
+    color: #6b7280;  /* 灰色文字配色，符合"非活跃/中性"状态的色彩语义 */
+    border-color: #6b7280;  /* 灰色边框与文字保持一致，形成完整的视觉识别 */
+}
+
+/* === 默认连接状态徽章 - 通用网络状态的兜底显示组件 === */
+/*
+ * 功能说明：作为网络状态显示的默认兜底组件，处理未明确分类的连接状态
+ * 设计理念：采用中性灰色配色，避免给用户传达错误的状态信息
+ * 架构原则：实现里氏替换原则，可以无缝替代其他状态徽章而不影响整体布局
+ * 扩展性：为未来可能新增的网络状态类型预留标准化的显示模板
+ */
 #connection_status_badge {
-    background-color: transparent;  /* 去除底色 */
-    color: #10b981;  /* 保留绿色文字，代表连接状态 */
-    border: 1px solid #10b981;  /* 细边框减少视觉重量 */
-    border-radius: 8px;  /* 减小圆角半径 */
-    padding: 2px 8px;  /* 紧凑内边距 */
-    font-size: 9px;  /* 减小字体尺寸 */
-    font-weight: bold;
-    margin: 1px 2px;  /* 减小外边距 */
-    min-width: 50px;  /* 减小最小宽度 */
-    text-align: center;  /* 文字居中对齐 */
+    /* 只定义与基类不同的专用属性，避免样式重复 */
+    margin: 2px 1px 2px 0px;  /* 第一个徽章左边距为0，完全靠左 */
 }
 
+/* === IP配置模式徽章 - 网络地址分配方式的状态指示器 === */
+/*
+ * 功能说明：专门显示网卡的IP地址获取方式（DHCP自动获取 vs 静态手动配置）
+ * 设计理念：使用橙色警示配色，提醒用户当前的网络配置模式类型
+ * 架构原则：遵循单一职责原则，专注于IP配置状态的可视化展示
+ * 业务价值：帮助网络管理员快速识别网络配置策略，提升故障排查效率
+ */
 #ip_mode_badge {
-    background-color: transparent;  /* 去除底色 */
-    color: #f59e0b;  /* 保留橙色文字，代表IP模式 */
-    border: 1px solid #f59e0b;  /* 细边框减少视觉重量 */
-    border-radius: 8px;  /* 减小圆角半径 */
-    padding: 2px 8px;  /* 紧凑内边距 */
-    font-size: 9px;  /* 减小字体尺寸 */
-    font-weight: bold;
-    margin: 1px 2px;  /* 减小外边距 */
-    min-width: 50px;  /* 减小最小宽度 */
-    text-align: center;  /* 文字居中对齐 */
+    /* 只定义与基类不同的专用属性，避免样式重复 */
+    color: #f59e0b;  /* 橙色文字配色，符合"警示/配置"类信息的色彩语义 */
+    border-color: #f59e0b;  /* 橙色边框与文字颜色呼应，形成完整的视觉识别 */
+    min-width: 60px;  /* 减少宽度，为网速徽章腾出空间 */
 }
 
+/* === 链路速度徽章 - 网络连接性能指标的可视化组件 === */
+/*
+ * 功能说明：专门显示网卡的物理连接速度和性能等级信息
+{{ ... }}
+ * 设计理念：使用紫色科技配色，体现网络性能和技术参数的专业属性
+ * 架构原则：遵循接口分离原则，独立处理网络性能相关的状态展示
+ * 实用价值：为网络性能分析和故障诊断提供直观的速度参考信息
+ */
 #link_speed_badge {
-    background-color: transparent;  /* 去除底色 */
-    color: #6366f1;  /* 保留紫色文字，代表网卡速率 */
-    border: 1px solid #6366f1;  /* 细边框减少视觉重量 */
-    border-radius: 8px;  /* 减小圆角半径 */
-    padding: 2px 8px;  /* 紧凑内边距 */
-    font-size: 9px;  /* 减小字体尺寸 */
-    font-weight: bold;
-    margin: 1px 2px;  /* 减小外边距 */
-    min-width: 50px;  /* 减小最小宽度 */
-    text-align: center;  /* 文字居中对齐 */
+    /* 只定义与基类不同的专用属性，避免样式重复 */
+    color: #6366f1;  /* 紫色文字配色，符合"技术/性能"类信息的色彩语义 */
+    border-color: #6366f1;  /* 紫色边框与文字颜色呼应，形成统一的视觉识别 */
 }
 
 /* === 通用按钮基类样式 === */
@@ -311,10 +370,12 @@ QPushButton:disabled {
     color: #6b7280;
 }
 
-/* === 刷新按钮 - 蓝色渐变 === */
+/* === 刷新按钮 - 蓝色渐变，减少宽度适应下拉框扩展 === */
 #refresh_btn {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
         stop:0 #60a5fa, stop:1 #3b82f6);
+    min-width: 60px;  /* 减少最小宽度，为下拉框让出空间 */
+    max-width: 80px;  /* 限制最大宽度 */
 }
 
 #refresh_btn:hover {
