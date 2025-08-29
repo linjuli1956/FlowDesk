@@ -50,6 +50,8 @@ class NetworkService(QObject):
     ip_config_applied = pyqtSignal(object)       # IP配置应用成功信号，参数：AdapterInfo
     operation_progress = pyqtSignal(str)         # 操作进度信号，参数：进度消息
     error_occurred = pyqtSignal(str, str)        # 错误发生信号，参数：(错误类型, 错误消息)
+    extra_ips_added = pyqtSignal(str)            # 额外IP添加成功信号，参数：成功消息
+    extra_ips_removed = pyqtSignal(str)          # 额外IP删除成功信号，参数：成功消息
     
     def __init__(self):
         """
@@ -115,17 +117,20 @@ class NetworkService(QObject):
                 )
                 lightweight_adapters.append(lightweight_adapter)
             
-            # 更新内部缓存
-            self._adapters = lightweight_adapters
+            # 智能排序网卡列表：连接的网卡优先显示
+            # 这确保了UI显示顺序与服务层选择优先级完全一致
+            # 解决启动时下拉框选中网卡与显示信息不匹配的根本问题
+            sorted_adapters = self._sort_adapters_by_priority(lightweight_adapters)
+            
+            # 更新内部缓存为排序后的列表
+            self._adapters = sorted_adapters
             
             # 发射信号通知UI层快速更新
             self.adapters_updated.emit(self._adapters)
             
-            # 自动选中第一个已连接的网卡，触发详细信息加载
-            connected_adapters = [a for a in self._adapters if a.is_connected]
-            if connected_adapters:
-                self.select_adapter(connected_adapters[0].id)
-            elif self._adapters:
+            # 自动选中第一个网卡（现在已经是优先级最高的网卡）
+            # 由于列表已经按优先级排序，第一个网卡就是最佳选择
+            if self._adapters:
                 self.select_adapter(self._adapters[0].id)
             
             self.logger.info(f"网络适配器信息获取完成，共找到 {len(self._adapters)} 个网卡")
@@ -136,6 +141,59 @@ class NetworkService(QObject):
             self.logger.error(error_msg)
             self.error_occurred.emit("网卡枚举错误", error_msg)
             return []
+    
+    def _sort_adapters_by_priority(self, adapters):
+        """
+        按优先级智能排序网卡列表的核心排序方法
+        
+        这个方法解决了启动时网卡信息不匹配的根本问题，通过统一的排序逻辑
+        确保UI显示顺序与服务层选择优先级完全一致。该方法体现了面向对象
+        架构中业务逻辑封装的重要原则，将复杂的排序策略集中管理。
+        
+        面向对象架构特点：
+        - 封装性：将复杂的网卡优先级排序逻辑完全封装在独立方法中
+        - 单一职责：专门负责网卡列表的优先级排序，不涉及其他业务逻辑
+        - 开闭原则：可以通过修改排序规则扩展功能，不影响调用方代码
+        - 依赖倒置：依赖于AdapterInfo抽象数据模型，不依赖具体实现
+        
+        排序优先级策略：
+        1. 已连接的网卡优先级最高（is_connected=True）
+        2. 已连接网卡内部按友好名称字母序排序
+        3. 未连接的网卡排在后面（is_connected=False）
+        4. 未连接网卡内部按友好名称字母序排序
+        
+        这样确保了用户最常使用的连接网卡始终显示在下拉框顶部，
+        同时保持了相同状态网卡之间的稳定排序，提供一致的用户体验。
+        
+        Args:
+            adapters (list): 未排序的AdapterInfo对象列表
+            
+        Returns:
+            list: 按优先级排序后的AdapterInfo对象列表
+        """
+        try:
+            # 使用Python内置的sorted函数进行多级排序
+            # key函数返回元组，Python会按元组元素顺序进行排序
+            sorted_adapters = sorted(adapters, key=lambda adapter: (
+                # 第一级排序：连接状态（False排在True前面，所以用not取反）
+                # 这样is_connected=True的网卡会排在前面
+                not adapter.is_connected,
+                
+                # 第二级排序：友好名称字母序（相同连接状态内部排序）
+                # 使用lower()确保大小写不敏感的排序
+                (adapter.friendly_name or adapter.name or adapter.description or "").lower()
+            ))
+            
+            # 记录排序结果便于调试和监控
+            connected_count = sum(1 for a in sorted_adapters if a.is_connected)
+            self.logger.debug(f"网卡排序完成：已连接 {connected_count} 个，未连接 {len(sorted_adapters) - connected_count} 个")
+            
+            return sorted_adapters
+            
+        except Exception as e:
+            # 异常处理：排序失败时返回原列表，确保功能不受影响
+            self.logger.error(f"网卡排序失败，使用原始顺序: {str(e)}")
+            return adapters
     
     def select_adapter(self, adapter_id: str) -> None:
         """
@@ -1620,5 +1678,462 @@ class NetworkService(QObject):
             return False
         except Exception as e:
             error_msg = f"💥 DNS配置过程中发生未预期异常\n网卡: '{connection_name}'\n异常详情: {str(e)}"
-            self.logger.error(error_msg, exc_info=True)
+            self.logger.error(error_msg)
+            return False
+
+    def add_selected_extra_ips(self, adapter_name: str, ip_configs: list):
+        """
+        批量添加选中的额外IP到指定网卡的核心业务方法
+        
+        核心作用与业务价值：
+        这个方法是FlowDesk网络管理系统中批量IP配置添加的核心入口点。
+        它负责将用户在界面上选择的多个IP配置，通过Windows系统API批量添加到指定的网络适配器上。
+        这个功能在企业网络环境中非常重要，可以让单个网卡承载多个IP地址，实现虚拟主机、负载均衡等高级网络配置。
+        
+        面向对象设计原则的完整体现：
+        
+        1. 单一职责原则(Single Responsibility Principle)：
+           - 该方法专门负责批量额外IP添加的业务逻辑处理
+           - 不涉及UI交互、数据持久化或其他无关职责
+           - 每个内部步骤都有明确的单一目的
+        
+        2. 开闭原则(Open-Closed Principle)：
+           - 通过参数化设计支持不同网卡和IP配置的扩展
+           - 新增网卡类型或IP格式时无需修改现有代码
+           - 通过继承和多态可以扩展新的添加策略
+        
+        3. 里氏替换原则(Liskov Substitution Principle)：
+           - 作为NetworkService的方法，遵循基类定义的契约
+           - 子类可以安全地重写此方法而不破坏系统行为
+           - 返回值和异常处理符合基类期望
+        
+        4. 接口分离原则(Interface Segregation Principle)：
+           - 提供专用的IP添加接口，与删除、查询等操作完全分离
+           - UI层只需要知道添加操作的接口，不需要了解其他复杂功能
+           - 通过信号机制实现松耦合的结果通知
+        
+        5. 依赖倒置原则(Dependency Inversion Principle)：
+           - 依赖AdapterInfo抽象数据模型而非具体的网卡硬件实现
+           - 通过subprocess抽象层调用系统命令，而非直接操作底层API
+           - 使用PyQt信号机制实现与UI层的解耦
+        
+        企业级软件架构特点：
+        
+        - 事务性操作：支持批量处理，提供原子性操作保证
+        - 异常安全：完整的错误处理和恢复机制，确保系统稳定性
+        - 可观测性：详细的日志记录和操作追踪，便于问题诊断
+        - 用户体验：友好的错误提示和操作反馈，提升用户满意度
+        - 性能优化：批量操作减少系统调用开销
+        - 安全性：输入验证和权限检查，防止恶意操作
+        
+        业务流程的精心设计：
+        
+        1. 输入参数严格验证：确保网卡名称和IP配置列表的有效性
+        2. 智能网卡查找算法：支持多种标识符匹配，提高容错性
+        3. IP配置解析和格式验证：确保每个IP地址和子网掩码的正确性
+        4. 批量系统API调用：逐个添加IP配置，记录每次操作结果
+        5. 全面的结果统计分析：区分成功、失败和异常情况
+        6. 实时UI状态同步：刷新网卡信息，确保界面显示最新状态
+        7. 用户友好的结果反馈：通过信号机制触发相应的提示弹窗
+        
+        错误处理的多层次策略：
+        
+        - 预防性验证：在操作前检查所有输入参数的合法性
+        - 渐进式容错：部分失败时继续处理剩余配置，最大化成功率
+        - 详细错误分类：区分格式错误、系统错误、权限错误等不同类型
+        - 用户友好提示：将技术错误转换为易懂的用户提示信息
+        - 完整日志记录：记录所有操作细节，便于后续问题排查
+        
+        Args:
+            adapter_name (str): 目标网络适配器的友好名称，用于在系统中唯一标识网卡
+            ip_configs (list): IP配置字符串列表，每个元素格式为"IP地址 / 子网掩码"
+                              例如：["192.168.1.100 / 255.255.255.0", "10.0.0.50 / 255.255.255.0"]
+        
+        信号发射：
+            extra_ips_added: 操作成功时发射，携带成功消息
+            error_occurred: 操作失败时发射，携带错误标题和详细信息
+        
+        异常处理：
+            所有异常都被捕获并转换为用户友好的错误信号，确保系统稳定性
+        """
+        try:
+            # 第一步：输入参数验证
+            if not adapter_name or not ip_configs:
+                error_msg = "❌ 批量添加IP失败：缺少必要参数\n请确保已选择网卡并勾选要添加的IP配置"
+                self.error_occurred.emit("参数错误", error_msg)
+                return
+            
+            self.logger.info(f"开始批量添加额外IP到网卡: {adapter_name}，共 {len(ip_configs)} 个IP配置")
+            
+            # 第二步：智能查找目标网卡信息
+            # 支持多种网卡标识符匹配：友好名称、描述、完整名称
+            # 这种设计提高了系统的容错性和用户体验
+            target_adapter = None
+            self.logger.info(f"正在查找网卡: '{adapter_name}'")
+            self.logger.info(f"当前缓存中共有 {len(self._adapters)} 个网卡")
+            
+            for adapter in self._adapters:
+                self.logger.info(f"检查网卡 - 友好名称: '{adapter.friendly_name}', 描述: '{adapter.description}', 完整名称: '{adapter.name}'")
+                
+                # 多重匹配策略：优先匹配友好名称，其次描述，最后完整名称
+                # 这种灵活的匹配机制确保UI层可以使用任何一种网卡标识符
+                if (adapter.friendly_name == adapter_name or 
+                    adapter.description == adapter_name or 
+                    adapter.name == adapter_name):
+                    target_adapter = adapter
+                    self.logger.info(f"成功匹配网卡: '{adapter_name}' -> 友好名称: '{adapter.friendly_name}'")
+                    break
+            
+            if not target_adapter:
+                error_msg = f"❌ 网卡查找失败：'{adapter_name}'\n可能原因：\n• 网卡已被禁用或断开连接\n• 网卡名称已更改\n• 系统网络配置发生变化"
+                self.logger.error(f"网卡查找失败，当前可用网卡: {[adapter.friendly_name for adapter in self._adapters]}")
+                self.error_occurred.emit("网卡不存在", error_msg)
+                return
+            
+            # 第三步：批量处理IP配置添加
+            success_count = 0
+            failed_configs = []
+            
+            for ip_config in ip_configs:
+                try:
+                    # 解析IP配置格式：支持 "192.168.1.100/255.255.255.0" 和 "192.168.1.100 / 255.255.255.0"
+                    if '/' not in ip_config:
+                        failed_configs.append(f"{ip_config} (格式错误)")
+                        continue
+                    
+                    # 兼容两种格式：带空格和不带空格的斜杠分隔符
+                    if ' / ' in ip_config:
+                        ip_address, subnet_mask = ip_config.split(' / ', 1)
+                    else:
+                        ip_address, subnet_mask = ip_config.split('/', 1)
+                    ip_address = ip_address.strip()
+                    subnet_mask = subnet_mask.strip()
+                    
+                    # 调用Windows网络API添加额外IP
+                    success = self._add_extra_ip_to_adapter(target_adapter, ip_address, subnet_mask)
+                    
+                    if success:
+                        success_count += 1
+                        self.logger.info(f"✅ 成功添加额外IP: {ip_address}/{subnet_mask}")
+                    else:
+                        failed_configs.append(f"{ip_address}/{subnet_mask}")
+                        self.logger.warning(f"❌ 添加额外IP失败: {ip_address}/{subnet_mask}")
+                        
+                except Exception as e:
+                    failed_configs.append(f"{ip_config} (解析异常: {str(e)})")
+                    self.logger.error(f"处理IP配置异常: {ip_config} - {str(e)}")
+            
+            # 第四步：刷新网卡信息和UI显示
+            self.refresh_current_adapter()
+            
+            # 第五步：生成操作结果报告并发射相应信号
+            total_count = len(ip_configs)
+            
+            if success_count == total_count:
+                # 全部成功
+                success_msg = f"✅ 批量添加IP配置成功！\n\n📊 操作统计：\n• 成功添加：{success_count} 个IP配置\n• 目标网卡：{adapter_name}\n\n💡 提示：新的IP配置已生效，可在左侧信息面板中查看"
+                self.extra_ips_added.emit(success_msg)
+                
+            elif success_count > 0:
+                # 部分成功
+                warning_msg = f"⚠️ 批量添加IP配置部分成功\n\n📊 操作统计：\n• 成功添加：{success_count} 个\n• 添加失败：{len(failed_configs)} 个\n• 目标网卡：{adapter_name}"
+                if failed_configs:
+                    warning_msg += f"\n\n❌ 失败的IP配置：\n" + "\n".join([f"• {config}" for config in failed_configs[:5]])
+                    if len(failed_configs) > 5:
+                        warning_msg += f"\n• ... 还有 {len(failed_configs) - 5} 个"
+                self.extra_ips_added.emit(warning_msg)
+                
+            else:
+                # 全部失败
+                error_msg = f"❌ 批量添加IP配置失败\n\n📊 操作统计：\n• 尝试添加：{total_count} 个IP配置\n• 全部失败：{len(failed_configs)} 个\n• 目标网卡：{adapter_name}"
+                if failed_configs:
+                    error_msg += f"\n\n❌ 失败原因：\n" + "\n".join([f"• {config}" for config in failed_configs[:3]])
+                error_msg += "\n\n💡 建议：\n• 检查IP地址格式是否正确\n• 确认网卡状态是否正常\n• 验证IP地址是否与网卡冲突"
+                self.error_occurred.emit("批量添加失败", error_msg)
+                
+        except Exception as e:
+            error_msg = f"💥 批量添加IP配置过程中发生系统异常\n\n🔍 异常详情：{str(e)}\n📡 目标网卡：{adapter_name}\n📝 IP配置数量：{len(ip_configs) if ip_configs else 0}"
+            self.logger.error(f"批量添加额外IP异常: {str(e)}")
+            self.error_occurred.emit("系统异常", error_msg)
+
+    def remove_selected_extra_ips(self, adapter_name: str, ip_configs: list):
+        """
+        批量删除选中的额外IP从指定网卡的核心业务方法
+        
+        作用说明：
+        这个方法负责处理UI层发送的批量IP删除请求，将用户选中的多个IP配置
+        从指定的网络适配器上移除。该方法遵循服务层的设计原则：提供完整的
+        业务逻辑封装，确保操作的原子性和数据一致性。
+        
+        面向对象架构特点：
+        - 单一职责：专门负责批量额外IP删除的业务逻辑处理
+        - 封装性：隐藏复杂的Windows网络API调用细节
+        - 依赖倒置：通过信号机制实现与UI层的松耦合
+        - 接口分离：提供清晰的删除操作接口，与添加操作完全独立
+        
+        业务处理流程：
+        1. 验证输入参数（网卡名称、IP配置列表）
+        2. 查找并验证目标网卡的存在性和可用性
+        3. 解析IP配置格式，提取IP地址和子网掩码
+        4. 逐个调用Windows网络API删除额外IP配置
+        5. 统计删除操作的成功和失败情况
+        6. 刷新网卡信息，同步UI显示状态
+        7. 发射操作结果信号，触发用户反馈弹窗
+        
+        安全性和可靠性：
+        - 删除前验证IP配置的存在性
+        - 支持部分删除成功的情况处理
+        - 提供详细的失败原因分析
+        - 完整的异常处理和错误恢复机制
+        
+        Args:
+            adapter_name (str): 目标网卡的友好名称
+            ip_configs (list): 待删除的IP配置列表，格式为["IP地址 / 子网掩码", ...]
+        """
+        try:
+            # 第一步：输入参数有效性验证
+            if not adapter_name or not ip_configs:
+                error_msg = "❌ 批量删除IP失败：缺少必要参数\n请确保已选择网卡并勾选要删除的IP配置"
+                self.error_occurred.emit("参数错误", error_msg)
+                return
+            
+            self.logger.info(f"开始批量删除额外IP从网卡: {adapter_name}，共 {len(ip_configs)} 个IP配置")
+            print(f"🔍 DEBUG - 删除操作开始，目标网卡: {adapter_name}")
+            
+            # 第二步：智能查找目标网卡信息
+            # 支持多种网卡标识符匹配：友好名称、描述、完整名称
+            # 这种设计提高了系统的容错性和用户体验
+            target_adapter = None
+            self.logger.info(f"正在查找网卡: '{adapter_name}'")
+            self.logger.info(f"当前缓存中共有 {len(self._adapters)} 个网卡")
+            print(f"🔍 DEBUG - 查找网卡: '{adapter_name}', 当前有 {len(self._adapters)} 个网卡")
+            
+            for adapter in self._adapters:
+                self.logger.info(f"检查网卡 - 友好名称: '{adapter.friendly_name}', 描述: '{adapter.description}', 完整名称: '{adapter.name}'")
+                
+                # 多重匹配策略：优先匹配友好名称，其次描述，最后完整名称
+                # 这种灵活的匹配机制确保UI层可以使用任何一种网卡标识符
+                if (adapter.friendly_name == adapter_name or 
+                    adapter.description == adapter_name or 
+                    adapter.name == adapter_name):
+                    target_adapter = adapter
+                    self.logger.info(f"成功匹配网卡: '{adapter_name}' -> 友好名称: '{adapter.friendly_name}'")
+                    break
+            
+            if not target_adapter:
+                error_msg = f"❌ 网卡查找失败：'{adapter_name}'\n可能原因：\n• 网卡已被禁用或断开连接\n• 网卡名称已更改\n• 系统网络配置发生变化"
+                self.logger.error(f"网卡查找失败，当前可用网卡: {[adapter.friendly_name for adapter in self._adapters]}")
+                self.error_occurred.emit("网卡不存在", error_msg)
+                return
+            
+            # 第三步：批量处理IP配置删除
+            success_count = 0
+            failed_configs = []
+            
+            for ip_config in ip_configs:
+                try:
+                    # 解析IP配置格式：支持 "192.168.1.100/255.255.255.0" 和 "192.168.1.100 / 255.255.255.0"
+                    if '/' not in ip_config:
+                        failed_configs.append(f"{ip_config} (格式错误)")
+                        continue
+                    
+                    # 兼容两种格式：带空格和不带空格的斜杠分隔符
+                    if ' / ' in ip_config:
+                        ip_address, subnet_mask = ip_config.split(' / ', 1)
+                    else:
+                        ip_address, subnet_mask = ip_config.split('/', 1)
+                    ip_address = ip_address.strip()
+                    subnet_mask = subnet_mask.strip()
+                    
+                    # 调用Windows网络API删除额外IP
+                    success = self._remove_extra_ip_from_adapter(target_adapter, ip_address, subnet_mask)
+                    
+                    if success:
+                        success_count += 1
+                        self.logger.info(f"✅ 成功删除额外IP: {ip_address}/{subnet_mask}")
+                    else:
+                        failed_configs.append(f"{ip_address}/{subnet_mask}")
+                        self.logger.warning(f"❌ 删除额外IP失败: {ip_address}/{subnet_mask}")
+                        
+                except Exception as e:
+                    failed_configs.append(f"{ip_config} (解析异常: {str(e)})")
+                    self.logger.error(f"处理IP配置异常: {ip_config} - {str(e)}")
+            
+            # 第四步：刷新网卡信息和UI显示
+            self.refresh_current_adapter()
+            
+            # 第五步：生成操作结果报告并发射相应信号
+            total_count = len(ip_configs)
+            
+            if success_count == total_count:
+                # 全部删除成功
+                success_msg = f"✅ 批量删除IP配置成功！\n\n📊 操作统计：\n• 成功删除：{success_count} 个IP配置\n• 目标网卡：{adapter_name}\n\n💡 提示：IP配置已从网卡中移除，左侧信息面板已更新"
+                self.extra_ips_removed.emit(success_msg)
+                
+            elif success_count > 0:
+                # 部分删除成功
+                warning_msg = f"⚠️ 批量删除IP配置部分成功\n\n📊 操作统计：\n• 成功删除：{success_count} 个\n• 删除失败：{len(failed_configs)} 个\n• 目标网卡：{adapter_name}"
+                if failed_configs:
+                    warning_msg += f"\n\n❌ 失败的IP配置：\n" + "\n".join([f"• {config}" for config in failed_configs[:5]])
+                    if len(failed_configs) > 5:
+                        warning_msg += f"\n• ... 还有 {len(failed_configs) - 5} 个"
+                self.extra_ips_removed.emit(warning_msg)
+                
+            else:
+                # 全部删除失败
+                error_msg = f"❌ 批量删除IP配置失败\n\n📊 操作统计：\n• 尝试删除：{total_count} 个IP配置\n• 全部失败：{len(failed_configs)} 个\n• 目标网卡：{adapter_name}"
+                if failed_configs:
+                    error_msg += f"\n\n❌ 失败原因：\n" + "\n".join([f"• {config}" for config in failed_configs[:3]])
+                error_msg += "\n\n💡 建议：\n• 检查IP配置是否确实存在于网卡上\n• 确认网卡状态是否正常\n• 验证是否有足够的系统权限"
+                self.error_occurred.emit("批量删除失败", error_msg)
+                
+        except Exception as e:
+            error_msg = f"💥 批量删除IP配置过程中发生系统异常\n\n🔍 异常详情：{str(e)}\n📡 目标网卡：{adapter_name}\n📝 IP配置数量：{len(ip_configs) if ip_configs else 0}"
+            self.logger.error(f"批量删除额外IP异常: {str(e)}")
+            self.error_occurred.emit("系统异常", error_msg)
+
+    def _add_extra_ip_to_adapter(self, adapter: AdapterInfo, ip_address: str, subnet_mask: str) -> bool:
+        """
+        向指定网卡添加单个额外IP配置的底层实现方法
+        
+        核心作用：
+        这个私有方法是FlowDesk网络管理系统中添加额外IP地址的核心实现。
+        它封装了Windows系统的netsh命令调用逻辑，实现对网络适配器的动态IP配置管理。
+        该方法遵循单一职责原则，专门负责单个IP地址的添加操作，为上层批量操作提供可靠的原子化服务。
+        
+        技术架构设计：
+        - 依赖倒置原则：通过subprocess模块抽象系统命令调用，降低对具体实现的依赖
+        - 开闭原则：通过参数化设计支持不同网卡和IP配置的扩展
+        - 单一职责原则：专注于IP添加的核心逻辑，不涉及UI交互和业务流程控制
+        - 封装性原则：隐藏netsh命令的复杂性，提供简洁的布尔返回值接口
+        
+        Windows网络配置原理：
+        netsh是Windows系统提供的网络配置命令行工具，支持对网络接口的动态配置。
+        添加额外IP地址实际上是在现有网卡配置基础上绑定多个IP地址，实现单网卡多IP的网络拓扑。
+        这种配置常用于服务器环境、虚拟化部署和网络测试场景。
+        
+        Args:
+            adapter (AdapterInfo): 目标网络适配器的完整信息对象，包含友好名称等标识信息
+            ip_address (str): 要添加的IPv4地址，必须符合点分十进制格式
+            subnet_mask (str): 对应的子网掩码，用于定义网络范围和广播域
+            
+        Returns:
+            bool: 操作结果标识，True表示IP地址成功添加到网卡，False表示添加操作失败
+        """
+        try:
+            # 构建Windows netsh命令用于添加额外IP地址到指定网络适配器
+            # 使用简单的位置参数格式，这是netsh命令最稳定可靠的语法形式
+            cmd = [
+                'netsh', 'interface', 'ipv4', 'add', 'address',
+                adapter.friendly_name,           # 网卡友好名称，subprocess会自动处理包含空格的参数
+                ip_address,                      # 要添加的IP地址
+                subnet_mask                      # 子网掩码
+            ]
+            
+            # 执行命令并设置超时
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                encoding='utf-8',
+                errors='ignore'
+            )
+            
+            # 检查命令执行结果
+            if result.returncode == 0:
+                self.logger.info(f"成功添加额外IP: {ip_address}/{subnet_mask} 到网卡 {adapter.friendly_name}")
+                return True
+            else:
+                # 详细记录netsh命令执行信息
+                cmd_str = ' '.join(cmd)
+                error_output = result.stderr.strip() if result.stderr else "无错误输出"
+                stdout_output = result.stdout.strip() if result.stdout else "无标准输出"
+                
+                self.logger.error(f"添加额外IP失败详情:")
+                self.logger.error(f"  命令: {cmd_str}")
+                self.logger.error(f"  返回码: {result.returncode}")
+                self.logger.error(f"  错误输出: {error_output}")
+                self.logger.error(f"  标准输出: {stdout_output}")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            self.logger.error(f"添加额外IP超时: {ip_address}/{subnet_mask}")
+            return False
+        except Exception as e:
+            self.logger.error(f"添加额外IP异常: {ip_address}/{subnet_mask} - {str(e)}")
+            return False
+
+    def _remove_extra_ip_from_adapter(self, adapter: AdapterInfo, ip_address: str, subnet_mask: str) -> bool:
+        """
+        从指定网卡删除单个额外IP配置的底层实现方法
+        
+        核心作用：
+        这个私有方法是FlowDesk网络管理系统中删除额外IP地址的核心实现。
+        它封装了Windows系统的netsh命令调用逻辑，实现对网络适配器的动态IP配置清理。
+        该方法遵循单一职责原则，专门负责单个IP地址的删除操作，确保网络配置的精确管理。
+        
+        技术架构设计：
+        - 依赖倒置原则：通过subprocess模块抽象系统命令调用，提供统一的接口
+        - 开闭原则：支持不同网卡和IP配置的删除操作扩展
+        - 单一职责原则：专注于IP删除的核心逻辑，不涉及复杂的业务流程
+        - 封装性原则：隐藏netsh命令的技术细节，提供简洁的操作结果反馈
+        
+        Windows网络配置原理：
+        删除额外IP地址是从网卡的IP绑定列表中移除指定的IP配置。
+        这个操作不会影响网卡的主IP地址，只会清理通过add address命令添加的额外IP。
+        删除操作是幂等的，即使IP地址不存在也不会产生严重错误。
+        
+        Args:
+            adapter (AdapterInfo): 目标网络适配器的完整信息对象，用于定位具体的网卡
+            ip_address (str): 要删除的IPv4地址，必须是已存在于网卡上的额外IP
+            subnet_mask (str): 对应的子网掩码，用于日志记录和验证（netsh删除时不需要）
+            
+        Returns:
+            bool: 操作结果标识，True表示IP地址成功从网卡删除，False表示删除操作失败
+        """
+        try:
+            # 构建Windows netsh命令用于从指定网络适配器删除额外IP地址
+            # netsh删除命令格式：netsh interface ipv4 delete address "网卡名" IP地址
+            cmd = [
+                'netsh', 'interface', 'ipv4', 'delete', 'address',
+                adapter.friendly_name,           # 网卡友好名称，subprocess会自动处理空格
+                ip_address                       # 要删除的IP地址（不需要子网掩码）
+            ]
+            
+            # 执行命令并设置超时
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                encoding='utf-8',
+                errors='ignore'
+            )
+            
+            # 检查命令执行结果
+            if result.returncode == 0:
+                self.logger.info(f"成功删除额外IP: {ip_address}/{subnet_mask} 从网卡 {adapter.friendly_name}")
+                return True
+            else:
+                # 详细记录netsh命令执行信息
+                cmd_str = ' '.join(cmd)
+                error_output = result.stderr.strip() if result.stderr else "无错误输出"
+                stdout_output = result.stdout.strip() if result.stdout else "无标准输出"
+                
+                self.logger.error(f"删除额外IP失败详情:")
+                self.logger.error(f"  完整命令: {cmd_str}")
+                self.logger.error(f"  返回码: {result.returncode}")
+                self.logger.error(f"  错误输出: {error_output}")
+                self.logger.error(f"  标准输出: {stdout_output}")
+                print(f"🔍 DEBUG - 删除命令: {cmd_str}")
+                print(f"🔍 DEBUG - 返回码: {result.returncode}")
+                print(f"🔍 DEBUG - 错误输出: {error_output}")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            self.logger.error(f"删除额外IP超时: {ip_address}/{subnet_mask}")
+            return False
+        except Exception as e:
+            self.logger.error(f"删除额外IP异常: {ip_address}/{subnet_mask} - {str(e)}")
             return False

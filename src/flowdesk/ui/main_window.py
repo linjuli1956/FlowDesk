@@ -21,7 +21,7 @@ UI四大铁律实现：
 
 import os
 from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, 
-                            QTabWidget, QLabel, QApplication)
+                            QTabWidget, QLabel, QApplication, QMessageBox)
 from PyQt5.QtCore import Qt, QSize, pyqtSignal
 from PyQt5.QtGui import QIcon, QCloseEvent
 
@@ -237,6 +237,16 @@ class MainWindow(QMainWindow):
             self._on_apply_ip_config
         )
         
+        # 批量添加选中IP：UI添加选中按钮 -> 服务层批量添加额外IP
+        self.network_config_tab.add_selected_ips.connect(
+            self.network_service.add_selected_extra_ips
+        )
+        
+        # 批量删除选中IP：UI删除选中按钮 -> 服务层批量删除额外IP
+        self.network_config_tab.remove_selected_ips.connect(
+            self.network_service.remove_selected_extra_ips
+        )
+        
         # === 服务层信号连接到UI更新方法 ===
         
         # 网卡列表更新：服务层获取网卡完成 -> UI更新下拉框
@@ -282,6 +292,16 @@ class MainWindow(QMainWindow):
         # 操作进度更新：服务层操作进度 -> UI显示进度信息
         self.network_service.operation_progress.connect(
             self._on_operation_progress
+        )
+        
+        # 批量额外IP添加完成：服务层批量添加完成 -> UI显示操作结果
+        self.network_service.extra_ips_added.connect(
+            self._on_extra_ips_added
+        )
+        
+        # 批量额外IP删除完成：服务层批量删除完成 -> UI显示操作结果
+        self.network_service.extra_ips_removed.connect(
+            self._on_extra_ips_removed
         )
     
     # === UI事件处理方法：将UI事件转换为服务层调用 ===
@@ -422,6 +442,61 @@ class MainWindow(QMainWindow):
             self.logger.error(f"处理IP配置应用请求失败，错误详情: {str(e)}")
             # 在生产环境中，这里应该向用户显示友好的错误提示
     
+    def _sync_adapter_combo_selection(self, adapter_info):
+        """
+        同步下拉框选择状态与服务层数据的核心同步方法
+        
+        这个方法解决了启动时网卡信息不匹配的根本问题，确保UI下拉框的选择
+        状态与服务层当前选中的网卡完全一致。该方法体现了面向对象架构中
+        数据一致性维护的重要原则，通过精确的匹配逻辑保证UI状态同步。
+        
+        面向对象架构特点：
+        - 封装性：将复杂的下拉框同步逻辑封装在独立方法中
+        - 单一职责：专门负责UI选择状态与数据状态的同步
+        - 依赖倒置：依赖于AdapterInfo抽象数据模型，不依赖具体实现
+        - 接口分离：提供清晰的同步接口，与其他UI更新操作分离
+        
+        工作原理：
+        1. 遍历下拉框中的所有选项，寻找与当前网卡匹配的项目
+        2. 使用多重匹配策略：name、description、friendly_name三重保障
+        3. 临时阻断信号发射，避免触发循环选择事件
+        4. 更新下拉框选中索引，确保UI显示与数据一致
+        
+        Args:
+            adapter_info (AdapterInfo): 服务层当前选中的网卡信息对象
+        """
+        try:
+            # 临时阻断下拉框的信号发射，避免触发循环选择事件
+            # 这是防止UI事件与服务层事件相互干扰的关键技术
+            self.network_config_tab.adapter_combo.blockSignals(True)
+            
+            # 遍历下拉框中的所有选项，寻找与当前网卡匹配的项目
+            combo_box = self.network_config_tab.adapter_combo
+            for index in range(combo_box.count()):
+                item_text = combo_box.itemText(index)
+                
+                # 使用多重匹配策略确保准确匹配
+                # 支持name、description、friendly_name三种标识符的匹配
+                if (item_text == adapter_info.name or 
+                    item_text == adapter_info.description or 
+                    item_text == adapter_info.friendly_name):
+                    
+                    # 找到匹配项，更新下拉框选中状态
+                    combo_box.setCurrentIndex(index)
+                    self.logger.debug(f"下拉框同步完成，选中索引: {index}, 网卡: {item_text}")
+                    break
+            else:
+                # 如果没有找到匹配项，记录警告信息便于调试
+                self.logger.warning(f"下拉框中未找到匹配的网卡选项: {adapter_info.name}")
+            
+        except Exception as e:
+            # 异常处理：确保同步错误不影响核心功能
+            self.logger.error(f"下拉框同步失败: {str(e)}")
+        finally:
+            # 恢复下拉框的信号发射，确保后续用户操作正常
+            # 使用finally确保信号状态始终能够正确恢复
+            self.network_config_tab.adapter_combo.blockSignals(False)
+    
     # === 信号处理方法：服务层信号触发的UI更新逻辑 ===
     
     def _on_adapters_updated(self, adapters):
@@ -484,11 +559,14 @@ class MainWindow(QMainWindow):
             adapter_info (AdapterInfo): 服务层传递的完整网卡信息对象
         """
         try:
-            # 更新当前网卡标签，让用户清楚知道正在操作哪个网卡
-            # 直接传递友好名称，由Tab组件统一添加前缀
+            # 第一步：同步下拉框选择状态，确保UI与服务层数据一致
+            # 这是解决启动时信息不匹配问题的关键步骤
+            self._sync_adapter_combo_selection(adapter_info)
+            
+            # 第二步：更新当前网卡标签，让用户清楚知道正在操作哪个网卡
             self.network_config_tab.update_current_adapter_label(adapter_info.friendly_name)
             
-            # 网卡状态显示逻辑 - 根据实际网卡状态显示准确的状态信息
+            # 第三步：网卡状态显示逻辑 - 根据实际网卡状态显示准确的状态信息
             # 优先显示网卡的真实状态（如已禁用），而不是简单的连接/未连接二分法
             if not adapter_info.is_enabled:
                 # 网卡被禁用时，显示禁用状态而非未连接状态
@@ -689,7 +767,6 @@ class MainWindow(QMainWindow):
             self.logger.error(f"{error_title}: {error_message}")
             
             # 显示用户友好的错误弹窗
-            from PyQt5.QtWidgets import QMessageBox
             
             # 创建错误消息框，使用警告图标吸引用户注意
             error_box = QMessageBox(self)
@@ -730,7 +807,6 @@ class MainWindow(QMainWindow):
             self.logger.info(f"IP配置应用成功: {success_message}")
             
             # 显示用户友好的成功弹窗
-            from PyQt5.QtWidgets import QMessageBox
             
             # 创建成功消息框，使用信息图标表示正面反馈
             success_box = QMessageBox(self)
@@ -780,6 +856,84 @@ class MainWindow(QMainWindow):
             
         except Exception as e:
             self.logger.error(f"处理操作进度信号失败: {str(e)}")
+    
+    def _on_extra_ips_added(self, success_message):
+        """
+        处理批量额外IP添加成功信号并显示成功弹窗
+        
+        当服务层完成批量添加额外IP操作后，会发射此信号通知UI层显示操作结果。
+        这个方法负责将服务层的成功消息转换为用户友好的界面反馈，采用统一的
+        弹窗样式和交互逻辑，确保用户体验的一致性。
+        
+        设计原则：
+        - 单一职责：专门处理批量添加IP的成功反馈
+        - 用户友好：提供清晰的操作结果提示
+        - 异常安全：确保弹窗显示失败不影响主程序运行
+        - 日志记录：详细记录操作结果便于问题追踪
+        
+        Args:
+            success_message (str): 服务层传递的成功消息文本
+        """
+        try:
+            if not success_message:
+                success_message = "批量添加额外IP成功"
+            
+            # 显示成功弹窗，使用统一的样式和交互逻辑
+            # 弹窗会自动应用Claymorphism设计风格
+            QMessageBox.information(
+                self,
+                "操作成功",
+                success_message,
+                QMessageBox.Ok
+            )
+            
+            # 记录成功操作日志，便于运维监控和问题追踪
+            self.logger.info(f"批量添加额外IP操作成功: {success_message}")
+            
+        except Exception as e:
+            # 异常处理：确保弹窗显示失败不会影响主程序运行
+            # 详细记录错误信息，便于开发人员快速定位问题
+            self.logger.error(f"处理批量添加IP成功信号失败: {str(e)}")
+            # 如果弹窗显示失败，至少记录日志保证成功信息不丢失
+    
+    def _on_extra_ips_removed(self, success_message):
+        """
+        处理批量额外IP删除成功信号并显示成功弹窗
+        
+        当服务层完成批量删除额外IP操作后，会发射此信号通知UI层显示操作结果。
+        这个方法负责将服务层的成功消息转换为用户友好的界面反馈，采用统一的
+        弹窗样式和交互逻辑，确保用户体验的一致性。
+        
+        设计原则：
+        - 单一职责：专门处理批量删除IP的成功反馈
+        - 用户友好：提供清晰的操作结果提示
+        - 异常安全：确保弹窗显示失败不影响主程序运行
+        - 日志记录：详细记录操作结果便于问题追踪
+        
+        Args:
+            success_message (str): 服务层传递的成功消息文本
+        """
+        try:
+            if not success_message:
+                success_message = "批量删除额外IP成功"
+            
+            # 显示成功弹窗，使用统一的样式和交互逻辑
+            # 弹窗会自动应用Claymorphism设计风格
+            QMessageBox.information(
+                self,
+                "操作成功",
+                success_message,
+                QMessageBox.Ok
+            )
+            
+            # 记录成功操作日志，便于运维监控和问题追踪
+            self.logger.info(f"批量删除额外IP操作成功: {success_message}")
+            
+        except Exception as e:
+            # 异常处理：确保弹窗显示失败不会影响主程序运行
+            # 详细记录错误信息，便于开发人员快速定位问题
+            self.logger.error(f"处理批量删除IP成功信号失败: {str(e)}")
+            # 如果弹窗显示失败，至少记录日志保证成功信息不丢失
     
     def _format_adapter_info_for_display(self, adapter_info):
         """

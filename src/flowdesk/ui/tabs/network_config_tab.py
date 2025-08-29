@@ -47,6 +47,8 @@ class NetworkConfigTab(QWidget):
     copy_adapter_info = pyqtSignal()    # 复制网卡信息信号
     add_extra_ip = pyqtSignal(str, str) # 添加额外IP信号
     remove_extra_ip = pyqtSignal(list)  # 删除额外IP信号
+    add_selected_ips = pyqtSignal(str, list)  # 添加选中的额外IP到网卡信号
+    remove_selected_ips = pyqtSignal(str, list)  # 从网卡删除选中的额外IP信号
 
     def __init__(self, parent=None):
         """
@@ -470,7 +472,10 @@ class NetworkConfigTab(QWidget):
         
         # 额外IP操作
         self.add_extra_ip_btn.clicked.connect(self._show_add_ip_dialog)
-        self.remove_selected_ip_btn.clicked.connect(self._remove_selected_ips)
+        
+        # 额外IP批量管理操作
+        self.add_selected_ip_btn.clicked.connect(self._add_selected_ips_to_adapter)
+        self.remove_selected_ip_btn.clicked.connect(self._remove_selected_ips_from_adapter)
 
     def _emit_ip_config(self):
         """
@@ -775,25 +780,148 @@ class NetworkConfigTab(QWidget):
         if selected_ips:
             self.remove_extra_ip.emit(selected_ips)
 
+    def _add_selected_ips_to_adapter(self):
+        """
+        将选中的额外IP添加到当前网卡的核心处理方法
+        
+        作用说明：
+        这个方法负责处理"添加选中"按钮的点击事件，将用户在额外IP管理列表中
+        勾选的IP地址配置应用到当前选择的网络适配器上。该方法体现了面向对象
+        设计的单一职责原则，专门负责批量IP添加操作的UI层逻辑处理。
+        
+        面向对象架构特点：
+        - 封装性：将复杂的选中项获取和验证逻辑封装在独立方法中
+        - 单一职责：专门负责批量添加选中IP的UI交互处理
+        - 依赖倒置：通过信号槽机制与服务层解耦，不直接调用网络配置API
+        - 开闭原则：可以通过扩展验证规则而不修改核心逻辑
+        
+        业务流程：
+        1. 遍历额外IP列表，识别用户勾选的复选框项目
+        2. 提取选中项目的IP配置信息（IP地址/子网掩码格式）
+        3. 获取当前网卡适配器名称作为目标配置对象
+        4. 验证选择有效性，确保至少有一个IP被选中
+        5. 发射信号给服务层执行实际的网络配置操作
+        6. 服务层完成后会通过回调显示成功/失败弹窗
+        
+        用户体验设计：
+        - 如果没有选中任何IP，不执行任何操作（静默处理）
+        - 支持多选操作，可以同时添加多个IP配置
+        - 通过信号槽实现异步处理，避免UI冻结
+        """
+        
+        # 第一步：获取当前选择的网络适配器名称
+        current_adapter = self.adapter_combo.currentText()
+        
+        # 第二步：遍历额外IP列表，收集所有勾选的IP配置项
+        selected_ip_configs = []
+        
+        for index in range(self.extra_ip_list.count()):
+            item = self.extra_ip_list.item(index)
+            if item.checkState() == Qt.Checked:
+                ip_config_text = item.text()
+                selected_ip_configs.append(ip_config_text)
+        
+        # 第三步：验证用户选择的有效性
+        if not selected_ip_configs:
+            # 显示用户友好提示
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.information(self, "提示", "请先勾选要添加的IP地址。")
+            return
+        
+        # 第四步：发射信号给服务层执行实际的网络配置操作
+        self.add_selected_ips.emit(current_adapter, selected_ip_configs)
+
+    def _remove_selected_ips_from_adapter(self):
+        """
+        从当前网卡删除选中的额外IP的核心处理方法
+        
+        作用说明：
+        这个方法负责处理"删除选中"按钮的点击事件，将用户在额外IP管理列表中
+        勾选的IP地址配置从当前选择的网络适配器上移除。该方法遵循面向对象
+        设计原则，专门负责批量IP删除操作的UI层交互逻辑。
+        
+        面向对象架构特点：
+        - 封装性：将IP删除的UI交互逻辑完全封装在独立方法中
+        - 单一职责：专门处理批量删除选中IP的用户操作
+        - 依赖倒置：通过信号槽与服务层通信，不直接操作网络配置
+        - 接口分离：提供清晰的删除操作接口，与添加操作完全分离
+        
+        业务流程：
+        1. 获取当前选择的网络适配器作为操作目标
+        2. 遍历额外IP列表，识别用户勾选的IP配置项
+        3. 提取选中项目的IP配置信息进行验证
+        4. 发射信号给服务层执行实际的删除操作
+        5. 服务层完成后通过回调显示操作结果
+        
+        用户体验设计：
+        - 如果没有选中任何IP，静默处理不显示错误
+        - 支持多选操作，可以同时删除多个IP配置
+        - 通过信号槽实现异步处理，避免UI冻结
+        """
+        
+        # 第一步：获取当前选择的网络适配器名称
+        current_adapter = self.adapter_combo.currentText()
+        
+        # 第二步：遍历额外IP列表，收集所有勾选的IP配置项
+        selected_ip_configs = []
+        
+        for index in range(self.extra_ip_list.count()):
+            item = self.extra_ip_list.item(index)
+            if item.checkState() == Qt.Checked:
+                ip_config_text = item.text()
+                selected_ip_configs.append(ip_config_text)
+        
+        # 第三步：验证用户选择的有效性
+        if not selected_ip_configs:
+            # 显示用户友好提示
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.information(self, "提示", "请先勾选要删除的IP地址。")
+            return
+        
+        # 第四步：发射信号给服务层执行删除操作
+        self.remove_selected_ips.emit(current_adapter, selected_ip_configs)
+
     # === 公共接口方法：供服务层调用更新UI ===
     
     def update_adapter_list(self, adapter_names):
         """
-        更新网卡下拉框列表
+        更新网卡下拉框列表的核心UI数据同步方法
         
-        这个方法负责将服务层传递的网卡名称列表更新到UI下拉框中。
-        遵循项目架构原则，所有样式控制通过QSS文件管理，
-        此方法只负责数据更新，不涉及任何样式设置。
+        这个方法严格遵循面向对象架构的单一职责原则，专门负责将服务层
+        传递的网卡名称列表同步到UI下拉框组件中。该方法体现了UI层与
+        服务层分离的设计理念，UI层只负责数据展示，不参与业务逻辑处理。
+        
+        面向对象架构特点：
+        - 封装性：将下拉框更新逻辑完全封装在独立方法中
+        - 单一职责：专门负责网卡列表的UI数据同步，不涉及选择逻辑
+        - 依赖倒置：依赖于服务层提供的抽象数据，不直接操作网络配置
+        - 接口分离：提供清晰的列表更新接口，与选择操作完全分离
+        
+        关键技术处理：
+        使用blockSignals()机制阻止addItems()操作触发意外的currentTextChanged信号，
+        避免在初始化阶段产生虚假的"用户选择网卡"事件。这是解决启动时信息
+        不匹配问题的核心技术方案，确保只有真实的用户操作才会触发选择事件。
         
         Args:
             adapter_names (list): 网卡名称列表，包含完整的网卡描述信息
         """
-        # 清空现有的下拉框项目，准备加载新的网卡列表
-        self.adapter_combo.clear()
+        # 临时阻断下拉框信号发射，防止addItems()触发意外的选择事件
+        # 这是解决启动时虚假"用户选择网卡"事件的关键技术
+        self.adapter_combo.blockSignals(True)
         
-        # 将网卡名称列表添加到下拉框中
-        # 下拉列表的显示效果完全由QSS样式文件控制
-        self.adapter_combo.addItems(adapter_names)
+        try:
+            # 清空现有的下拉框项目，为新数据做准备
+            # 这确保了每次更新都是完全替换，避免数据残留
+            self.adapter_combo.clear()
+            
+            # 将服务层提供的网卡名称列表添加到下拉框中
+            # UI组件的显示效果完全由QSS样式文件控制，符合样式分离原则
+            self.adapter_combo.addItems(adapter_names)
+            
+        finally:
+            # 恢复下拉框的信号发射，确保后续用户操作正常
+            # 使用finally确保信号状态始终能够正确恢复
+            self.adapter_combo.blockSignals(False)
 
     def update_ip_info_display(self, formatted_info):
         """
