@@ -30,6 +30,7 @@ from flowdesk.services.system_tray_service import SystemTrayService
 from flowdesk.services.stylesheet_service import StylesheetService
 from flowdesk.utils.resource_path import resource_path
 from flowdesk.utils.logger import setup_logging, get_logger
+from flowdesk.utils.admin_utils import ensure_admin_privileges, get_elevation_status_message
 
 
 class FlowDeskApplication:
@@ -63,32 +64,67 @@ class FlowDeskApplication:
         self.tray_service = None
         self.stylesheet_service = None
         
-    def initialize_components(self):
+    def _load_styles(self):
         """
-        初始化应用程序的核心组件
+        加载样式表
         
-        按照依赖关系顺序创建各个组件：
-        1. 样式管理器 - 负责加载QSS样式表
-        2. 主窗口 - 应用程序的主界面
-        3. 系统托盘服务 - 提供托盘图标和菜单功能
+        加载外置QSS样式表，应用到整个应用程序。
         """
         try:
             # 创建并应用新的样式表管理服务
             self.stylesheet_service = StylesheetService()
             self.stylesheet_service.apply_stylesheets(self.app)
             self.logger.info("样式表加载完成")
+        except Exception as e:
+            self.logger.error(f"样式表加载失败: {e}")
+    
+    def run(self):
+        """
+        启动应用程序主循环
+        
+        按照正确的顺序初始化各个组件，确保应用程序能够正常运行。
+        包括权限检查、样式加载、主窗口创建、托盘服务启动等关键步骤。
+        """
+        try:
+            # 第一步：检查并申请管理员权限
+            # 这必须在任何UI组件创建之前进行，因为权限申请可能会重启应用程序
+            self.logger.info("正在检查管理员权限...")
+            if not ensure_admin_privileges():
+                self.logger.warning("未获得管理员权限，网络配置功能将受限")
+                # 注意：如果权限申请成功，ensure_admin_privileges会重启程序并退出当前进程
+                # 只有权限申请失败时才会继续执行到这里
+            else:
+                self.logger.info("已获得管理员权限，网络配置功能可正常使用")
             
-            # 创建主窗口实例
+            # 设置应用程序基本信息
+            self.app.setApplicationName("FlowDesk")
+            self.app.setApplicationVersion("1.0.0")
+            self.app.setOrganizationName("FlowDesk Team")
+            
+            # 设置应用程序图标
+            icon_path = resource_path("assets/icons/flowdesk.ico")
+            if os.path.exists(icon_path):
+                self.app.setWindowIcon(QIcon(icon_path))
+            
+            # 加载样式表
+            self._load_styles()
+            
+            # 创建主窗口
             self.main_window = MainWindow()
-            self.logger.info("主窗口创建完成")
             
-            # 创建系统托盘服务
+            # 创建并初始化系统托盘服务
             self.tray_service = SystemTrayService(self.main_window)
             self.tray_service.initialize()
-            self.logger.info("系统托盘服务初始化完成")
             
-            # 连接应用程序退出信号
-            self.app.aboutToQuit.connect(self.on_application_quit)
+            # 显示主窗口
+            self.main_window.show()
+            
+            # 记录权限状态信息
+            status_msg = get_elevation_status_message()
+            self.logger.info(f"应用程序启动完成 - {status_msg}")
+            
+            # 启动应用程序事件循环
+            return self.app.exec_()
             
         except Exception as e:
             self.logger.error(f"组件初始化失败: {e}")
@@ -125,27 +161,6 @@ class FlowDeskApplication:
             self.main_window.save_settings()
         
         self.logger.info("应用程序退出完成")
-    
-    def run(self):
-        """
-        启动应用程序主循环
-        
-        初始化所有组件后启动Qt事件循环，
-        应用程序将持续运行直到用户退出。
-        """
-        try:
-            # 初始化所有组件
-            self.initialize_components()
-            
-            # 显示主窗口
-            self.show_main_window()
-            
-            # 启动Qt事件循环
-            return self.app.exec_()
-            
-        except Exception as e:
-            self.logger.error(f"应用程序运行失败: {e}")
-            return 1
 
 
 def main():
@@ -159,7 +174,7 @@ def main():
         # 创建应用程序实例
         app = FlowDeskApplication()
         
-        # 启动应用程序
+        # 运行应用程序
         exit_code = app.run()
         
         # 返回退出码

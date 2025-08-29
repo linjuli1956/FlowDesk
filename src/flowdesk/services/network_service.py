@@ -47,6 +47,8 @@ class NetworkService(QObject):
     extra_ips_updated = pyqtSignal(list)         # 额外IP列表更新信号，参数：List[ExtraIP]
     network_info_copied = pyqtSignal(str)        # 网卡信息复制完成信号，参数：复制的文本内容
     adapter_refreshed = pyqtSignal(object)       # 单个网卡刷新完成信号，参数：AdapterInfo
+    ip_config_applied = pyqtSignal(object)       # IP配置应用成功信号，参数：AdapterInfo
+    operation_progress = pyqtSignal(str)         # 操作进度信号，参数：进度消息
     error_occurred = pyqtSignal(str, str)        # 错误发生信号，参数：(错误类型, 错误消息)
     
     def __init__(self):
@@ -1219,3 +1221,404 @@ class NetworkService(QObject):
             return '虚拟'
         else:
             return '其他'
+    
+    def apply_ip_config(self, adapter_id: str, ip_address: str, subnet_mask: str, 
+                       gateway: str = '', primary_dns: str = '', secondary_dns: str = '') -> bool:
+        """
+        应用IP配置到指定网卡的核心业务方法
+        
+        此方法负责将用户输入的IP配置信息应用到选定的网络适配器上。
+        采用Windows netsh命令实现配置修改，确保与系统原生网络管理的兼容性。
+        实现了完整的错误处理和进度反馈机制，遵循单一职责原则。
+        
+        架构设计：
+        - 输入验证：确保IP地址格式正确，避免无效配置
+        - 分步执行：IP配置和DNS配置分别处理，提供细粒度控制
+        - 信号通信：通过PyQt信号向UI层报告操作进度和结果
+        - 异常安全：完整的try-catch机制，确保操作失败时不影响系统稳定性
+        
+        Args:
+            adapter_id (str): 目标网卡的GUID标识符
+            ip_address (str): 要设置的IP地址
+            subnet_mask (str): 子网掩码
+            gateway (str, optional): 默认网关地址，可选
+            primary_dns (str, optional): 主DNS服务器地址，可选
+            secondary_dns (str, optional): 辅助DNS服务器地址，可选
+            
+        Returns:
+            bool: 配置应用成功返回True，失败返回False
+            
+        Raises:
+            无直接异常抛出，所有异常均被捕获并通过信号报告
+        """
+        try:
+            # 发射操作开始信号，通知UI层显示进度指示器
+            self.operation_progress.emit("开始应用IP配置...")
+            self.logger.info(f"开始为网卡 {adapter_id} 应用IP配置")
+            
+            # 查找目标网卡的连接名称，netsh命令需要使用连接名而非GUID
+            adapter_info = self._find_adapter_basic_info(adapter_id)
+            if not adapter_info:
+                error_msg = f"未找到网卡 {adapter_id}"
+                self.logger.error(error_msg)
+                self.error_occurred.emit("网卡查找失败", error_msg)
+                return False
+            
+            # 获取网卡的友好连接名称，用于netsh命令
+            connection_name = adapter_info.get('NetConnectionID', '')
+            if not connection_name:
+                error_msg = f"网卡 {adapter_id} 缺少连接名称"
+                self.logger.error(error_msg)
+                self.error_occurred.emit("网卡配置错误", error_msg)
+                return False
+            
+            # 记录网卡信息用于调试
+            self.logger.info(f"准备配置网卡: {connection_name} (ID: {adapter_id})")
+            self.logger.debug(f"网卡详细信息: {adapter_info}")
+            
+            # 第一步：配置IP地址和子网掩码
+            self.operation_progress.emit("正在配置IP地址...")
+            ip_success = self._apply_ip_address(connection_name, ip_address, subnet_mask, gateway)
+            
+            if not ip_success:
+                error_msg = "IP地址配置失败"
+                self.logger.error(error_msg)
+                self.error_occurred.emit("IP配置失败", error_msg)
+                return False
+            
+            # 第二步：配置DNS服务器（如果提供了DNS地址）
+            if primary_dns or secondary_dns:
+                self.operation_progress.emit("正在配置DNS服务器...")
+                dns_success = self._apply_dns_config(connection_name, primary_dns, secondary_dns)
+                
+                if not dns_success:
+                    # DNS配置失败不影响整体操作，但需要记录警告
+                    self.logger.warning("DNS配置失败，但IP配置已成功应用")
+            
+            # 第三步：刷新当前网卡信息，确保UI显示最新配置
+            self.operation_progress.emit("正在刷新网卡信息...")
+            self.refresh_current_adapter()
+            
+            # 发射成功信号，通知UI层配置已完成
+            success_msg = f"网卡 {connection_name} 的IP配置已成功应用"
+            self.logger.info(success_msg)
+            self.ip_config_applied.emit(success_msg)
+            self.operation_progress.emit("IP配置应用完成")
+            
+            return True
+            
+        except Exception as e:
+            # 捕获所有未预期的异常，确保方法的异常安全性
+            error_msg = f"应用IP配置时发生异常: {str(e)}"
+            self.logger.error(error_msg)
+            self.error_occurred.emit("系统异常", error_msg)
+            return False
+    
+    def _apply_ip_address(self, connection_name: str, ip_address: str, subnet_mask: str, gateway: str = '') -> bool:
+        """
+        网络接口IP地址配置的核心业务逻辑实现
+        
+        这个方法是网络配置服务层的核心组件，专门负责通过Windows系统的netsh工具
+        来设置网络适配器的静态IP地址配置。设计遵循面向对象的单一职责原则，
+        将IP地址配置与DNS配置分离，确保每个方法只负责一个特定的网络配置任务。
+        
+        面向对象设计特点：
+        - 封装性：将复杂的netsh命令构建和执行逻辑封装在方法内部
+        - 单一职责：只负责IP地址、子网掩码和网关的配置，不涉及DNS设置
+        - 依赖倒置：通过参数注入的方式接收配置数据，不直接依赖UI层
+        - 开闭原则：可以通过继承扩展新的IP配置策略，无需修改现有代码
+        
+        技术实现说明：
+        netsh interface ipv4 set address命令是Windows系统提供的网络配置工具，
+        它可以在管理员权限下修改网络适配器的IP配置。命令的基本语法为：
+        netsh interface ipv4 set address name="连接名" static IP地址 子网掩码 [网关]
+        
+        Args:
+            connection_name (str): Windows系统中网络连接的显示名称，如"以太网"、"WLAN"等
+            ip_address (str): 要设置的IPv4地址，格式为点分十进制，如"192.168.1.100"
+            subnet_mask (str): 子网掩码，定义网络和主机部分，如"255.255.255.0"
+            gateway (str, optional): 默认网关地址，用于跨网段通信，可选参数
+            
+        Returns:
+            bool: 配置操作的执行结果，True表示成功，False表示失败
+            
+        Raises:
+            subprocess.TimeoutExpired: 当netsh命令执行超过30秒时抛出超时异常
+            Exception: 其他系统级异常，如权限不足、网卡不存在等
+        """
+        try:
+            # 构建Windows netsh命令的参数列表
+            # 根据Windows官方文档和实际测试，正确的netsh语法为位置参数格式：
+            # netsh interface ipv4 set address "连接名" static IP地址 子网掩码 [网关地址]
+            # 使用列表形式可以避免shell注入攻击，提高安全性
+            cmd = [
+                'netsh',                    # Windows网络配置工具
+                'interface',                # 网络接口操作模块
+                'ipv4',                     # IPv4协议栈配置
+                'set',                      # 设置操作命令
+                'address',                  # 地址配置子命令
+                connection_name,            # 目标网络连接名称（不需要引号）
+                'static',                   # 指定使用静态IP配置模式
+                ip_address,                 # IPv4地址参数（位置参数）
+                subnet_mask                 # 子网掩码参数（位置参数）
+            ]
+            
+            # 条件性添加网关参数
+            # 网关是可选配置，只有在用户提供且非空时才添加到命令中
+            # 作为位置参数直接添加到命令末尾
+            if gateway and gateway.strip():
+                cmd.append(gateway)
+            
+            # 记录即将执行的完整命令，用于调试和问题排查
+            # 将命令列表转换为可读的字符串格式，便于日志记录和问题分析
+            cmd_str = ' '.join(f'"{arg}"' if ' ' in str(arg) else str(arg) for arg in cmd)
+            self.logger.info(f"执行IP配置命令: {cmd_str}")
+            self.logger.debug(f"命令参数详情: {cmd}")
+            
+            # 使用subprocess模块执行系统命令
+            # 这是Python中执行外部程序的标准方式，具有良好的安全性和控制能力
+            # 设置30秒超时是因为网络配置操作可能需要较长时间完成
+            result = subprocess.run(
+                cmd,                        # 要执行的命令列表
+                capture_output=True,        # 捕获标准输出和错误输出
+                text=True,                  # 以文本模式处理输出（而非字节模式）
+                timeout=30,                 # 命令执行超时限制（秒）
+                encoding='gbk',             # 中文Windows系统的默认编码
+                errors='replace'            # 编码错误时用替换字符处理，避免程序崩溃
+            )
+            
+            # 详细记录命令执行结果，包括返回码、标准输出和错误输出
+            # 这些信息对于调试网络配置问题非常重要
+            self.logger.info(f"netsh命令执行完成 - 返回码: {result.returncode}")
+            if result.stdout.strip():
+                self.logger.info(f"命令输出: {result.stdout.strip()}")
+            if result.stderr.strip():
+                self.logger.warning(f"命令错误输出: {result.stderr.strip()}")
+            
+            # 检查命令执行结果
+            # netsh命令成功时返回码为0，失败时为非零值
+            if result.returncode == 0:
+                success_msg = f"✅ IP地址配置成功应用到网卡 '{connection_name}'"
+                success_msg += f"\n   📍 IP地址: {ip_address}"
+                success_msg += f"\n   🔒 子网掩码: {subnet_mask}"
+                if gateway:
+                    success_msg += f"\n   🚪 网关: {gateway}"
+                self.logger.info(success_msg)
+                return True
+            else:
+                # 命令执行失败，分析具体原因并提供解决建议
+                error_msg = f"❌ IP地址配置失败 - 网卡: '{connection_name}'"
+                
+                # 分析常见错误原因
+                if result.stderr:
+                    stderr_lower = result.stderr.lower()
+                    if 'access is denied' in stderr_lower or '拒绝访问' in result.stderr:
+                        error_msg += "\n🔐 错误原因: 权限不足，需要管理员权限"
+                    elif 'not found' in stderr_lower or '找不到' in result.stderr:
+                        error_msg += f"\n🔍 错误原因: 找不到网络连接 '{connection_name}'"
+                    elif 'invalid' in stderr_lower or '无效' in result.stderr:
+                        error_msg += "\n⚠️ 错误原因: 网络参数格式无效"
+                    else:
+                        error_msg += f"\n❗ 系统错误: {result.stderr.strip()}"
+                
+                error_msg += f"\n📊 返回码: {result.returncode}"
+                if result.stdout.strip():
+                    error_msg += f"\n📝 命令输出: {result.stdout.strip()}"
+                
+                self.logger.error(error_msg)
+                return False
+                
+        except subprocess.TimeoutExpired:
+            error_msg = f"⏰ IP配置命令执行超时 (>30秒)\n网卡: '{connection_name}'\n可能原因: 系统响应缓慢或网络服务异常"
+            self.logger.error(error_msg)
+            return False
+        except FileNotFoundError:
+            error_msg = "🚫 系统错误: 找不到netsh命令\n请确认Windows系统完整性"
+            self.logger.error(error_msg)
+            return False
+        except Exception as e:
+            error_msg = f"💥 IP配置过程中发生未预期异常\n网卡: '{connection_name}'\n异常详情: {str(e)}"
+            self.logger.error(error_msg, exc_info=True)
+            return False
+    
+    def _apply_dns_config(self, connection_name: str, primary_dns: str, secondary_dns: str = '') -> bool:
+        """
+        网络接口DNS服务器配置的专用业务逻辑实现
+        
+        这个方法是网络配置服务的重要组成部分，专门负责DNS服务器的设置。
+        DNS（Domain Name System）是互联网的基础服务，将域名转换为IP地址。
+        正确的DNS配置对于网络连接的稳定性和访问速度至关重要。
+        
+        面向对象设计原则体现：
+        - 单一职责原则：只负责DNS配置，与IP地址配置完全分离
+        - 开闭原则：可以通过继承扩展支持IPv6 DNS或其他DNS配置策略
+        - 里氏替换原则：可以被子类重写而不影响调用方的行为
+        - 接口隔离原则：提供简洁的方法签名，只暴露必要的参数
+        - 依赖倒置原则：依赖于抽象的连接名称和DNS地址，不依赖具体实现
+        
+        技术实现细节：
+        Windows系统使用netsh interface ipv4 set dns命令来配置DNS服务器。
+        主DNS服务器使用"static"模式设置，辅助DNS使用"add"模式追加。
+        这种分步配置方式确保了DNS服务器列表的正确顺序。
+        
+        Args:
+            connection_name (str): Windows网络连接的显示名称，必须与系统中的实际连接名匹配
+            primary_dns (str): 主DNS服务器的IPv4地址，如"8.8.8.8"（Google DNS）
+            secondary_dns (str, optional): 辅助DNS服务器地址，用于主DNS不可用时的备用解析
+            
+        Returns:
+            bool: DNS配置操作的执行结果，True表示所有DNS服务器配置成功
+            
+        Note:
+            如果主DNS配置失败，方法会立即返回False，不会尝试配置辅助DNS
+            这样可以避免DNS配置处于不一致的状态
+        """
+        try:
+            # 初始化操作计数器，用于跟踪DNS配置的成功率
+            # 这种计数方式体现了面向对象编程中的状态管理原则
+            success_count = 0
+            total_operations = 0
+            
+            # 第一步：配置主DNS服务器
+            # 主DNS是必需的，它是域名解析的首选服务器
+            # 只有在用户提供了有效的主DNS地址时才进行配置
+            if primary_dns and primary_dns.strip():
+                total_operations += 1
+                
+                # 构建主DNS配置命令
+                # 根据Windows官方文档，正确的DNS配置语法为位置参数格式：
+                # netsh interface ipv4 set dnsservers "连接名" static DNS地址
+                cmd_primary = [
+                    'netsh',                        # Windows网络配置工具
+                    'interface',                    # 网络接口操作模块  
+                    'ipv4',                         # IPv4协议栈配置
+                    'set',                          # 设置操作命令
+                    'dnsservers',                   # DNS服务器配置子命令（注意是dnsservers不是dns）
+                    connection_name,                # 目标网络连接名称（位置参数，不需要name=格式）
+                    'static',                       # 静态DNS配置模式
+                    primary_dns                     # 主DNS服务器地址（位置参数）
+                ]
+                
+                self.logger.debug(f"准备配置主DNS服务器: {primary_dns}")
+                
+                # 记录即将执行的DNS配置命令，便于调试和问题排查
+                cmd_str = ' '.join(f'"{arg}"' if ' ' in str(arg) else str(arg) for arg in cmd_primary)
+                self.logger.info(f"执行主DNS配置命令: {cmd_str}")
+                
+                # 执行主DNS配置命令
+                result_primary = subprocess.run(
+                    cmd_primary,
+                    capture_output=True,
+                    text=True,
+                    timeout=15,                     # DNS配置通常比IP配置更快
+                    shell=False,                    # 不使用shell，提高安全性
+                    encoding='utf-8',               # 使用UTF-8编码处理中文输出
+                    errors='replace'                # 处理编码错误，避免程序崩溃
+                )
+                
+                # 记录命令执行结果
+                self.logger.info(f"主DNS命令执行完成 - 返回码: {result_primary.returncode}")
+                if result_primary.stdout.strip():
+                    self.logger.info(f"命令输出: {result_primary.stdout.strip()}")
+                if result_primary.stderr.strip():
+                    self.logger.warning(f"命令错误输出: {result_primary.stderr.strip()}")
+                
+                # 检查主DNS配置结果
+                if result_primary.returncode == 0:
+                    success_count += 1
+                    self.logger.info(f"✅ 主DNS服务器配置成功: {primary_dns}")
+                else:
+                    # 主DNS配置失败，分析具体原因并提供解决建议
+                    error_msg = f"❌ 主DNS服务器配置失败 - 连接: '{connection_name}'"
+                    if result_primary.stderr:
+                        stderr_lower = result_primary.stderr.lower()
+                        if 'not found' in stderr_lower or '找不到' in result_primary.stderr:
+                            error_msg += f"\n🔍 错误原因: 找不到网络连接 '{connection_name}'"
+                        elif 'access is denied' in stderr_lower or '拒绝访问' in result_primary.stderr:
+                            error_msg += "\n🔐 错误原因: 权限不足，需要管理员权限"
+                        else:
+                            error_msg += f"\n❗ 系统错误: {result_primary.stderr.strip()}"
+                    
+                    error_msg += f"\n📊 返回码: {result_primary.returncode}"
+                    error_msg += f"\n📝 执行的命令: {cmd_str}"
+                    
+                    self.logger.error(error_msg)
+                    return False  # 主DNS失败则整个DNS配置失败
+            
+            # 第二步：配置辅助DNS服务器（可选）
+            # 辅助DNS提供冗余和负载分担，提高域名解析的可靠性
+            # 只有在主DNS配置成功且用户提供了辅助DNS时才进行配置
+            if secondary_dns and secondary_dns.strip() and success_count > 0:
+                total_operations += 1
+                
+                # 构建辅助DNS配置命令
+                # 根据Windows官方文档，正确的辅助DNS添加语法为位置参数格式：
+                # netsh interface ipv4 add dnsservers "连接名" DNS地址 index=2
+                cmd_secondary = [
+                    'netsh',                        # Windows网络配置工具
+                    'interface',                    # 网络接口操作模块
+                    'ipv4',                         # IPv4协议栈配置
+                    'add',                          # 添加操作命令
+                    'dnsservers',                   # DNS服务器添加子命令
+                    connection_name,                # 目标网络连接名称（位置参数）
+                    secondary_dns,                  # 辅助DNS服务器地址（位置参数）
+                    'index=2'                       # 设置为第二优先级（键值对参数）
+                ]
+                
+                self.logger.debug(f"准备配置辅助DNS服务器: {secondary_dns}")
+                
+                # 记录即将执行的辅助DNS配置命令
+                cmd_str_secondary = ' '.join(f'"{arg}"' if ' ' in str(arg) else str(arg) for arg in cmd_secondary)
+                self.logger.info(f"执行辅助DNS配置命令: {cmd_str_secondary}")
+                
+                # 执行辅助DNS配置命令
+                result_secondary = subprocess.run(
+                    cmd_secondary,
+                    capture_output=True,
+                    text=True,
+                    timeout=15,
+                    shell=False,                    # 不使用shell，提高安全性
+                    encoding='utf-8',               # 使用UTF-8编码处理中文输出
+                    errors='replace'                # 处理编码错误
+                )
+                
+                # 记录辅助DNS命令执行结果
+                self.logger.info(f"辅助DNS命令执行完成 - 返回码: {result_secondary.returncode}")
+                if result_secondary.stdout.strip():
+                    self.logger.info(f"命令输出: {result_secondary.stdout.strip()}")
+                if result_secondary.stderr.strip():
+                    self.logger.warning(f"命令错误输出: {result_secondary.stderr.strip()}")
+                
+                # 检查辅助DNS配置结果
+                if result_secondary.returncode == 0:
+                    success_count += 1
+                    self.logger.info(f"✅ 辅助DNS服务器配置成功: {secondary_dns}")
+                else:
+                    # 辅助DNS配置失败不是致命错误，但需要记录详细信息
+                    warning_msg = f"⚠️ 辅助DNS服务器配置失败 - 连接: '{connection_name}'"
+                    if result_secondary.stderr:
+                        warning_msg += f"\n❗ 系统错误: {result_secondary.stderr.strip()}"
+                    warning_msg += f"\n📊 返回码: {result_secondary.returncode}"
+                    warning_msg += f"\n📝 执行的命令: {cmd_str_secondary}"
+                    self.logger.warning(warning_msg)
+            
+            # 评估DNS配置的整体结果
+            # 只要主DNS配置成功，就认为DNS配置基本成功
+            if success_count > 0:
+                if success_count == total_operations:
+                    self.logger.info(f"DNS配置完全成功，共配置 {success_count} 个DNS服务器")
+                else:
+                    self.logger.info(f"DNS配置部分成功，{success_count}/{total_operations} 个DNS服务器配置成功")
+                return True
+            else:
+                self.logger.error("DNS配置完全失败，没有成功配置任何DNS服务器")
+                return False
+                
+        except subprocess.TimeoutExpired:
+            error_msg = f"⏰ DNS配置命令执行超时 (>15秒)\n网卡: '{connection_name}'\n可能原因: 系统响应缓慢或网络服务异常"
+            self.logger.error(error_msg)
+            return False
+        except Exception as e:
+            error_msg = f"💥 DNS配置过程中发生未预期异常\n网卡: '{connection_name}'\n异常详情: {str(e)}"
+            self.logger.error(error_msg, exc_info=True)
+            return False

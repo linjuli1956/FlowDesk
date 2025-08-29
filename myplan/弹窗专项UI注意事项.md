@@ -244,6 +244,161 @@ QDialog#弹窗objectName QPushButton#dialog_cancel_button {
 
 ---
 
-*文档版本: 1.0*  
+## QMessageBox专项补充经验
+
+### 🚨 QMessageBox与QDialog的关键区别
+
+#### 问题现象
+QMessageBox显示为系统默认黑色主题，无法应用Claymorphism样式。
+
+#### 根本原因分析
+```python
+# ❌ 错误认知 - QMessageBox不是QDialog
+# QMessageBox有自己独特的内部结构，不能使用QDialog的样式选择器
+QDialog#message_box QPushButton { }  # 无效选择器
+
+# ✅ 正确认知 - QMessageBox需要专用选择器
+QMessageBox QPushButton { }  # 有效选择器
+```
+
+#### 架构设计原则
+1. **不要为QMessageBox创建独立QSS文件**：违反StylesheetService统一管理原则
+2. **在主样式文件中添加QMessageBox样式**：确保样式加载顺序和优先级
+3. **使用文本选择器区分按钮类型**：`QPushButton[text="确定"]`、`QPushButton[text="取消"]`
+
+### 🎨 QMessageBox渐变色按钮实现
+
+#### 按钮文本选择器设计
+```css
+/* 确定按钮 - 蓝色渐变（主要操作） */
+QMessageBox QPushButton[text="确定"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #3b82f6, stop:1 #2563eb);
+    border: 2px solid #1d4ed8;
+    color: white;
+    font-weight: 600;
+}
+
+/* 取消按钮 - 灰色渐变（次要操作） */
+QMessageBox QPushButton[text="取消"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #6b7280, stop:1 #4b5563);
+    border: 2px solid #374151;
+    color: white;
+    font-weight: 500;
+}
+
+/* 通用按钮 - 浅蓝色渐变（其他按钮） */
+QMessageBox QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #e0f2fe, stop:1 #b3e5fc);
+    border: 2px solid #81d4fa;
+    color: #0277bd;
+}
+```
+
+#### 选择器优先级原理
+- `QPushButton[text="确定"]` > `QPushButton` （属性选择器优先级更高）
+- 确保特定按钮样式覆盖通用样式
+- 通用样式作为兜底方案，处理未知按钮类型
+
+### 🔧 开发流程更新
+
+#### QMessageBox样式开发清单
+- [ ] 在`main_pyqt5.qss`中添加QMessageBox基础样式
+- [ ] 使用`QPushButton[text="按钮文本"]`选择器区分按钮类型
+- [ ] 实现完整交互状态：normal/hover/pressed
+- [ ] 确保渐变色符合Claymorphism设计风格
+- [ ] 测试不同类型消息框的显示效果
+
+#### 样式冲突排查更新
+- [ ] 检查是否误用QDialog选择器
+- [ ] 验证按钮文本选择器是否正确
+- [ ] 确认样式定义在主样式文件中
+- [ ] 测试按钮渐变色是否生效
+- [ ] 检查是否影响其他UI组件
+
+### 📋 QMessageBox样式模板
+
+#### 完整模板代码
+```css
+/* QMessageBox 基础容器样式 */
+QMessageBox {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.95), stop:1 rgba(245,247,250,0.95));
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.6);
+    color: #2c3e50;
+    min-width: 300px;
+    min-height: 120px;
+}
+
+/* 文本标签样式 */
+QMessageBox QLabel {
+    color: #1f2937;
+    margin: 8px 12px;
+    background: transparent;
+    border: none;
+}
+
+/* 确定按钮 - 蓝色渐变 */
+QMessageBox QPushButton[text="确定"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #3b82f6, stop:1 #2563eb);
+    border: 2px solid #1d4ed8;
+    border-radius: 6px;
+    color: white;
+    font-weight: 600;
+    min-width: 70px;
+    min-height: 28px;
+    padding: 6px 14px;
+}
+
+/* 取消按钮 - 灰色渐变 */
+QMessageBox QPushButton[text="取消"] {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #6b7280, stop:1 #4b5563);
+    border: 2px solid #374151;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    min-width: 70px;
+    min-height: 28px;
+    padding: 6px 14px;
+}
+
+/* 通用按钮 - 浅蓝色渐变 */
+QMessageBox QPushButton {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #e0f2fe, stop:1 #b3e5fc);
+    border: 2px solid #81d4fa;
+    border-radius: 6px;
+    color: #0277bd;
+    font-weight: 500;
+    min-width: 70px;
+    min-height: 28px;
+    padding: 6px 14px;
+}
+
+/* 悬停和按下状态省略，参考完整实现 */
+```
+
+### 🎯 核心经验教训补充
+
+#### QMessageBox特有问题
+- **样式隔离失效**：QMessageBox不支持objectName样式隔离
+- **按钮识别困难**：必须使用文本选择器区分按钮类型
+- **容器结构特殊**：内部布局与QDialog完全不同
+
+#### 解决方案总结
+- **统一样式管理**：在主样式文件中定义，不创建独立文件
+- **文本选择器**：使用`[text="按钮文本"]`精确控制按钮样式
+- **渐变色实现**：确保所有按钮都有完整的渐变色效果
+- **交互状态完整**：包含normal/hover/pressed三种状态
+
+---
+
+*文档版本: 1.1*  
 *最后更新: 2025-08-29*  
-*适用项目: FlowDesk*
+*适用项目: FlowDesk*  
+*新增内容: QMessageBox专项开发经验*

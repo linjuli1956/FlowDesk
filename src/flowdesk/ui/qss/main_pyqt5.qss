@@ -600,5 +600,170 @@ QToolTip {
     font-size: 9pt;
 }
 
+/* ===== QMessageBox 消息框样式 - Claymorphism 设计 ===== */
+/*
+作用说明：
+为系统消息框提供统一的Claymorphism视觉风格，确保与主界面保持一致性。
+采用面向对象设计原则，通过CSS选择器实现样式与功能的分离，
+支持成功、错误、信息等不同类型消息框的主题化显示。
+
+面向对象架构特点：
+- 封装性：将消息框样式封装在主样式文件中统一管理
+- 单一职责：专门负责QMessageBox组件的视觉呈现
+- 开闭原则：可通过objectName扩展不同主题而不修改基础样式
+- 依赖倒置：样式定义与具体消息内容解耦
+*/
+
+/* QMessageBox 基础容器样式 */
+QMessageBox {
+    /* Claymorphism 背景：柔和的毛玻璃卡片效果 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.95), stop:1 rgba(245,247,250,0.95));
+    
+    /* 卡片式圆角设计，符合现代UI趋势 */
+    border-radius: 12px;
+    
+    /* Claymorphism 边框：半透明白色边框营造浮起效果 */
+    border: 2px solid rgba(255,255,255,0.6);
+    
+    /* 文字颜色：深灰色确保良好的可读性 */
+    color: #2c3e50;
+    
+    /* 字体设置：使用系统默认字体确保兼容性 */
+    font-family: "Microsoft YaHei UI", "Segoe UI", Arial, sans-serif;
+    font-size: 10pt;
+    
+    /* 最小尺寸：确保消息框有足够的显示空间 */
+    min-width: 300px;
+    min-height: 120px;
+}
+
+/* QMessageBox 文本标签样式 */
+QMessageBox QLabel {
+    /* 消息文本样式：清晰的深色文字 */
+    color: #1f2937;
+    font-size: 10pt;
+    
+    /* 文字边距：提供适当的间距 */
+    margin: 8px 12px;
+    
+    /* 背景透明：继承父容器背景 */
+    background: transparent;
+    border: none;
+}
+
+/* QMessageBox 确定按钮样式 - 蓝色渐变 */
+QMessageBox QPushButton[text="确定"] {
+    /* 确定按钮：蓝色渐变背景突出重要性 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #3b82f6, stop:1 #2563eb);
+    
+    /* 蓝色边框：与背景色协调 */
+    border: 2px solid #1d4ed8;
+    border-radius: 6px;
+    
+    /* 按钮尺寸：确保良好的点击体验 */
+    min-width: 70px;
+    min-height: 28px;
+    padding: 6px 14px;
+    
+    /* 白色文字：在蓝色背景上提供良好对比度 */
+    color: white;
+    font-weight: 600;
+    font-size: 9pt;
+}
+
+/* 确定按钮悬停状态 */
+QMessageBox QPushButton[text="确定"]:hover {
+    /* 悬停效果：更深的蓝色渐变 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #2563eb, stop:1 #1d4ed8);
+    border: 2px solid #1e40af;
+}
+
+/* 确定按钮按下状态 */
+QMessageBox QPushButton[text="确定"]:pressed {
+    /* 按下效果：最深的蓝色渐变 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #1d4ed8, stop:1 #1e40af);
+    border: 2px solid #1e3a8a;
+}
+
+/* QMessageBox 取消按钮样式 - 灰色渐变 */
+QMessageBox QPushButton[text="取消"] {
+    /* 取消按钮：灰色渐变背景表示次要操作 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #6b7280, stop:1 #4b5563);
+    
+    /* 灰色边框：与背景色协调 */
+    border: 2px solid #374151;
+    border-radius: 6px;
+    
+    /* 按钮尺寸：与确定按钮保持一致 */
+    min-width: 70px;
+    min-height: 28px;
+    padding: 6px 14px;
+    
+    /* 白色文字：在灰色背景上确保可读性 */
+    color: white;
+    font-weight: 500;
+    font-size: 9pt;
+}
+
+/* 取消按钮悬停状态 */
+QMessageBox QPushButton[text="取消"]:hover {
+    /* 悬停效果：更深的灰色渐变 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #4b5563, stop:1 #374151);
+    border: 2px solid #1f2937;
+}
+
+/* 取消按钮按下状态 */
+QMessageBox QPushButton[text="取消"]:pressed {
+    /* 按下效果：最深的灰色渐变 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #374151, stop:1 #1f2937);
+    border: 2px solid #111827;
+}
+
+/* QMessageBox 通用按钮样式 - 适用于其他按钮 */
+QMessageBox QPushButton {
+    /* 通用按钮：浅蓝色渐变背景 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #e0f2fe, stop:1 #b3e5fc);
+    
+    /* 浅蓝色边框：柔和的视觉效果 */
+    border: 2px solid #81d4fa;
+    border-radius: 6px;
+    
+    /* 按钮尺寸：确保良好的点击体验 */
+    min-width: 70px;
+    min-height: 28px;
+    padding: 6px 14px;
+    
+    /* 深色文字：在浅色背景上确保对比度 */
+    color: #0277bd;
+    font-weight: 500;
+    font-size: 9pt;
+}
+
+/* 通用按钮悬停状态 */
+QMessageBox QPushButton:hover {
+    /* 悬停效果：更深的浅蓝色渐变 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #b3e5fc, stop:1 #81d4fa);
+    border: 2px solid #4fc3f7;
+    color: #01579b;
+}
+
+/* 通用按钮按下状态 */
+QMessageBox QPushButton:pressed {
+    /* 按下效果：最深的浅蓝色渐变 */
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #81d4fa, stop:1 #4fc3f7);
+    border: 2px solid #29b6f6;
+    color: #01579b;
+}
+
 /* ===== 主样式文件结束 ===== */
 /* 所有Tab专用样式已移至各自的QSS文件中管理，遵循StylesheetService模块化设计原则 */

@@ -232,6 +232,11 @@ class MainWindow(QMainWindow):
             self.network_service.copy_adapter_info
         )
         
+        # IP配置应用：UI修改IP按钮 -> 服务层应用IP配置
+        self.network_config_tab.apply_ip_config.connect(
+            self._on_apply_ip_config
+        )
+        
         # === 服务层信号连接到UI更新方法 ===
         
         # 网卡列表更新：服务层获取网卡完成 -> UI更新下拉框
@@ -267,6 +272,16 @@ class MainWindow(QMainWindow):
         # 错误处理：服务层发生错误 -> UI显示错误信息
         self.network_service.error_occurred.connect(
             self._on_service_error
+        )
+        
+        # IP配置应用完成：服务层配置完成 -> UI显示成功提示
+        self.network_service.ip_config_applied.connect(
+            self._on_ip_config_applied
+        )
+        
+        # 操作进度更新：服务层操作进度 -> UI显示进度信息
+        self.network_service.operation_progress.connect(
+            self._on_operation_progress
         )
     
     # === UI事件处理方法：将UI事件转换为服务层调用 ===
@@ -316,6 +331,95 @@ class MainWindow(QMainWindow):
             # 异常处理：确保网卡选择错误不会导致程序崩溃
             # 详细记录错误信息，便于开发人员快速定位问题
             self.logger.error(f"网卡选择处理失败，错误详情: {str(e)}")
+            # 在生产环境中，这里应该向用户显示友好的错误提示
+    
+    def _on_apply_ip_config(self, config_data):
+        """
+        处理IP配置应用请求的核心业务逻辑转换方法
+        
+        这个方法是"修改IP地址"按钮功能的关键桥梁，负责将UI层收集的
+        配置数据转换为服务层能够处理的格式，并调用相应的业务方法。
+        采用面向对象的设计原则，将UI事件转换逻辑封装在独立方法中。
+        
+        工作流程：
+        1. 接收UI层传递的配置数据字典
+        2. 验证必要的配置参数是否完整
+        3. 获取当前选中的网卡标识符
+        4. 调用服务层的IP配置应用方法
+        5. 处理可能的异常情况并记录日志
+        
+        参数说明：
+            config_data (dict): UI层收集的IP配置数据，包含：
+                - ip_address: IP地址
+                - subnet_mask: 子网掩码
+                - gateway: 网关地址（可选）
+                - primary_dns: 主DNS服务器（可选）
+                - secondary_dns: 辅助DNS服务器（可选）
+                - adapter: 网卡显示名称
+        """
+        try:
+            # 验证服务层是否已正确初始化
+            if not self.network_service:
+                self.logger.error("网络服务未初始化，无法应用IP配置")
+                return
+            
+            # 验证必要的配置参数
+            ip_address = config_data.get('ip_address', '').strip()
+            subnet_mask = config_data.get('subnet_mask', '').strip()
+            
+            if not ip_address or not subnet_mask:
+                self.logger.warning("IP地址或子网掩码为空，无法应用配置")
+                return
+            
+            # 获取当前选中的网卡ID
+            # 需要通过显示名称查找对应的网卡对象
+            adapter_display_name = config_data.get('adapter', '')
+            if not adapter_display_name:
+                self.logger.warning("未选择网卡，无法应用IP配置")
+                return
+            
+            # 在服务层的网卡缓存中查找匹配的网卡对象
+            target_adapter_id = None
+            for adapter in self.network_service._adapters:
+                if (adapter.name == adapter_display_name or 
+                    adapter.description == adapter_display_name or 
+                    adapter.friendly_name == adapter_display_name):
+                    target_adapter_id = adapter.id
+                    break
+            
+            if not target_adapter_id:
+                self.logger.error(f"无法找到匹配的网卡: {adapter_display_name}")
+                return
+            
+            # 提取可选配置参数
+            gateway = config_data.get('gateway', '').strip()
+            primary_dns = config_data.get('primary_dns', '').strip()
+            secondary_dns = config_data.get('secondary_dns', '').strip()
+            
+            # 记录IP配置应用操作的开始
+            self.logger.info(f"开始应用IP配置到网卡 {adapter_display_name}: "
+                           f"IP={ip_address}, 掩码={subnet_mask}")
+            
+            # 调用服务层的IP配置应用方法
+            # 这将触发实际的网络配置修改操作
+            success = self.network_service.apply_ip_config(
+                adapter_id=target_adapter_id,
+                ip_address=ip_address,
+                subnet_mask=subnet_mask,
+                gateway=gateway,
+                primary_dns=primary_dns,
+                secondary_dns=secondary_dns
+            )
+            
+            if success:
+                self.logger.info(f"IP配置应用成功: {adapter_display_name}")
+            else:
+                self.logger.warning(f"IP配置应用失败: {adapter_display_name}")
+                
+        except Exception as e:
+            # 异常处理：确保IP配置错误不会导致程序崩溃
+            # 记录详细错误信息便于开发人员快速定位问题
+            self.logger.error(f"处理IP配置应用请求失败，错误详情: {str(e)}")
             # 在生产环境中，这里应该向用户显示友好的错误提示
     
     # === 信号处理方法：服务层信号触发的UI更新逻辑 ===
@@ -564,24 +668,118 @@ class MainWindow(QMainWindow):
     
     def _on_service_error(self, error_title, error_message):
         """
-        处理服务层错误信号
+        处理服务层错误信号并显示错误弹窗
         
-        当服务层发生错误时，在UI上显示错误信息。
-        确保用户能够了解操作失败的原因。
+        作用说明：
+        当网络配置操作失败时，这个方法负责向用户显示明确的错误信息弹窗。
+        采用面向对象设计原则，将错误处理逻辑封装在独立方法中，
+        确保用户能够及时了解操作失败的具体原因和解决建议。
+        
+        面向对象设计特点：
+        - 单一职责：专门负责错误信息的UI显示
+        - 封装性：将复杂的错误处理逻辑封装在方法内部
+        - 用户体验：提供直观的错误信息和操作建议
         
         Args:
-            error_title (str): 错误标题
-            error_message (str): 错误详细信息
+            error_title (str): 错误标题，用于弹窗标题栏显示
+            error_message (str): 详细的错误信息，包含原因分析和解决建议
         """
         try:
-            # 记录错误日志
+            # 记录错误日志供开发者调试使用
             self.logger.error(f"{error_title}: {error_message}")
             
-            # 这里可以添加错误提示逻辑
-            # 例如消息框、状态栏错误提示等
+            # 显示用户友好的错误弹窗
+            from PyQt5.QtWidgets import QMessageBox
+            
+            # 创建错误消息框，使用警告图标吸引用户注意
+            error_box = QMessageBox(self)
+            error_box.setIcon(QMessageBox.Critical)  # 使用严重错误图标
+            error_box.setWindowTitle(f"操作失败 - {error_title}")
+            error_box.setText(error_message)
+            
+            # 设置按钮文本为中文，提升用户体验
+            error_box.setStandardButtons(QMessageBox.Ok)
+            error_box.button(QMessageBox.Ok).setText("确定")
+            
+            # 显示弹窗并等待用户确认
+            error_box.exec_()
             
         except Exception as e:
             self.logger.error(f"处理服务层错误信号失败: {str(e)}")
+            # 如果弹窗显示失败，至少记录日志保证错误信息不丢失
+    
+    def _on_ip_config_applied(self, success_message):
+        """
+        处理IP配置应用成功信号并显示成功弹窗
+        
+        作用说明：
+        当网络配置操作成功完成时，这个方法负责向用户显示明确的成功确认弹窗。
+        采用面向对象设计原则，将成功反馈逻辑封装在独立方法中，
+        确保用户能够及时了解操作结果并获得积极的成功反馈。
+        
+        面向对象设计特点：
+        - 单一职责：专门负责成功信息的UI显示
+        - 封装性：将成功处理逻辑封装在方法内部
+        - 用户体验：提供直观的成功确认和操作结果展示
+        
+        Args:
+            success_message (str): 服务层传递的成功消息，包含配置详情
+        """
+        try:
+            # 记录IP配置成功的详细信息供开发者调试使用
+            self.logger.info(f"IP配置应用成功: {success_message}")
+            
+            # 显示用户友好的成功弹窗
+            from PyQt5.QtWidgets import QMessageBox
+            
+            # 创建成功消息框，使用信息图标表示正面反馈
+            success_box = QMessageBox(self)
+            success_box.setIcon(QMessageBox.Information)  # 使用信息图标
+            success_box.setWindowTitle("配置成功")
+            
+            # 构建用户友好的成功消息内容
+            success_text = f"✅ 网络配置已成功应用！\n\n{success_message}"
+            success_text += "\n\n📝 提示：新的网络配置已生效，您可以在左侧信息面板中查看更新后的配置。"
+            
+            success_box.setText(success_text)
+            
+            # 设置按钮文本为中文，提升用户体验
+            success_box.setStandardButtons(QMessageBox.Ok)
+            success_box.button(QMessageBox.Ok).setText("确定")
+            
+            # 显示弹窗并等待用户确认
+            success_box.exec_()
+            
+        except Exception as e:
+            self.logger.error(f"处理IP配置成功信号失败: {str(e)}")
+            # 如果弹窗显示失败，至少记录日志保证成功信息不丢失
+    
+    def _on_operation_progress(self, progress_message):
+        """
+        处理操作进度更新信号的UI反馈逻辑
+        
+        这个方法负责在长时间操作过程中向用户提供实时的进度反馈。
+        采用面向对象的设计原则，将进度显示逻辑封装在独立方法中，
+        提升用户体验和操作透明度。
+        
+        功能特点：
+        1. 实时显示操作进度信息
+        2. 让用户了解当前操作状态
+        3. 为将来扩展进度条功能预留接口
+        
+        Args:
+            progress_message (str): 服务层传递的进度消息文本
+        """
+        try:
+            # 记录操作进度的详细信息
+            self.logger.info(f"操作进度: {progress_message}")
+            
+            # 这里可以添加用户友好的进度提示逻辑
+            # 例如进度条、状态栏消息、加载动画等
+            # 当前版本通过日志记录，后续版本可扩展UI进度显示
+            
+        except Exception as e:
+            self.logger.error(f"处理操作进度信号失败: {str(e)}")
     
     def _format_adapter_info_for_display(self, adapter_info):
         """
