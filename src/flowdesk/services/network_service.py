@@ -65,7 +65,7 @@ class NetworkService(QObject):
         
         self.logger.info("网络配置服务初始化完成")
     
-    def get_all_adapters(self) -> None:
+    def get_all_adapters(self) -> List[AdapterInfo]:
         """
         获取所有网络适配器信息
         
@@ -99,11 +99,13 @@ class NetworkService(QObject):
                 self.select_adapter(self._adapters[0].id)
             
             self.logger.info(f"网络适配器信息获取完成，共找到 {len(self._adapters)} 个网卡")
+            return self._adapters
             
         except Exception as e:
             error_msg = f"获取网络适配器信息失败: {str(e)}"
             self.logger.error(error_msg)
             self.error_occurred.emit("网卡枚举错误", error_msg)
+            return []
     
     def select_adapter(self, adapter_id: str) -> None:
         """
@@ -244,8 +246,26 @@ class NetworkService(QObject):
             return
         
         try:
-            # 格式化网卡信息
-            formatted_info = self._current_adapter.format_for_copy()
+            # 使用与界面显示一致的格式化方法
+            # 确保复制的内容与左侧IP信息容器显示的内容完全一致
+            from flowdesk.ui.main_window import MainWindow
+            main_window = None
+            
+            # 查找MainWindow实例以使用其格式化方法
+            from PyQt5.QtWidgets import QApplication
+            app = QApplication.instance()
+            if app:
+                for widget in app.allWidgets():
+                    if isinstance(widget, MainWindow):
+                        main_window = widget
+                        break
+            
+            if main_window:
+                # 使用MainWindow的格式化方法，确保与界面显示一致
+                formatted_info = main_window._format_adapter_info_for_display(self._current_adapter)
+            else:
+                # 备用方案：使用原有的格式化方法
+                formatted_info = self._current_adapter.format_for_copy()
             
             # 复制到剪贴板
             clipboard = QApplication.clipboard()
@@ -357,39 +377,69 @@ class NetworkService(QObject):
             # 获取IP配置信息
             ip_config = self._get_adapter_ip_config(adapter_name)
             
-            # 网卡连接状态解析逻辑
-            # 根据Windows网络连接状态代码映射到用户友好的中文描述
-            # 这个映射表基于Windows WMI NetConnectionStatus枚举值
-            status_code = basic_info.get('NetConnectionStatus', '0')
-            status_map = {
-                '0': '已禁用',        # 网卡被用户或系统禁用
-                '1': '正在连接',      # 网卡正在尝试建立连接
-                '2': '已连接',        # 网卡已成功连接到网络
-                '3': '正在断开',      # 网卡正在断开连接过程中
-                '4': '硬件不存在',    # 网卡硬件设备不存在或未检测到
-                '5': '硬件已禁用',    # 网卡硬件被禁用（通常在设备管理器中）
-                '6': '硬件故障',      # 网卡硬件出现故障
-                '7': '媒体断开',      # 网线未连接或无线信号断开
-                '8': '正在验证',      # 网卡正在进行身份验证
-                '9': '验证失败',      # 网络身份验证失败
-                '10': '验证成功',     # 网络身份验证成功
-                '11': '正在获取地址'  # 网卡正在通过DHCP获取IP地址
-            }
-            status = status_map.get(status_code, '未知状态')
+            # 增强DNS配置获取 - 使用netsh命令作为补充数据源
+            # 遵循开闭原则，通过新增功能而不修改现有逻辑来增强DNS获取能力
+            enhanced_dns = self._get_enhanced_dns_config(adapter_name)
+            if enhanced_dns:
+                # 如果netsh获取到了DNS信息，优先使用或合并到现有DNS列表中
+                existing_dns = ip_config.get('dns_servers', [])
+                # 合并DNS服务器列表，去重并保持顺序
+                combined_dns = enhanced_dns.copy()
+                for dns in existing_dns:
+                    if dns not in combined_dns:
+                        combined_dns.append(dns)
+                ip_config['dns_servers'] = combined_dns
+                self.logger.debug(f"网卡 {adapter_name} DNS配置已增强: {combined_dns}")
             
-            # 网卡启用状态判断逻辑 - 基于Windows网络连接状态的精确判断
-            # 这个逻辑用于区分网卡是被禁用还是仅仅未连接到网络
-            # 状态码0表示网卡被用户禁用，状态码4、5表示硬件层面的禁用或不存在
-            # 状态码7表示媒体断开（如网线未插或WiFi未连接），这种情况网卡是启用的但未连接
-            is_adapter_enabled = (status_code not in ['0', '4', '5'])
+            # 获取精确的网卡状态信息 - 使用netsh interface show interface命令
+            # 这是新增的双重状态判断机制，提供比wmic状态码更准确的状态信息
+            interface_status = self._get_interface_status_info(adapter_name)
             
-            # 网卡连接状态判断逻辑 - 严格区分连接状态和启用状态
-            # 只有状态码2表示网卡真正连接到网络并可以传输数据
-            # 状态码7（媒体断开）、状态码0（已禁用）等都视为未连接状态
-            is_adapter_connected = (status_code == '2')
+            # 应用双重状态判断逻辑 - 结合管理状态和连接状态
+            # 这个逻辑遵循面向对象架构的单一职责原则，专门处理状态判断
+            final_status, is_adapter_enabled, is_adapter_connected = self._determine_final_status(
+                interface_status['admin_status'], 
+                interface_status['connect_status']
+            )
             
-            # 调试日志 - 帮助开发者理解状态判断逻辑
-            self.logger.debug(f"网卡 {adapter_name} 状态分析: 状态码={status_code}, 状态描述={status}, 启用={is_adapter_enabled}, 连接={is_adapter_connected}")
+            # 备用状态判断机制 - 当netsh命令获取失败时使用wmic状态码
+            # 遵循依赖倒置原则，提供多种状态获取方式的抽象
+            if interface_status['admin_status'] == '未知' and interface_status['connect_status'] == '未知':
+                self.logger.info(f"网卡 {adapter_name} netsh状态获取失败，使用wmic状态码作为备用方案")
+                
+                # 原有的wmic状态码解析逻辑作为备用方案
+                status_code = basic_info.get('NetConnectionStatus', '0')
+                
+                # 添加调试日志以分析WLAN状态码
+                self.logger.debug(f"网卡 {adapter_name} wmic状态码: {status_code}")
+                
+                status_map = {
+                    '0': '已禁用',        # 网卡被用户或系统禁用
+                    '1': '正在连接',      # 网卡正在尝试建立连接
+                    '2': '已连接',        # 网卡已成功连接到网络
+                    '3': '正在断开',      # 网卡正在断开连接过程中
+                    '4': '已禁用',        # 修复：WLAN禁用时也返回状态码4，应显示为已禁用
+                    '5': '硬件已禁用',    # 网卡硬件被禁用（通常在设备管理器中）
+                    '6': '硬件故障',      # 网卡硬件出现故障
+                    '7': '媒体断开',      # 网线未连接或无线信号断开
+                    '8': '正在验证',      # 网卡正在进行身份验证
+                    '9': '验证失败',      # 网络身份验证失败
+                    '10': '验证成功',     # 网络身份验证成功
+                    '11': '正在获取地址'  # 网卡正在通过DHCP获取IP地址
+                }
+                final_status = status_map.get(status_code, '未知状态')
+                
+                # 备用状态判断逻辑 - 修复WLAN禁用状态判断
+                is_adapter_enabled = (status_code not in ['0', '4', '5'])
+                is_adapter_connected = (status_code == '2')
+                
+                # 特殊处理：如果是WLAN且状态码为4，根据netsh结果判断是否真的禁用
+                if 'WLAN' in adapter_name and status_code == '4':
+                    is_adapter_enabled = False  # WLAN禁用时设为False
+                
+                self.logger.debug(f"网卡 {adapter_name} 备用状态分析: 状态码={status_code}, 最终状态={final_status}")
+            else:
+                self.logger.debug(f"网卡 {adapter_name} 精确状态分析: 管理状态={interface_status['admin_status']}, 连接状态={interface_status['connect_status']}, 最终状态={final_status}")
             
             # 构造完整的网卡信息对象
             # 采用面向对象设计，将所有网卡相关数据封装在AdapterInfo类中
@@ -399,7 +449,7 @@ class NetworkService(QObject):
                 friendly_name=adapter_name,                       # 网卡友好名称（用户界面显示）
                 description=basic_info.get('Description', ''),    # 网卡硬件描述信息
                 mac_address=basic_info.get('MACAddress', ''),     # 网卡物理MAC地址
-                status=status,                                     # 网卡当前连接状态的中文描述
+                status=final_status,                              # 网卡当前连接状态的中文描述（使用增强的状态判断结果）
                 is_enabled=is_adapter_enabled,                    # 网卡是否处于启用状态
                 is_connected=is_adapter_connected,                # 网卡是否已连接到网络
                 ip_addresses=ip_config.get('ip_addresses', []),
@@ -631,9 +681,8 @@ class NetworkService(QObject):
                         config['subnet_masks'] = mask_matches
                         self.logger.debug(f"解析到子网掩码: {mask_matches}")
                     
-                    # 解析默认网关 - 支持多行格式
-                    # 格式1: "默认网关. . . . . . . . . . . . . : 172.2.0.1"
-                    # 格式2: "默认网关. . . . . . . . . . . . . : fe80::xxx%4\n                                    172.2.0.1"
+                    # 解析默认网关
+                    # 支持"默认网关 . . . . . . . . . . . . : 192.168.1.1"格式
                     gateway_pattern = r'默认网关[.\s]*:\s*([^\n]*(?:\n\s*\d+\.\d+\.\d+\.\d+)?)'
                     gateway_match = re.search(gateway_pattern, adapter_section, re.IGNORECASE)
                     if gateway_match:
@@ -644,17 +693,54 @@ class NetworkService(QObject):
                         if ipv4_matches:
                             config['gateway'] = ipv4_matches[0]  # 使用第一个IPv4地址
                             self.logger.debug(f"解析到IPv4网关: {ipv4_matches[0]}")
-                        else:
-                            config['gateway'] = ''
-                            self.logger.debug("未找到IPv4网关，网关未配置")
                     
-                    # 解析DNS服务器
-                    # 支持"DNS 服务器  . . . . . . . . . . . : 114.114.114.114"格式
-                    dns_pattern = r'DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)'
-                    dns_matches = re.findall(dns_pattern, adapter_section, re.IGNORECASE)
-                    if dns_matches:
-                        config['dns_servers'] = dns_matches
-                        self.logger.debug(f"解析到DNS服务器: {dns_matches}")
+                    # 解析DNS服务器配置 - 增强的DNS解析逻辑
+                    # 这是解决"DNS服务器获取不准确"问题的关键代码，支持更多DNS配置格式
+                    dns_patterns = [
+                        r'DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',                    # 标准DNS格式
+                        r'通过 DHCP 配置的 DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',  # DHCP DNS格式
+                        r'静态配置的 DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',          # 静态DNS格式
+                        r'首选 DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',              # 首选DNS格式
+                        r'备用 DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',              # 备用DNS格式
+                        r'Primary DNS Server[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',           # 英文主DNS
+                        r'Secondary DNS Server[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',         # 英文备用DNS
+                    ]
+                    
+                    dns_servers_found = []
+                    # 逐个尝试所有DNS匹配模式，确保不遗漏任何可能的DNS配置
+                    for i, pattern in enumerate(dns_patterns, 1):
+                        dns_matches = re.findall(pattern, adapter_section, re.IGNORECASE)
+                        if dns_matches:
+                            dns_servers_found.extend(dns_matches)
+                            self.logger.debug(f"ipconfig DNS模式{i}匹配成功: {dns_matches}")
+                    
+                    # 如果标准模式都没有找到DNS，尝试多行DNS配置解析
+                    if not dns_servers_found:
+                        self.logger.debug("尝试多行DNS配置解析")
+                        # 查找DNS服务器配置行，然后提取后续行中的IP地址
+                        dns_section_pattern = r'DNS 服务器[^:]*:([^\n]*(?:\n\s+[^\n]*)*)'  
+                        dns_section_match = re.search(dns_section_pattern, adapter_section, re.IGNORECASE)
+                        if dns_section_match:
+                            dns_section = dns_section_match.group(1)
+                            # 从DNS配置段落中提取所有IP地址
+                            ip_addresses = re.findall(r'(\d+\.\d+\.\d+\.\d+)', dns_section)
+                            if ip_addresses:
+                                dns_servers_found.extend(ip_addresses)
+                                self.logger.debug(f"多行DNS解析成功: {ip_addresses}")
+                    
+                    if dns_servers_found:
+                        # 去重并保持顺序，确保DNS服务器列表的唯一性和正确性
+                        unique_dns = []
+                        seen = set()
+                        for dns in dns_servers_found:
+                            # 过滤掉无效的DNS地址（如0.0.0.0或本地地址）
+                            if dns not in seen and not dns.startswith('0.') and not dns.startswith('127.'):
+                                seen.add(dns)
+                                unique_dns.append(dns)
+                        config['dns_servers'] = unique_dns
+                        self.logger.debug(f"ipconfig最终解析到DNS服务器: {unique_dns}")
+                    else:
+                        self.logger.debug(f"ipconfig未能解析到DNS服务器，网卡段落内容: {adapter_section[:300]}...")
                     
                     # 解析DHCP状态
                     # 支持"DHCP 已启用 . . . . . . . . . . . : 否"格式
@@ -675,6 +761,269 @@ class NetworkService(QObject):
         except Exception as e:
             self.logger.error(f"使用ipconfig补充配置信息失败: {str(e)}")
     
+    def _get_interface_status_info(self, adapter_name: str) -> Dict[str, str]:
+        """
+        获取网卡精确的启用和连接状态信息
+        
+        这个方法通过netsh interface show interface命令获取网卡的精确状态信息，
+        遵循面向对象架构的单一职责原则，专门负责状态信息的获取和解析。
+        相比wmic命令的状态码，这种方式能够更准确地区分网卡的启用状态和连接状态。
+        
+        技术实现：
+        - 使用netsh interface show interface命令获取所有网卡的状态表格
+        - 通过友好名称精确匹配目标网卡
+        - 解析"管理状态"和"状态"两个关键字段
+        - 支持中英文系统的状态文本识别
+        
+        状态说明：
+        - 管理状态：已启用/已禁用（用户或系统设置的启用状态）
+        - 状态：已连接/已断开连接（实际的网络连接状态）
+        
+        Args:
+            adapter_name (str): 网卡友好名称，如"以太网"、"WLAN"等
+            
+        Returns:
+            Dict[str, str]: 包含状态信息的字典，键包括：
+                - admin_status: 管理状态（已启用/已禁用/未知）
+                - connect_status: 连接状态（已连接/已断开连接/未知）
+                - interface_name: 接口名称（用于验证匹配正确性）
+        """
+        # 初始化状态字典，提供默认值确保数据结构完整性
+        status_info = {
+            'admin_status': '未知',      # 管理状态：网卡是否被启用
+            'connect_status': '未知',    # 连接状态：网卡是否已连接到网络
+            'interface_name': ''         # 接口名称：用于验证匹配结果
+        }
+        
+        try:
+            # 执行netsh interface show interface命令获取所有网卡的状态表格
+            # 这个命令返回系统中所有网络接口的详细状态信息
+            result = subprocess.run(
+                ['netsh', 'interface', 'show', 'interface'],
+                capture_output=True, text=True, timeout=15, encoding='gbk', errors='ignore'
+            )
+            
+            if result.returncode == 0:
+                output = result.stdout
+                
+                # 按行分割输出，查找目标网卡的状态信息
+                lines = output.strip().split('\n')
+                
+                # 跳过表头，查找包含目标网卡名称的行
+                for line in lines:
+                    line = line.strip()
+                    if not line or '---' in line:  # 跳过空行和分隔线
+                        continue
+                    
+                    # 检查当前行是否包含目标网卡名称
+                    # 使用多种匹配策略，因为netsh输出的名称可能与友好名称略有差异
+                    line_parts = line.split()
+                    if len(line_parts) >= 4:
+                        interface_name = ' '.join(line_parts[3:])  # 接口名称是第4列及之后的所有内容
+                        
+                        # 多种匹配策略：完全匹配、包含匹配、反向包含匹配
+                        if (adapter_name == interface_name or 
+                            adapter_name in interface_name or 
+                            interface_name in adapter_name):
+                            
+                            # 解析状态行的格式：管理状态 状态 类型 接口名称
+                            # 典型格式："已启用     已连接     专用         以太网"
+                            admin_status_raw = line_parts[0].strip()      # 管理状态
+                            connect_status_raw = line_parts[1].strip()    # 连接状态
+                            
+                            # 解析管理状态（第一列）- 网卡是否被启用
+                            if '已启用' in admin_status_raw or 'Enabled' in admin_status_raw:
+                                status_info['admin_status'] = '已启用'
+                            elif '已禁用' in admin_status_raw or 'Disabled' in admin_status_raw:
+                                status_info['admin_status'] = '已禁用'
+                            else:
+                                status_info['admin_status'] = '未知'
+                            
+                            # 解析连接状态（第二列）- 网卡是否已连接
+                            if '已连接' in connect_status_raw or 'Connected' in connect_status_raw:
+                                status_info['connect_status'] = '已连接'
+                            elif '已断开连接' in connect_status_raw or 'Disconnected' in connect_status_raw or '未连接' in connect_status_raw or 'Not connected' in connect_status_raw:
+                                status_info['connect_status'] = '已断开连接'
+                            else:
+                                status_info['connect_status'] = '未知'
+                            
+                            self.logger.debug(f"网卡 {adapter_name} 状态解析成功: 管理状态={status_info['admin_status']}, 连接状态={status_info['connect_status']}")
+                            break
+                else:
+                    # 如果没有找到匹配的网卡，记录警告信息
+                    self.logger.warning(f"在netsh interface show interface输出中未找到网卡: {adapter_name}")
+            else:
+                # 命令执行失败时的错误处理
+                self.logger.error(f"netsh interface show interface命令执行失败: {result.stderr}")
+                
+        except Exception as e:
+            # 异常安全处理，确保方法调用不会导致系统崩溃
+            self.logger.error(f"获取网卡 {adapter_name} 状态信息时发生异常: {str(e)}")
+        
+        return status_info
+    
+    def _determine_final_status(self, admin_status: str, connect_status: str) -> tuple:
+        """
+        基于管理状态和连接状态确定网卡的最终状态
+        
+        这个方法实现了双重状态判断逻辑，遵循面向对象架构的单一职责原则。
+        通过组合分析网卡的管理状态（启用/禁用）和连接状态（连接/断开），
+        得出用户界面显示的最终状态和相应的布尔标志。
+        
+        判断逻辑：
+        1. 已禁用 → 最终状态：已禁用，is_enabled=False, is_connected=False
+        2. 已启用 + 已连接 → 最终状态：已连接，is_enabled=True, is_connected=True
+        3. 已启用 + 已断开连接 → 最终状态：未连接，is_enabled=True, is_connected=False
+        4. 其他情况 → 最终状态：未知状态，is_enabled=False, is_connected=False
+        
+        Args:
+            admin_status (str): 管理状态（已启用/已禁用/未知）
+            connect_status (str): 连接状态（已连接/已断开连接/未知）
+            
+        Returns:
+            tuple: 包含三个元素的元组：
+                - final_status (str): 最终显示状态
+                - is_enabled (bool): 网卡是否启用
+                - is_connected (bool): 网卡是否已连接
+        """
+        # 第一层判断：检查管理状态（网卡是否被用户或系统启用）
+        if admin_status == '已禁用':
+            # 网卡被禁用时，无论连接状态如何，都视为禁用状态
+            final_status = '已禁用'
+            is_enabled = False
+            is_connected = False
+            self.logger.debug(f"状态判断结果: 网卡已禁用")
+            
+        elif admin_status == '已启用':
+            # 网卡已启用时，需要进一步判断连接状态
+            is_enabled = True
+            
+            # 第二层判断：检查连接状态（网卡是否实际连接到网络）
+            if connect_status == '已连接':
+                # 已启用且已连接：网卡正常工作，可以传输数据
+                final_status = '已连接'
+                is_connected = True
+                self.logger.debug(f"状态判断结果: 网卡已启用且已连接")
+                
+            elif connect_status == '已断开连接':
+                # 已启用但未连接：网卡启用但无网络连接（如网线未插、WiFi未连接）
+                final_status = '未连接'
+                is_connected = False
+                self.logger.debug(f"状态判断结果: 网卡已启用但未连接")
+                
+            else:
+                # 连接状态未知：无法确定具体连接情况
+                final_status = '未知状态'
+                is_connected = False
+                self.logger.debug(f"状态判断结果: 网卡已启用但连接状态未知")
+        else:
+            # 管理状态未知：无法确定网卡的基本启用状态
+            final_status = '未知状态'
+            is_enabled = False
+            is_connected = False
+            self.logger.debug(f"状态判断结果: 网卡管理状态未知")
+        
+        return final_status, is_enabled, is_connected
+    
+    def _get_enhanced_dns_config(self, adapter_name: str) -> List[str]:
+        """
+        使用netsh命令增强DNS服务器信息获取
+        
+        这个方法通过正确的netsh命令语法获取DNS配置信息，解决之前语法错误的问题。
+        遵循面向对象架构的开闭原则，作为现有DNS获取方式的补充和增强。
+        
+        技术实现：
+        - 使用正确的netsh interface ipv4 show config "接口名称"语法
+        - 专门解析DNS服务器配置段落，支持多种输出格式
+        - 实现异常安全的DNS解析机制
+        - 与现有DNS获取方式进行数据融合
+        
+        Args:
+            adapter_name (str): 网卡友好名称，如"以太网"、"WLAN"等
+            
+        Returns:
+            List[str]: DNS服务器IP地址列表，按优先级排序
+        """
+        dns_servers = []
+        
+        try:
+            # 修复netsh命令语法：使用正确的参数格式
+            # 正确语法：netsh interface ipv4 show config "接口名称"
+            # 错误语法：netsh interface ipv4 show config name="接口名称"
+            cmd = ['netsh', 'interface', 'ipv4', 'show', 'config', f'"{adapter_name}"']
+            self.logger.debug(f"执行修复后的netsh DNS获取命令: {' '.join(cmd)}")
+            
+            result = subprocess.run(
+                cmd,
+                capture_output=True, text=True, timeout=15, encoding='gbk', errors='ignore'
+            )
+            
+            # 详细的调试日志，帮助诊断DNS获取问题
+            self.logger.debug(f"netsh命令返回码: {result.returncode}")
+            if result.stdout:
+                # 显示更多输出内容以便调试
+                self.logger.debug(f"netsh命令完整输出: {result.stdout}")
+            if result.stderr:
+                self.logger.debug(f"netsh命令错误输出: {result.stderr}")
+            
+            if result.returncode == 0 and result.stdout.strip():
+                output = result.stdout
+                
+                # 检查输出是否包含错误信息或帮助信息
+                if "此命令提供的语法不正确" in output or "用法:" in output:
+                    self.logger.warning(f"netsh命令语法仍然不正确，输出: {output[:100]}...")
+                    return dns_servers
+                
+                # 增强的DNS正则表达式模式，支持更多格式
+                # 这些模式基于实际的Windows netsh输出格式设计
+                dns_patterns = [
+                    r'通过 DHCP 配置的 DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',  # DHCP DNS格式
+                    r'DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',                    # 标准DNS格式
+                    r'静态配置的 DNS 服务器[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',          # 静态DNS格式
+                    r'DNS Servers[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',                   # 英文系统格式
+                    r'主 DNS 后缀[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',                   # 主DNS后缀格式
+                    r'备用 DNS 后缀[.\s]*:\s*(\d+\.\d+\.\d+\.\d+)',                 # 备用DNS后缀格式
+                ]
+                
+                # 逐个尝试所有DNS匹配模式
+                # 这种设计确保能够捕获各种可能的DNS配置格式
+                for i, pattern in enumerate(dns_patterns, 1):
+                    matches = re.findall(pattern, output, re.IGNORECASE | re.MULTILINE)
+                    if matches:
+                        dns_servers.extend(matches)
+                        self.logger.debug(f"DNS模式{i}匹配成功: {matches}")
+                
+                # 如果标准模式都没有匹配，尝试更宽松的IP地址匹配
+                if not dns_servers:
+                    self.logger.debug("标准DNS模式未匹配，尝试宽松IP地址匹配")
+                    # 查找所有可能的IP地址，然后过滤掉明显不是DNS的地址
+                    ip_pattern = r'(\d+\.\d+\.\d+\.\d+)'
+                    all_ips = re.findall(ip_pattern, output)
+                    # 过滤掉本地地址和广播地址
+                    for ip in all_ips:
+                        if not (ip.startswith('127.') or ip.startswith('0.') or 
+                               ip.endswith('.0') or ip.endswith('.255') or ip == '255.255.255.255'):
+                            dns_servers.append(ip)
+                            self.logger.debug(f"通过宽松匹配找到可能的DNS: {ip}")
+                
+                # 去重并保持顺序，确保DNS服务器列表的唯一性
+                seen = set()
+                unique_dns = []
+                for dns in dns_servers:
+                    if dns not in seen:
+                        seen.add(dns)
+                        unique_dns.append(dns)
+                dns_servers = unique_dns
+                
+            else:
+                self.logger.warning(f"netsh DNS配置命令执行失败或无输出: 返回码={result.returncode}, 错误={result.stderr}")
+                
+        except Exception as e:
+            # 异常安全处理，确保DNS获取失败不影响主流程
+            self.logger.error(f"使用netsh获取网卡 {adapter_name} DNS配置时发生异常: {str(e)}")
+        
+        return dns_servers
+
     def _get_link_speed_info(self, adapter_name: str, config: Dict[str, Any]) -> None:
         """
         获取网卡链路速度信息的专用方法

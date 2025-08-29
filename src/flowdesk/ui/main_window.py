@@ -381,9 +381,8 @@ class MainWindow(QMainWindow):
         """
         try:
             # 更新当前网卡标签，让用户清楚知道正在操作哪个网卡
-            # 使用友好名称提供用户熟悉的网卡标识
-            current_adapter_text = f"当前网卡: {adapter_info.friendly_name}"
-            self.network_config_tab.update_current_adapter_label(current_adapter_text)
+            # 直接传递友好名称，由Tab组件统一添加前缀
+            self.network_config_tab.update_current_adapter_label(adapter_info.friendly_name)
             
             # 网卡状态显示逻辑 - 根据实际网卡状态显示准确的状态信息
             # 优先显示网卡的真实状态（如已禁用），而不是简单的连接/未连接二分法
@@ -510,8 +509,8 @@ class MainWindow(QMainWindow):
         """
         try:
             # 更新当前网卡标签，确保显示最新的网卡标识
-            current_adapter_text = f"当前网卡: {adapter_info.friendly_name}"
-            self.network_config_tab.update_current_adapter_label(current_adapter_text)
+            # 直接传递友好名称，由Tab组件统一添加前缀
+            self.network_config_tab.update_current_adapter_label(adapter_info.friendly_name)
             
             # 网卡状态显示逻辑 - 刷新后根据实际网卡状态显示准确的状态信息
             # 优先显示网卡的真实状态（如已禁用），确保刷新后状态显示的准确性
@@ -603,9 +602,24 @@ class MainWindow(QMainWindow):
             info_lines.append(f"网卡描述: {adapter_info.description or '未知'}")
             info_lines.append(f"友好名称: {adapter_info.friendly_name}")
             info_lines.append(f"物理地址: {adapter_info.mac_address or '未知'}")
-            info_lines.append(f"连接状态: {'已连接' if adapter_info.is_connected else '未连接'}")
+            # 智能状态显示：优先显示禁用状态，其次显示连接状态
+            # 这确保了用户能够准确了解网卡的真实工作状态
+            if not adapter_info.is_enabled:
+                connection_status = "已禁用"
+            elif adapter_info.is_connected:
+                connection_status = "已连接"
+            else:
+                connection_status = "未连接"
+            info_lines.append(f"连接状态: {connection_status}")
+            
             info_lines.append(f"接口类型: {adapter_info.interface_type or '未知'}")
-            info_lines.append(f"链路速度: {adapter_info.link_speed}Mbps" if adapter_info.link_speed else "链路速度: 未知")
+            
+            # 链路速度显示：避免重复添加单位，因为link_speed已包含单位信息
+            # 支持Gbps、Mbps等不同速度单位的正确显示
+            if adapter_info.link_speed and adapter_info.link_speed != '未知':
+                info_lines.append(f"链路速度: {adapter_info.link_speed}")
+            else:
+                info_lines.append("链路速度: 未知")
             info_lines.append("")
             
             # IP配置信息 - 优先显示IPv4地址信息
