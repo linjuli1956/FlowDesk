@@ -28,7 +28,7 @@ from PyQt5.QtGui import QIcon, QCloseEvent
 from ..utils.resource_path import resource_path
 from ..utils.logger import get_logger
 from .tabs.network_config_tab import NetworkConfigTab
-from ..services.network_service import NetworkService
+from ..services import NetworkService
 
 
 class MainWindow(QMainWindow):

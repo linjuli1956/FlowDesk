@@ -19,18 +19,19 @@
 - 提供统一的错误处理和进度反馈机制
 - 支持异步操作和任务取消
 """
-# 导入核心服务 - 当前阶段需要系统托盘服务和样式表服务
+# 导入核心服务 - 当前阶段需要系统托盘服务、样式表服务和网络服务
 from .system_tray_service import SystemTrayService
 from .stylesheet_service import StylesheetService
+from .network_service import NetworkService
 
 # 其他服务将在后续开发阶段逐步添加
 # from .base_service import BaseService
-# from .network_service import NetworkService
 # from .hardware_monitor_service import HardwareMonitorService
 # from .rdp_service import RdpService
 # from .settings_service import SettingsService
 
 __all__ = [
     'SystemTrayService',
-    'StylesheetService'
+    'StylesheetService',
+    'NetworkService'
 ]

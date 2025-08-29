@@ -748,10 +748,18 @@ class NetworkService(QObject):
                 output = result.stdout
                 self.logger.debug(f"ipconfig输出长度: {len(output)} 字符")
                 
-                # 构建更精确的网卡段落匹配模式
+                # 构建更精确的网卡段落匹配模式，支持无线和以太网适配器
                 # 匹配从网卡名称开始到下一个网卡或文件结束的完整段落
-                adapter_pattern = rf'以太网适配器\s+{re.escape(adapter_name)}:(.*?)(?=\n以太网适配器|\n无线局域网适配器|\nPPP 适配器|\Z)'
-                adapter_match = re.search(adapter_pattern, output, re.DOTALL | re.IGNORECASE)
+                adapter_patterns = [
+                    rf'无线局域网适配器\s+{re.escape(adapter_name)}:(.*?)(?=\n以太网适配器|\n无线局域网适配器|\nPPP 适配器|\Z)',
+                    rf'以太网适配器\s+{re.escape(adapter_name)}:(.*?)(?=\n以太网适配器|\n无线局域网适配器|\nPPP 适配器|\Z)'
+                ]
+                
+                adapter_match = None
+                for pattern in adapter_patterns:
+                    adapter_match = re.search(pattern, output, re.DOTALL | re.IGNORECASE)
+                    if adapter_match:
+                        break
                 
                 if adapter_match:
                     adapter_section = adapter_match.group(1)
@@ -1147,26 +1155,42 @@ class NetworkService(QObject):
 
     def _get_link_speed_info(self, adapter_name: str, config: Dict[str, Any]) -> None:
         """
-        获取网卡链路速度信息的专用方法
+        获取网卡链路速度信息的优化版本
         
-        这个方法实现了网卡链路速度的精确获取，遵循面向对象架构的单一职责原则。
-        通过wmic命令查询网卡的物理连接速度，补充ipconfig无法提供的硬件层面信息。
+        使用wmic nic命令直接通过网卡描述匹配获取速度，这种方法对所有网卡类型都有效。
+        遵循面向对象架构的单一职责原则，专门负责链路速度的获取和格式化。
         
         技术实现：
-        - 使用wmic查询Win32_NetworkAdapter获取Speed属性
-        - 将字节速度转换为用户友好的Mbps/Gbps格式
+        - 使用wmic nic where "NetEnabled=true"查询所有启用的网卡
+        - 通过网卡描述精确匹配目标网卡
+        - 将比特/秒转换为用户友好的Mbps/Gbps格式
         - 实现异常安全的查询机制，确保不影响主流程
         
         Args:
             adapter_name (str): 网卡连接名称
             config (Dict[str, Any]): 配置字典，用于存储链路速度信息
         """
+        self.logger.info(f"开始为网卡 {adapter_name} 获取链路速度信息，当前值: {config.get('link_speed', '')}")
+        
         try:
-            # 使用wmic命令查询网卡的链路速度信息
-            # Speed属性返回的是每秒比特数，需要转换为用户友好的格式
+            # 首先需要根据adapter_name找到对应的网卡描述
+            # 因为wmic nic使用的是Description，而不是NetConnectionID
+            adapter_description = self._get_adapter_description_by_name(adapter_name)
+            if not adapter_description:
+                self.logger.debug(f"无法获取网卡 {adapter_name} 的描述，尝试备用方法")
+                # 如果无法获取描述，直接尝试netsh备用方法
+                if adapter_name.upper() == 'WLAN' or '无线' in adapter_name:
+                    wlan_speed = self._get_wireless_link_speed(adapter_name)
+                    if wlan_speed:
+                        config['link_speed'] = wlan_speed
+                        self.logger.debug(f"使用netsh备用方法成功获取链路速度: {wlan_speed}")
+                        return
+                config['link_speed'] = '未知'
+                return
+            
+            # 使用wmic nic命令查询所有启用网卡的Name和Speed
             result = subprocess.run(
-                ['wmic', 'path', 'win32_networkadapter', 'where', f'NetConnectionID="{adapter_name}"', 
-                 'get', 'Speed', '/format:csv'],
+                ['wmic', 'nic', 'where', 'NetEnabled=true', 'get', 'Name,Speed', '/format:csv'],
                 capture_output=True, text=True, timeout=10, encoding='cp936', errors='replace'
             )
             
@@ -1174,37 +1198,225 @@ class NetworkService(QObject):
                 output = result.stdout.strip()
                 lines = [line for line in output.split('\n') if line.strip() and not line.startswith('Node,')]
                 
-                if lines:
-                    # 解析CSV格式的输出，提取Speed字段
-                    for line in lines:
-                        parts = line.split(',')
-                        if len(parts) >= 2:
-                            speed_str = parts[1].strip()
+                self.logger.info(f"wmic nic输出行数: {len(lines)}")
+                self.logger.info(f"目标网卡描述: '{adapter_description}'")
+                
+                # 如果无法获取描述，直接尝试通过友好名称匹配
+                if not adapter_description:
+                    self.logger.debug(f"无网卡描述，尝试通过友好名称 '{adapter_name}' 匹配")
+                    
+                for i, line in enumerate(lines):
+                    parts = line.split(',')
+                    self.logger.debug(f"第{i+1}行解析: parts数量={len(parts)}")
+                    
+                    if len(parts) >= 3:  # Node,Name,Speed
+                        name = parts[1].strip()
+                        speed_str = parts[2].strip()
+                        
+                        self.logger.info(f"网卡名称: '{name}', 速度: '{speed_str}'")
+                        
+                        # 多重匹配策略：描述匹配 或 关键字匹配
+                        is_match = False
+                        if adapter_description:
+                            # 策略1：完整描述匹配
+                            if adapter_description.lower() == name.lower():
+                                is_match = True
+                                self.logger.info(f"完整描述匹配成功")
+                            # 策略2：描述包含匹配
+                            elif adapter_description.lower() in name.lower() or name.lower() in adapter_description.lower():
+                                is_match = True  
+                                self.logger.info(f"描述包含匹配成功")
+                        
+                        # 策略3：针对WLAN的关键字匹配（备用策略）
+                        if not is_match and adapter_name.upper() == 'WLAN':
+                            if 'wireless' in name.lower() or '802.11' in name.lower() or 'wlan' in name.lower():
+                                is_match = True
+                                self.logger.info(f"WLAN关键字匹配成功")
+                        
+                        if is_match:
+                            self.logger.info(f"网卡匹配成功! 名称: {name}")
                             if speed_str and speed_str.isdigit():
                                 # 将比特/秒转换为用户友好的格式
                                 speed_bps = int(speed_str)
                                 if speed_bps >= 1000000000:  # >= 1 Gbps
                                     speed_formatted = f"{speed_bps / 1000000000:.1f} Gbps"
                                 elif speed_bps >= 1000000:  # >= 1 Mbps
-                                    speed_formatted = f"{speed_bps / 1000000:.0f} Mbps"
+                                    speed_formatted = f"{speed_bps / 1000000:.1f} Mbps"
                                 else:
                                     speed_formatted = f"{speed_bps} bps"
                                 
                                 config['link_speed'] = speed_formatted
-                                self.logger.debug(f"解析到链路速度: {speed_formatted}")
+                                self.logger.info(f"wmic nic解析到链路速度: {speed_formatted} (匹配网卡: {name})")
                                 return
+                            else:
+                                self.logger.info(f"匹配的网卡速度为空或无效: '{speed_str}'")
                 
-                # 如果无法获取具体速度，设置为未知
-                config['link_speed'] = '未知'
+                self.logger.debug("wmic nic方法未找到匹配的网卡或速度信息")
+            else:
+                self.logger.debug(f"wmic nic命令执行失败: return code {result.returncode}")
+                self.logger.debug(f"错误输出: {result.stderr}")
+            
+            # 如果wmic nic失败，尝试使用netsh wlan作为备用方法
+            if adapter_name.upper() == 'WLAN' or '无线' in adapter_name:
+                self.logger.debug(f"wmic nic未获取到速度，尝试netsh wlan方法作为备用")
+                wlan_speed = self._get_wireless_link_speed(adapter_name)
+                if wlan_speed:
+                    config['link_speed'] = wlan_speed
+                    self.logger.debug(f"netsh wlan备用方法解析到链路速度: {wlan_speed}")
+                    return
+                
+            # 如果无法获取具体速度，设置为未知
+            config['link_speed'] = '未知'
                 
         except Exception as e:
             self.logger.warning(f"获取网卡 {adapter_name} 链路速度失败: {str(e)}")
             config['link_speed'] = '未知'
     
+    def _get_adapter_description_by_name(self, adapter_name: str) -> Optional[str]:
+        """
+        通过网卡连接名称获取对应的硬件描述信息
+        
+        这个方法是链路速度获取架构的关键组件，负责建立友好名称与硬件描述之间的映射关系。
+        采用Windows Management Instrumentation Commands (wmic) 查询Win32_NetworkAdapter类，
+        实现从用户可见的连接名称到系统内部硬件描述的精确转换。
+        
+        架构设计原则：
+        - 单一职责原则：专门负责名称-描述映射转换
+        - 封装性原则：封装wmic命令执行和CSV格式解析逻辑
+        - 异常安全性：提供完整的错误处理和超时保护机制
+        - 开闭原则：支持未来扩展其他网卡信息查询方式
+        
+        技术实现：
+        - 使用wmic path win32_networkadapter查询网卡对象
+        - 通过NetConnectionID字段精确匹配连接名称
+        - 解析CSV格式输出获取Description字段值
+        - 实现编码兼容性处理，支持中文系统环境
+        
+        Args:
+            adapter_name (str): 网卡连接的友好名称，如"WLAN"、"以太网"等系统显示名称
+            
+        Returns:
+            Optional[str]: 网卡的硬件描述字符串，如"Realtek 8188GU Wireless LAN 802.11n USB NIC"，
+                          查询失败时返回None
+        """
+        self.logger.info(f"开始查询网卡 {adapter_name} 的硬件描述信息")
+        
+        try:
+            # 构建wmic查询命令，使用NetConnectionID字段进行精确匹配
+            # 这里使用win32_networkadapter类来查询物理和虚拟网络适配器的完整信息
+            # 
+            # 关键修复：使用shell=True和正确的引号转义来解决编码兼容性问题
+            # 在Windows环境下，subprocess对复杂引号处理存在编码差异，需要特殊处理
+            command_str = f'wmic path win32_networkadapter where "NetConnectionID=\'{adapter_name}\'" get Description /format:csv'
+            
+            self.logger.debug(f"执行wmic查询命令: {command_str}")
+            
+            result = subprocess.run(
+                command_str,
+                shell=True,  # 使用shell=True来正确处理引号和编码
+                capture_output=True, text=True, timeout=8, encoding='gbk', errors='replace'  # 改用gbk编码
+            )
+            
+            self.logger.debug(f"wmic查询返回码: {result.returncode}")
+            self.logger.debug(f"wmic查询输出: {repr(result.stdout)}")
+            
+            if result.returncode == 0:
+                output = result.stdout.strip()
+                # 过滤掉空行和CSV头部，只保留数据行
+                lines = [line for line in output.split('\n') if line.strip() and not line.startswith('Node,')]
+                
+                self.logger.debug(f"解析到 {len(lines)} 行有效数据")
+                
+                if lines:
+                    for i, line in enumerate(lines):
+                        self.logger.debug(f"处理第 {i+1} 行数据: {repr(line)}")
+                        parts = line.split(',')
+                        if len(parts) >= 2:
+                            description = parts[1].strip()
+                            if description:
+                                self.logger.info(f"成功获取网卡 {adapter_name} 的描述: {description}")
+                                return description
+                            else:
+                                self.logger.debug(f"第 {i+1} 行描述字段为空")
+                        else:
+                            self.logger.debug(f"第 {i+1} 行数据格式不正确，字段数: {len(parts)}")
+                else:
+                    self.logger.warning(f"wmic查询 {adapter_name} 返回空数据")
+            else:
+                self.logger.warning(f"wmic查询 {adapter_name} 失败，返回码: {result.returncode}")
+                if result.stderr:
+                    self.logger.warning(f"wmic查询错误信息: {result.stderr}")
+            
+            return None
+            
+        except Exception as e:
+            self.logger.debug(f"获取网卡描述失败: {str(e)}")
+            return None
+    
+    def _get_wireless_link_speed(self, adapter_name: str) -> Optional[str]:
+        """
+        获取无线网卡链路速度的专用方法
+        
+        使用netsh wlan show interface命令获取无线网卡的连接速度信息，
+        这是针对无线网卡Speed属性经常为空的专门解决方案。
+        
+        Args:
+            adapter_name (str): 无线网卡连接名称，如"WLAN"
+            
+        Returns:
+            Optional[str]: 格式化的链路速度字符串，如"72.2 Mbps"，失败时返回None
+        """
+        try:
+            result = subprocess.run(
+                ['netsh', 'wlan', 'show', 'interface'],
+                capture_output=True, text=True, timeout=8, encoding='cp936', errors='replace'
+            )
+            
+            if result.returncode == 0:
+                output = result.stdout
+                self.logger.debug(f"netsh wlan完整输出:\n{output}")
+                
+                # 解析接收速率，支持多种格式
+                # 格式1: "接收速率(Mbps)     : 72.2"  
+                # 格式2: "接收速率          : 72.2 Mbps"
+                # 格式3: "接收速率          : 72.2"
+                # 格式4: 英文版本
+                speed_patterns = [
+                    r'接收速率\(Mbps\)\s*[:：]\s*([\d.]+)',
+                    r'接收速率\s*[:：]\s*([\d.]+)\s*\(?Mbps\)?',
+                    r'接收速率\s*[:：]\s*([\d.]+)',
+                    r'Receive\s+rate\s*\(Mbps\)\s*[:：]\s*([\d.]+)',
+                    r'Receive\s+rate\s*[:：]\s*([\d.]+)\s*\(?Mbps\)?'
+                ]
+                
+                for i, pattern in enumerate(speed_patterns, 1):
+                    match = re.search(pattern, output, re.IGNORECASE)
+                    if match:
+                        speed_value = match.group(1)
+                        speed_formatted = f"{speed_value} Mbps"
+                        self.logger.debug(f"netsh解析到无线速率: {speed_formatted} (使用模式{i}: {pattern})")
+                        return speed_formatted
+                
+                self.logger.debug("netsh wlan所有模式都未匹配到速率信息")
+                # 输出前200个字符用于调试
+                debug_output = output[:200].replace('\n', '\\n')
+                self.logger.debug(f"netsh输出前200字符: {debug_output}")
+                
+            else:
+                self.logger.debug(f"netsh wlan命令执行失败: return code {result.returncode}")
+                
+        except subprocess.TimeoutExpired:
+            self.logger.debug(f"netsh wlan查询超时")
+        except Exception as e:
+            self.logger.debug(f"netsh wlan查询失败: {str(e)}")
+            
+        return None
+    
     def _find_adapter_basic_info(self, adapter_id: str) -> Optional[Dict[str, Any]]:
         """
         根据网卡GUID查找基本信息的核心匹配方法
         
+{{ ... }}
         这个方法实现了网卡信息检索的核心逻辑，通过GUID精确匹配网卡。
         遵循面向对象架构的封装性原则，将复杂的查找逻辑封装在独立方法中，
         确保数据访问的一致性和可靠性。
