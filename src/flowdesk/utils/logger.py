@@ -35,52 +35,62 @@ _logger_initialized = False
 _loggers = {}
 
 
-def setup_logging(log_level=logging.INFO, enable_file_logging=True, enable_console_logging=True):
+def setup_logging(log_level=logging.INFO, enable_file_logging=True, enable_console_logging=True, verbose_mode=False):
     """
-    设置应用程序的日志系统
+    设置应用程序的分级日志系统
     
-    配置日志记录器的基本参数，包括日志级别、输出目标、格式等。
-    应该在应用程序启动时调用一次。
+    这是FlowDesk日志系统的核心配置函数，实现了专业的分级日志输出策略：
+    - 控制台输出：只显示INFO级别及以上的重要信息，保持输出简洁
+    - 文件输出：记录DEBUG级别及以上的所有详细信息，便于问题排查
+    - 动态模式：支持verbose模式一键切换到详细调试输出
+    
+    分级策略说明：
+    - 正常模式：控制台显示关键操作和错误，详细调试信息写入日志文件
+    - 详细模式：控制台也显示DEBUG信息，适合开发调试使用
+    - 文件日志：始终记录完整的调试信息，不受控制台级别影响
     
     参数:
-        log_level (int): 日志级别，默认为INFO
-        enable_file_logging (bool): 是否启用文件日志，默认True
-        enable_console_logging (bool): 是否启用控制台日志，默认True
+        log_level (int): 根日志记录器的最低级别，默认为INFO
+        enable_file_logging (bool): 是否启用文件日志记录，生产环境建议开启
+        enable_console_logging (bool): 是否启用控制台日志显示，调试时建议开启
+        verbose_mode (bool): 是否启用详细模式，True时控制台也显示DEBUG信息
     """
     global _logger_initialized
     
     if _logger_initialized:
         return
     
-    # 获取根日志记录器
+    # 设置根日志记录器的最低级别为DEBUG，确保所有级别的日志都能被处理
+    # 具体的过滤由各个handler的级别设置来控制
     root_logger = logging.getLogger()
-    root_logger.setLevel(log_level)
+    root_logger.setLevel(logging.DEBUG)  # 根记录器设为最低级别，由handler控制过滤
     
-    # 清除现有的处理器
+    # 清除可能存在的旧处理器，确保配置的纯净性
     root_logger.handlers.clear()
     
-    # 创建日志格式器
+    # 创建统一的日志消息格式器，包含时间戳、模块名、级别等关键信息
     formatter = create_log_formatter()
     
-    # 设置控制台日志处理器
+    # 配置控制台日志处理器：根据verbose模式动态调整显示级别
     if enable_console_logging:
-        console_handler = create_console_handler(formatter)
+        console_handler = create_console_handler(formatter, verbose_mode)
         root_logger.addHandler(console_handler)
     
-    # 设置文件日志处理器
+    # 配置文件日志处理器：始终记录详细的DEBUG级别信息
     if enable_file_logging:
         file_handler = create_file_handler(formatter)
         if file_handler:
             root_logger.addHandler(file_handler)
     
-    # 设置第三方库的日志级别
+    # 配置第三方库的日志级别，避免过多的第三方调试信息干扰
     configure_third_party_loggers()
     
     _logger_initialized = True
     
-    # 记录日志系统初始化完成
+    # 记录日志系统初始化完成状态，使用INFO级别确保在控制台可见
     logger = get_logger(__name__)
-    logger.info("日志系统初始化完成")
+    mode_desc = "详细模式" if verbose_mode else "标准模式"
+    logger.info(f"日志系统初始化完成 - {mode_desc}")
 
 
 def create_log_formatter():
@@ -105,56 +115,98 @@ def create_log_formatter():
     return logging.Formatter(log_format, date_format)
 
 
-def create_console_handler(formatter):
+def create_console_handler(formatter, verbose_mode=False):
     """
-    创建控制台日志处理器
+    创建智能控制台日志处理器
     
-    配置输出到控制台（stdout）的日志处理器。
+    这个函数负责创建向终端输出日志的处理器，是用户与程序交互的主要信息窗口。
+    处理器会根据运行模式智能调整显示的信息量：
+    
+    - 标准模式（verbose_mode=False）：
+      只显示INFO、WARNING、ERROR级别的信息，保持控制台整洁
+      适合日常使用，用户只看到关键操作结果和错误提示
+      
+    - 详细模式（verbose_mode=True）：
+      显示DEBUG及以上所有级别的信息，包含详细的调试过程
+      适合开发调试，帮助开发者理解程序执行流程和定位问题
+    
+    设计理念：
+    控制台是用户的直接交互界面，信息过多会造成干扰，信息过少会缺乏反馈。
+    通过动态级别控制，在便利性和清晰性之间找到最佳平衡点。
     
     参数:
-        formatter (logging.Formatter): 日志格式器
-    
+        formatter (logging.Formatter): 日志格式器，定义消息的显示格式
+        verbose_mode (bool): 详细模式开关，True时显示DEBUG信息
+        
     返回:
-        logging.StreamHandler: 控制台日志处理器
+        logging.StreamHandler: 配置完成的控制台处理器
     """
-    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler = logging.StreamHandler()
     console_handler.setFormatter(formatter)
-    console_handler.setLevel(logging.INFO)
+    
+    # 根据verbose模式动态设置控制台日志级别
+    # 这是分级日志的核心：同样的日志记录，不同级别的显示策略
+    if verbose_mode:
+        console_handler.setLevel(logging.DEBUG)  # 详细模式：显示所有调试信息
+    else:
+        console_handler.setLevel(logging.INFO)   # 标准模式：只显示重要信息
     
     return console_handler
 
 
 def create_file_handler(formatter):
     """
-    创建文件日志处理器
+    创建持久化文件日志处理器
     
-    配置输出到文件的日志处理器，支持日志文件轮转。
+    这个处理器负责将程序运行的完整日志信息保存到文件中，是问题排查的重要工具。
+    与控制台处理器不同，文件处理器始终记录DEBUG级别及以上的所有信息，确保：
+    
+    功能特点：
+    - 完整记录：保存所有DEBUG级别的详细调试信息，不受控制台显示级别影响
+    - 自动轮转：当日志文件超过5MB时自动创建新文件，保留最近3个备份
+    - 持久存储：程序关闭后日志信息仍然保留，便于事后分析问题
+    - UTF-8编码：确保中文日志信息正确保存，避免乱码问题
+    
+    使用场景：
+    - 生产环境问题排查：用户反馈问题时，可通过日志文件详细了解程序行为
+    - 开发调试：即使控制台不显示DEBUG信息，文件中仍有完整的执行轨迹
+    - 性能分析：通过详细的时间戳和执行流程分析程序性能瓶颈
+    
+    文件轮转策略：
+    - flowdesk.log（当前文件）
+    - flowdesk.log.1（上一个备份）
+    - flowdesk.log.2（更早的备份）
+    - flowdesk.log.3（最早的备份，超过后会被删除）
     
     参数:
-        formatter (logging.Formatter): 日志格式器
-    
+        formatter (logging.Formatter): 日志格式器，定义文件中日志的格式
+        
     返回:
-        logging.Handler: 文件日志处理器，如果创建失败返回None
+        RotatingFileHandler: 配置完成的文件处理器，创建失败时返回None
     """
     try:
-        # 获取日志文件路径
         log_file_path = get_log_path("flowdesk.log")
         
-        # 创建轮转文件处理器
-        # 最大文件大小10MB，保留5个备份文件
+        # 创建旋转文件处理器，实现智能的日志文件管理
+        # maxBytes=5MB：单个文件最大5兆字节，避免日志文件过大影响性能
+        # backupCount=3：保留3个历史备份，平衡存储空间和历史信息保留
+        # encoding='utf-8'：支持中文字符，确保日志内容完整可读
         file_handler = logging.handlers.RotatingFileHandler(
             log_file_path,
-            maxBytes=10 * 1024 * 1024,  # 10MB
-            backupCount=5,
+            maxBytes=5*1024*1024,  # 5MB
+            backupCount=3,
             encoding='utf-8'
         )
         
         file_handler.setFormatter(formatter)
-        file_handler.setLevel(logging.DEBUG)  # 文件日志记录更详细的信息
+        # 文件日志始终设置为DEBUG级别，记录最详细的信息
+        # 这是分级日志策略的核心：控制台简洁，文件详尽
+        file_handler.setLevel(logging.DEBUG)
         
         return file_handler
         
     except Exception as e:
+        # 使用print而不是logger，避免在日志系统初始化时产生循环依赖
         print(f"创建文件日志处理器失败: {e}")
         return None
 

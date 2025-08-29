@@ -18,6 +18,7 @@ python src/flowdesk/app.py
 
 import sys
 import os
+import argparse
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QIcon
@@ -41,25 +42,38 @@ class FlowDeskApplication:
     样式加载等核心功能。采用单例模式确保应用程序唯一性。
     """
     
-    def __init__(self):
-        """初始化应用程序，设置基本配置和日志系统"""
-        # 设置应用程序基本信息
+    def __init__(self, verbose_mode=False):
+        """
+        初始化应用程序，设置基本配置和分级日志系统
+        
+        这是FlowDesk应用程序的核心初始化函数，负责建立程序运行的基础环境。
+        特别重要的是日志系统的初始化，它支持两种运行模式：
+        
+        - 标准模式：控制台输出简洁的关键信息，详细调试信息写入日志文件
+        - 详细模式：控制台也显示详细的DEBUG信息，便于开发调试
+        
+        参数:
+            verbose_mode (bool): 是否启用详细日志模式，通过命令行参数-v/--verbose控制
+        """
+        # 设置应用程序基本信息，这些信息会显示在系统的任务管理器和窗口标题中
         self.app = QApplication(sys.argv)
         self.app.setApplicationName("FlowDesk")
         self.app.setApplicationVersion("1.0.0")
         self.app.setOrganizationName("FlowDesk Team")
         
         # 设置应用程序图标（显示在任务栏和窗口标题栏）
+        # 图标路径通过resource_path函数获取，确保在开发和打包环境都能正确找到
         app_icon_path = resource_path("assets/icons/flowdesk.ico")
         if os.path.exists(app_icon_path):
             self.app.setWindowIcon(QIcon(app_icon_path))
         
-        # 初始化日志系统，记录应用程序运行状态
-        setup_logging()
+        # 初始化分级日志系统，这是程序调试和问题排查的核心工具
+        # verbose_mode参数控制控制台日志的详细程度，文件日志始终保持详细记录
+        setup_logging(verbose_mode=verbose_mode)
         self.logger = get_logger(__name__)
         self.logger.info("FlowDesk应用程序启动")
         
-        # 初始化核心组件
+        # 初始化核心组件的占位变量，这些将在run()方法中被实际创建
         self.main_window = None
         self.tray_service = None
         self.stylesheet_service = None
@@ -163,27 +177,81 @@ class FlowDeskApplication:
         self.logger.info("应用程序退出完成")
 
 
+def parse_command_line_arguments():
+    """
+    解析命令行参数
+    
+    这个函数负责处理用户通过命令行传递的各种参数，为FlowDesk提供灵活的启动选项。
+    当前支持的参数主要用于控制日志输出的详细程度，便于开发调试和问题排查。
+    
+    支持的参数：
+    -v, --verbose: 启用详细日志模式
+        正常情况下，控制台只显示INFO级别及以上的关键信息，保持输出简洁。
+        使用此参数后，控制台也会显示DEBUG级别的详细调试信息。
+        文件日志始终记录详细信息，不受此参数影响。
+    
+    使用示例：
+        python src/flowdesk/app.py           # 标准模式，控制台输出简洁
+        python src/flowdesk/app.py -v       # 详细模式，控制台显示调试信息
+        python src/flowdesk/app.py --verbose # 同上，完整参数名
+    
+    返回:
+        argparse.Namespace: 解析后的命令行参数对象
+    """
+    parser = argparse.ArgumentParser(
+        prog='FlowDesk',
+        description='FlowDesk - 专业的网络配置管理工具',
+        epilog='使用 -v 参数可以查看详细的调试信息，便于问题排查'
+    )
+    
+    # 添加详细模式参数
+    parser.add_argument(
+        '-v', '--verbose',
+        action='store_true',
+        help='启用详细日志模式，在控制台显示DEBUG级别的调试信息'
+    )
+    
+    # 解析命令行参数
+    return parser.parse_args()
+
+
 def main():
     """
     程序主入口函数
     
-    创建FlowDesk应用程序实例并启动运行。
-    处理命令行参数和异常情况。
+    这是FlowDesk的启动入口，负责处理命令行参数、创建应用程序实例并启动运行。
+    函数会根据用户提供的命令行参数（如-v详细模式）来配置应用程序的行为。
+    
+    主要职责：
+    1. 解析命令行参数，获取用户的启动偏好
+    2. 根据参数创建相应配置的应用程序实例
+    3. 启动应用程序主循环
+    4. 处理异常情况和程序退出
+    
+    异常处理：
+    - KeyboardInterrupt: 用户按Ctrl+C中断程序时的友好退出
+    - 其他异常: 记录错误信息并以非零退出码退出，便于脚本检测失败
     """
     try:
-        # 创建应用程序实例
-        app = FlowDeskApplication()
+        # 解析命令行参数，获取用户的启动配置选项
+        args = parse_command_line_arguments()
         
-        # 运行应用程序
+        # 根据命令行参数创建应用程序实例
+        # verbose_mode参数控制日志系统的详细程度
+        app = FlowDeskApplication(verbose_mode=args.verbose)
+        
+        # 启动应用程序主循环，这里会阻塞直到程序退出
         exit_code = app.run()
         
-        # 返回退出码
+        # 返回应用程序的退出码，0表示正常退出，非0表示异常
         sys.exit(exit_code)
         
     except KeyboardInterrupt:
+        # 用户通过Ctrl+C中断程序时的友好提示
         print("\n应用程序被用户中断")
         sys.exit(0)
     except Exception as e:
+        # 捕获其他未预期的异常，记录错误信息
         print(f"应用程序启动失败: {e}")
         sys.exit(1)
 

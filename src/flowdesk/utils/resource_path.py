@@ -18,6 +18,8 @@
 
 import os
 import sys
+import platform
+import tempfile
 from pathlib import Path
 
 
@@ -132,6 +134,20 @@ def get_config_path(config_filename):
     return resource_path(f"config/{config_filename}")
 
 
+def get_project_root():
+    """
+    获取项目根目录路径
+    
+    返回:
+        str: 项目根目录的绝对路径
+    """
+    # 从当前文件位置向上查找项目根目录
+    current_file = Path(__file__).resolve()
+    # 当前文件路径: src/flowdesk/utils/resource_path.py
+    # 项目根目录: 向上3级目录
+    return str(current_file.parent.parent.parent.parent)
+
+
 def get_logs_dir() -> str:
     """
     获取日志文件目录路径
@@ -170,11 +186,10 @@ def get_logs_dir() -> str:
         # 确保目录存在
         os.makedirs(log_dir, exist_ok=True)
         
-        logger.debug(f"日志目录: {log_dir}")
         return log_dir
         
     except Exception as e:
-        logger.error(f"获取日志目录失败: {e}")
+        print(f"获取日志目录失败: {e}")
         # 返回临时目录作为备选
         fallback_dir = os.path.join(tempfile.gettempdir(), 'FlowDesk', 'logs')
         os.makedirs(fallback_dir, exist_ok=True)
@@ -216,11 +231,10 @@ def get_app_data_dir() -> str:
         # 确保目录存在
         os.makedirs(data_dir, exist_ok=True)
         
-        logger.debug(f"应用数据目录: {data_dir}")
         return data_dir
         
     except Exception as e:
-        logger.error(f"获取应用数据目录失败: {e}")
+        print(f"获取应用数据目录失败: {e}")
         # 返回临时目录作为备选
         fallback_dir = os.path.join(tempfile.gettempdir(), 'FlowDesk', 'data')
         os.makedirs(fallback_dir, exist_ok=True)

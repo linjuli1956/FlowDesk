@@ -628,7 +628,7 @@ class NetworkService(QObject):
             
             if result.returncode == 0:
                 output = result.stdout
-                self.logger.debug(f"netsh命令输出: {output[:200]}...")  # 记录前200字符用于调试
+                self.logger.debug(f"netsh命令执行成功，输出长度: {len(output)} 字符")  # 避免记录可能乱码的原始输出
                 
                 # 解析DHCP启用状态
                 if "DHCP 已启用" in output or "DHCP enabled" in output:
@@ -1088,16 +1088,16 @@ class NetworkService(QObject):
             self.logger.debug(f"netsh命令返回码: {result.returncode}")
             if result.stdout:
                 # 显示更多输出内容以便调试
-                self.logger.debug(f"netsh命令完整输出: {result.stdout}")
+                self.logger.debug(f"netsh命令执行成功，输出长度: {len(result.stdout)} 字符")
             if result.stderr:
-                self.logger.debug(f"netsh命令错误输出: {result.stderr}")
+                self.logger.debug(f"netsh命令有错误输出，长度: {len(result.stderr)} 字符")
             
             if result.returncode == 0 and result.stdout.strip():
                 output = result.stdout
                 
                 # 检查输出是否包含错误信息或帮助信息
                 if "此命令提供的语法不正确" in output or "用法:" in output:
-                    self.logger.warning(f"netsh命令语法仍然不正确，输出: {output[:100]}...")
+                    self.logger.warning(f"netsh命令语法仍然不正确，输出长度: {len(output)} 字符")
                     return dns_servers
                 
                 # 增强的DNS正则表达式模式，支持更多格式
@@ -1254,7 +1254,7 @@ class NetworkService(QObject):
                 self.logger.debug("wmic nic方法未找到匹配的网卡或速度信息")
             else:
                 self.logger.debug(f"wmic nic命令执行失败: return code {result.returncode}")
-                self.logger.debug(f"错误输出: {result.stderr}")
+                self.logger.debug(f"命令执行有错误，错误输出长度: {len(result.stderr)} 字符")
             
             # 如果wmic nic失败，尝试使用netsh wlan作为备用方法
             if adapter_name.upper() == 'WLAN' or '无线' in adapter_name:
@@ -1318,7 +1318,7 @@ class NetworkService(QObject):
             )
             
             self.logger.debug(f"wmic查询返回码: {result.returncode}")
-            self.logger.debug(f"wmic查询输出: {repr(result.stdout)}")
+            self.logger.debug(f"wmic查询成功，输出长度: {len(result.stdout)} 字符")
             
             if result.returncode == 0:
                 output = result.stdout.strip()
@@ -1374,7 +1374,7 @@ class NetworkService(QObject):
             
             if result.returncode == 0:
                 output = result.stdout
-                self.logger.debug(f"netsh wlan完整输出:\n{output}")
+                self.logger.debug(f"netsh wlan命令执行成功，输出长度: {len(output)} 字符")
                 
                 # 解析接收速率，支持多种格式
                 # 格式1: "接收速率(Mbps)     : 72.2"  
@@ -1400,7 +1400,7 @@ class NetworkService(QObject):
                 self.logger.debug("netsh wlan所有模式都未匹配到速率信息")
                 # 输出前200个字符用于调试
                 debug_output = output[:200].replace('\n', '\\n')
-                self.logger.debug(f"netsh输出前200字符: {debug_output}")
+                self.logger.debug(f"netsh wlan未匹配到速率信息，输出长度: {len(output)} 字符")
                 
             else:
                 self.logger.debug(f"netsh wlan命令执行失败: return code {result.returncode}")
@@ -1661,7 +1661,7 @@ class NetworkService(QObject):
             # 这些信息对于调试网络配置问题非常重要
             self.logger.info(f"netsh命令执行完成 - 返回码: {result.returncode}")
             if result.stdout.strip():
-                self.logger.info(f"命令输出: {result.stdout.strip()}")
+                self.logger.info(f"命令输出长度: {len(result.stdout.strip())} 字符")
             if result.stderr.strip():
                 self.logger.warning(f"命令错误输出: {result.stderr.strip()}")
             
@@ -1693,7 +1693,7 @@ class NetworkService(QObject):
                 
                 error_msg += f"\n📊 返回码: {result.returncode}"
                 if result.stdout.strip():
-                    error_msg += f"\n📝 命令输出: {result.stdout.strip()}"
+                    error_msg += f"\n📝 命令输出长度: {len(result.stdout.strip())} 字符"
                 
                 self.logger.error(error_msg)
                 return False
@@ -1789,7 +1789,7 @@ class NetworkService(QObject):
                 # 记录命令执行结果
                 self.logger.info(f"主DNS命令执行完成 - 返回码: {result_primary.returncode}")
                 if result_primary.stdout.strip():
-                    self.logger.info(f"命令输出: {result_primary.stdout.strip()}")
+                    self.logger.info(f"命令输出长度: {len(result_primary.stdout.strip())} 字符")
                 if result_primary.stderr.strip():
                     self.logger.warning(f"命令错误输出: {result_primary.stderr.strip()}")
                 
@@ -1855,7 +1855,7 @@ class NetworkService(QObject):
                 # 记录辅助DNS命令执行结果
                 self.logger.info(f"辅助DNS命令执行完成 - 返回码: {result_secondary.returncode}")
                 if result_secondary.stdout.strip():
-                    self.logger.info(f"命令输出: {result_secondary.stdout.strip()}")
+                    self.logger.info(f"命令输出长度: {len(result_secondary.stdout.strip())} 字符")
                 if result_secondary.stderr.strip():
                     self.logger.warning(f"命令错误输出: {result_secondary.stderr.strip()}")
                 
@@ -2266,7 +2266,7 @@ class NetworkService(QObject):
                 self.logger.error(f"  命令: {cmd_str}")
                 self.logger.error(f"  返回码: {result.returncode}")
                 self.logger.error(f"  错误输出: {error_output}")
-                self.logger.error(f"  标准输出: {stdout_output}")
+                self.logger.error(f"  标准输出长度: {len(stdout_output)} 字符")
                 return False
                 
         except subprocess.TimeoutExpired:
@@ -2337,7 +2337,7 @@ class NetworkService(QObject):
                 self.logger.error(f"  完整命令: {cmd_str}")
                 self.logger.error(f"  返回码: {result.returncode}")
                 self.logger.error(f"  错误输出: {error_output}")
-                self.logger.error(f"  标准输出: {stdout_output}")
+                self.logger.error(f"  标准输出长度: {len(stdout_output)} 字符")
                 print(f"🔍 DEBUG - 删除命令: {cmd_str}")
                 print(f"🔍 DEBUG - 返回码: {result.returncode}")
                 print(f"🔍 DEBUG - 错误输出: {error_output}")
