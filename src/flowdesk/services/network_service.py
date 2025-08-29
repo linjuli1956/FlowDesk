@@ -67,35 +67,63 @@ class NetworkService(QObject):
     
     def get_all_adapters(self) -> List[AdapterInfo]:
         """
-        获取所有网络适配器信息
+        获取所有网络适配器信息 - 快速启动优化版本
         
-        通过Windows系统命令获取所有网卡的详细信息，
-        包括IP配置、连接状态、硬件信息等，
-        处理完成后发射adapters_updated信号通知UI层更新。
+        这个方法实现了快速启动优化，采用延迟加载策略减少启动时间。
+        只获取网卡的基本信息用于界面显示，详细配置信息在用户选择时再获取。
         
-        这是启动初始化的核心方法，会自动选中第一个网卡。
+        性能优化策略：
+        - 启动时只获取网卡基本信息（名称、状态、MAC地址）
+        - 详细IP配置采用按需加载，用户选择网卡时才获取
+        - 减少系统命令调用次数，提升启动速度
+        - 保持UI响应性，避免长时间阻塞
+        
+        面向对象设计：
+        - 单一职责：专门负责网卡信息的快速获取和缓存管理
+        - 开闭原则：支持后续扩展更多优化策略
+        - 依赖倒置：通过信号机制与UI层解耦
         """
         try:
-            self.logger.info("开始获取网络适配器信息")
+            self.logger.info("开始快速获取网络适配器基本信息")
             
-            # 获取网卡基本信息
+            # 只获取网卡基本信息，大幅减少启动时间
             adapters_info = self._get_adapters_basic_info()
             
-            # 获取每个网卡的详细IP配置
-            detailed_adapters = []
+            # 创建轻量级适配器对象，不包含详细IP配置
+            # 这样可以快速显示网卡列表，详细信息按需加载
+            lightweight_adapters = []
             for adapter_basic in adapters_info:
-                detailed_adapter = self._get_adapter_detailed_info(adapter_basic)
-                if detailed_adapter:
-                    detailed_adapters.append(detailed_adapter)
+                # 创建最小化的AdapterInfo对象，只包含必要的显示信息
+                # 修复字段映射：使用正确的字典键名匹配wmic输出格式
+                lightweight_adapter = AdapterInfo(
+                    id=adapter_basic.get('GUID', ''),
+                    name=adapter_basic.get('Name', ''),
+                    friendly_name=adapter_basic.get('NetConnectionID', ''),
+                    description=adapter_basic.get('Description', ''),
+                    mac_address=adapter_basic.get('MACAddress', ''),
+                    status=self._get_status_display(adapter_basic.get('NetConnectionStatus', '0')),
+                    is_connected=adapter_basic.get('NetConnectionStatus', '0') == '2',
+                    # 详细配置信息留空，按需加载
+                    ip_addresses=[],
+                    subnet_masks=[],
+                    gateway='',
+                    dns_servers=[],
+                    dhcp_enabled=False,
+                    ipv6_addresses=[]
+                )
+                lightweight_adapters.append(lightweight_adapter)
             
             # 更新内部缓存
-            self._adapters = detailed_adapters
+            self._adapters = lightweight_adapters
             
-            # 发射信号通知UI层
+            # 发射信号通知UI层快速更新
             self.adapters_updated.emit(self._adapters)
             
-            # 自动选中第一个网卡（启动初始化逻辑）
-            if self._adapters:
+            # 自动选中第一个已连接的网卡，触发详细信息加载
+            connected_adapters = [a for a in self._adapters if a.is_connected]
+            if connected_adapters:
+                self.select_adapter(connected_adapters[0].id)
+            elif self._adapters:
                 self.select_adapter(self._adapters[0].id)
             
             self.logger.info(f"网络适配器信息获取完成，共找到 {len(self._adapters)} 个网卡")
@@ -355,6 +383,36 @@ class NetworkService(QObject):
         except Exception as e:
             self.logger.error(f"获取网卡基本信息失败: {str(e)}")
             raise
+    
+    def _get_status_display(self, status_code: str) -> str:
+        """
+        将网卡状态码转换为中文显示文本
+        
+        这个方法将Windows系统的网卡连接状态码转换为用户友好的中文显示文本。
+        遵循面向对象架构的单一职责原则，专门负责状态码的转换逻辑。
+        
+        Args:
+            status_code (str): 网卡连接状态码
+            
+        Returns:
+            str: 中文状态显示文本
+        """
+        status_map = {
+            '0': '已断开连接',
+            '1': '正在连接',
+            '2': '已连接',
+            '3': '正在断开连接',
+            '4': '硬件不存在',
+            '5': '硬件已禁用',
+            '6': '硬件故障',
+            '7': '媒体已断开连接',
+            '8': '正在验证身份',
+            '9': '身份验证成功',
+            '10': '身份验证失败',
+            '11': '无效地址',
+            '12': '凭据需要'
+        }
+        return status_map.get(status_code, '未知状态')
     
     def _get_adapter_detailed_info(self, basic_info: Dict[str, Any]) -> Optional[AdapterInfo]:
         """
@@ -623,7 +681,7 @@ class NetworkService(QObject):
             # 使用ipconfig /all命令获取系统完整的网络配置信息
             result = subprocess.run(
                 ['ipconfig', '/all'],
-                capture_output=True, text=True, timeout=15, encoding='gbk', errors='ignore'
+                capture_output=True, text=True, timeout=6, encoding='gbk', errors='ignore'
             )
             
             if result.returncode == 0:
@@ -955,7 +1013,7 @@ class NetworkService(QObject):
             
             result = subprocess.run(
                 cmd,
-                capture_output=True, text=True, timeout=15, encoding='gbk', errors='ignore'
+                capture_output=True, text=True, timeout=8, encoding='gbk', errors='ignore'
             )
             
             # 详细的调试日志，帮助诊断DNS获取问题
@@ -1018,9 +1076,12 @@ class NetworkService(QObject):
             else:
                 self.logger.warning(f"netsh DNS配置命令执行失败或无输出: 返回码={result.returncode}, 错误={result.stderr}")
                 
+        except subprocess.TimeoutExpired:
+            # 超时异常的专门处理，避免阻塞启动流程
+            self.logger.warning(f"netsh DNS获取超时，跳过网卡 {adapter_name} 的DNS配置")
         except Exception as e:
             # 异常安全处理，确保DNS获取失败不影响主流程
-            self.logger.error(f"使用netsh获取网卡 {adapter_name} DNS配置时发生异常: {str(e)}")
+            self.logger.debug(f"使用netsh获取网卡 {adapter_name} DNS配置时发生异常: {str(e)}")
         
         return dns_servers
 
