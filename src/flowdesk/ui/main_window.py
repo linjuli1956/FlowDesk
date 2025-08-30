@@ -752,7 +752,9 @@ class MainWindow(QMainWindow):
             
             # 调用UI层的配置更新方法，实现界面与数据的同步
             # 这确保了用户看到的信息与实际网卡配置保持一致
+            self.logger.info(f"[调试] 准备更新IP配置输入框，数据: {config_data}")
             self.network_config_tab.update_ip_config_inputs(config_data)
+            self.logger.info(f"[调试] IP配置输入框更新完成")
             
             # 记录IP配置更新的成功状态，便于系统监控和调试
             self.logger.info(f"IP配置界面更新完成: {ip_config.ip_address or '无IP地址'}")
@@ -774,11 +776,19 @@ class MainWindow(QMainWindow):
             extra_ips (list): ExtraIP对象列表
         """
         try:
-            # 格式化额外IP信息
-            ip_list = []
-            for extra_ip in extra_ips:
-                ip_info = f"{extra_ip.ip_address}/{extra_ip.subnet_mask}"
-                ip_list.append(ip_info)
+            # 检查数据类型并相应处理
+            if extra_ips and isinstance(extra_ips[0], str):
+                # 如果接收到的是字符串列表（格式："ip/mask"），直接使用
+                ip_list = extra_ips
+                self.logger.info(f"接收到字符串格式的额外IP列表: {ip_list}")
+            else:
+                # 如果接收到的是ExtraIP对象列表，格式化为字符串
+                ip_list = []
+                for extra_ip in extra_ips:
+                    if hasattr(extra_ip, 'ip_address') and hasattr(extra_ip, 'subnet_mask'):
+                        ip_info = f"{extra_ip.ip_address}/{extra_ip.subnet_mask}"
+                        ip_list.append(ip_info)
+                self.logger.info(f"格式化ExtraIP对象为字符串列表: {ip_list}")
             
             # 更新额外IP列表
             self.network_config_tab.update_extra_ip_list(ip_list)
@@ -787,6 +797,8 @@ class MainWindow(QMainWindow):
             
         except Exception as e:
             self.logger.error(f"更新额外IP列表失败: {str(e)}")
+            import traceback
+            self.logger.error(f"异常堆栈: {traceback.format_exc()}")
     
     
     def _update_ip_display_from_detailed_info(self, adapter_info):

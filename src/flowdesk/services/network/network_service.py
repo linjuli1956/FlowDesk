@@ -109,6 +109,12 @@ class NetworkService(NetworkServiceBase):
         self._ui_coordinator.adapters_updated.connect(self._update_adapters_cache)  # 添加缓存同步
         self._ui_coordinator.adapter_info_updated.connect(self._debug_adapter_info_signal)  # 添加调试日志
         self._ui_coordinator.adapter_info_updated.connect(self.adapter_info_updated)
+        
+        # 连接IP配置和额外IP相关信号（修复信号转发缺失问题）
+        self._ui_coordinator.ip_info_updated.connect(self.ip_info_updated)
+        self._ui_coordinator.extra_ips_updated.connect(self.extra_ips_updated)
+        
+        # 连接通用操作信号
         self._ui_coordinator.operation_progress.connect(self.operation_progress)
         self._ui_coordinator.error_occurred.connect(self.error_occurred)
         

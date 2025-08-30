@@ -245,6 +245,46 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             # 发射聚合信息更新信号
             self.logger.info(f"发射adapter_info_updated信号 - 网卡ID: {aggregated_info.get('adapter_id', 'Unknown')}")
             self.adapter_info_updated.emit(aggregated_info)
+            
+            # 从详细信息中提取IP配置信息并发射ip_info_updated信号
+            detailed_info = aggregated_info.get('detailed_info')
+            if detailed_info:
+                # 构建IPConfigInfo格式的数据对象，用于UI层处理
+                # UI层期望的是具有ip_address、subnet_mask等属性的对象
+                ip_config_data = type('IPConfigInfo', (), {
+                    'ip_address': detailed_info.get_primary_ip() if hasattr(detailed_info, 'get_primary_ip') else (detailed_info.ip_addresses[0] if detailed_info.ip_addresses else ''),
+                    'subnet_mask': detailed_info.get_primary_subnet_mask() if hasattr(detailed_info, 'get_primary_subnet_mask') else (detailed_info.subnet_masks[0] if detailed_info.subnet_masks else ''),
+                    'gateway': detailed_info.gateway or '',
+                    'dns_primary': detailed_info.dns_servers[0] if detailed_info.dns_servers else '',
+                    'dns_secondary': detailed_info.dns_servers[1] if len(detailed_info.dns_servers) > 1 else '',
+                    'dhcp_enabled': detailed_info.dhcp_enabled
+                })()
+                
+                # 发射IP配置信息更新信号，用于填充右侧输入框
+                self.logger.info("发射ip_info_updated信号，用于更新右侧输入框")
+                self.ip_info_updated.emit(ip_config_data)
+                
+                # 发射额外IP列表更新信号，用于显示额外IP
+                # 使用get_extra_ips()方法获取额外IP列表
+                if hasattr(detailed_info, 'get_extra_ips'):
+                    extra_ips = detailed_info.get_extra_ips()
+                    if extra_ips:
+                        # 格式化额外IP信息为UI显示格式
+                        formatted_extra_ips = []
+                        for ip, mask in extra_ips:
+                            formatted_extra_ips.append(f"{ip}/{mask}")
+                        
+                        self.logger.info(f"发射extra_ips_updated信号，共{len(extra_ips)}个额外IP: {formatted_extra_ips}")
+                        self.extra_ips_updated.emit(formatted_extra_ips)
+                    else:
+                        # 如果没有额外IP，发射空列表清空显示
+                        self.logger.info("发射空的extra_ips_updated信号，清空额外IP显示")
+                        self.extra_ips_updated.emit([])
+                else:
+                    # 如果没有get_extra_ips方法，发射空列表
+                    self.logger.info("AdapterInfo对象没有get_extra_ips方法，发射空列表")
+                    self.extra_ips_updated.emit([])
+            
             self._log_operation_success("刷新当前网卡", "信息更新完成")
             self.operation_progress.emit("网卡信息刷新完成")
             
