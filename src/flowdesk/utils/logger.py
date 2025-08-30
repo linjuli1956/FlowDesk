@@ -163,38 +163,42 @@ def create_file_handler(formatter):
     
     功能特点：
     - 完整记录：保存所有DEBUG级别的详细调试信息，不受控制台显示级别影响
-    - 自动轮转：当日志文件超过5MB时自动创建新文件，保留最近3个备份
-    - 持久存储：程序关闭后日志信息仍然保留，便于事后分析问题
+    - 启动清空：每次程序启动时自动清空旧日志，避免日志文件过大
+    - 单次会话：只保留当前运行会话的日志，简化日志管理
     - UTF-8编码：确保中文日志信息正确保存，避免乱码问题
     
     使用场景：
-    - 生产环境问题排查：用户反馈问题时，可通过日志文件详细了解程序行为
+    - 当前会话问题排查：记录本次运行的所有操作和错误信息
     - 开发调试：即使控制台不显示DEBUG信息，文件中仍有完整的执行轨迹
     - 性能分析：通过详细的时间戳和执行流程分析程序性能瓶颈
     
-    文件轮转策略：
-    - flowdesk.log（当前文件）
-    - flowdesk.log.1（上一个备份）
-    - flowdesk.log.2（更早的备份）
-    - flowdesk.log.3（最早的备份，超过后会被删除）
+    文件管理策略：
+    - flowdesk.log（当前会话文件，启动时清空）
+    - 不保留历史备份，专注当前运行状态
     
     参数:
         formatter (logging.Formatter): 日志格式器，定义文件中日志的格式
         
     返回:
-        RotatingFileHandler: 配置完成的文件处理器，创建失败时返回None
+        FileHandler: 配置完成的文件处理器，创建失败时返回None
     """
     try:
         log_file_path = get_log_path("flowdesk.log")
         
-        # 创建旋转文件处理器，实现智能的日志文件管理
-        # maxBytes=5MB：单个文件最大5兆字节，避免日志文件过大影响性能
-        # backupCount=3：保留3个历史备份，平衡存储空间和历史信息保留
-        # encoding='utf-8'：支持中文字符，确保日志内容完整可读
-        file_handler = logging.handlers.RotatingFileHandler(
+        # 启动时清空旧日志文件，确保只记录当前会话
+        if os.path.exists(log_file_path):
+            try:
+                # 清空日志文件内容
+                with open(log_file_path, 'w', encoding='utf-8') as f:
+                    f.write('')  # 写入空内容，清空文件
+            except Exception as clear_error:
+                print(f"清空旧日志文件失败: {clear_error}")
+        
+        # 创建普通文件处理器，不使用轮转功能
+        # 每次启动都是全新的日志文件，避免累积过大
+        file_handler = logging.FileHandler(
             log_file_path,
-            maxBytes=5*1024*1024,  # 5MB
-            backupCount=3,
+            mode='w',  # 写入模式，确保文件从头开始
             encoding='utf-8'
         )
         

@@ -17,13 +17,45 @@ from PyQt5.QtWidgets import (
     QWidget, QHBoxLayout, QVBoxLayout, QGridLayout, QFormLayout,
     QComboBox, QPushButton, QLineEdit, QTextEdit, QLabel, 
     QGroupBox, QFrame, QScrollArea, QCheckBox, QListWidget,
-    QListWidgetItem, QSizePolicy, QSpacerItem
+    QListWidgetItem, QSizePolicy, QSpacerItem, QAbstractItemView
 )
-from PyQt5.QtCore import Qt, pyqtSignal, QSize
+from PyQt5.QtCore import Qt, pyqtSignal, QSize, QEvent
 from PyQt5.QtGui import QFont
 
 from ..widgets.validators import IPAddressValidator, SubnetMaskValidator, DNSValidator
 from ..dialogs import AddIPDialog
+
+
+
+class CustomTextEdit(QTextEdit):
+    """
+    自定义文本编辑框 - 禁用右键菜单，保留选择和Ctrl+C功能
+    
+    继承QTextEdit并重写右键菜单事件，实现：
+    - 禁用右键上下文菜单显示
+    - 保留文本选择功能（鼠标拖拽选中）
+    - 保留键盘复制功能（Ctrl+C快捷键）
+    - 维持原有的只读和显示功能
+    
+    设计目的：
+    为IP信息显示容器提供纯净的文本展示体验，避免用户误操作
+    右键菜单中的粘贴、剪切等功能，同时保留核心的复制功能。
+    """
+    
+    def contextMenuEvent(self, event):
+        """
+        重写右键菜单事件处理方法
+        
+        通过忽略右键菜单事件，禁用上下文菜单的显示。
+        用户仍然可以通过鼠标选择文本和Ctrl+C快捷键复制文本，
+        但无法通过右键菜单进行任何操作。
+        
+        Args:
+            event (QContextMenuEvent): 右键菜单事件对象
+        """
+        # 直接忽略右键菜单事件，不显示任何菜单
+        # 这样既禁用了右键菜单，又不影响其他功能
+        event.ignore()
 
 
 class NetworkConfigTab(QWidget):
@@ -91,9 +123,16 @@ class NetworkConfigTab(QWidget):
         每个组件都设置了合适的objectName用于QSS样式定位。
         """
         # 网卡选择下拉框 - 支持智能缩放，宽度可随容器调整
+        # 注释说明：这里使用标准QComboBox，但会通过重写事件处理来实现悬停提示功能
         self.adapter_combo = QComboBox()
         self.adapter_combo.setObjectName("adapter_combo")
         self.adapter_combo.setToolTip("选择要配置的网络适配器")
+        
+        # 为下拉框安装自定义的悬停提示功能
+        # 设计思路：当鼠标悬停在下拉框上时，动态显示当前选中网卡的完整名称
+        # 这解决了长网卡名称在下拉框中显示不全的用户体验问题
+        self._setup_adapter_combo_hover_tooltip()
+        
         
         
         # 刷新按钮 - 固定尺寸，不随窗口缩放
@@ -105,8 +144,8 @@ class NetworkConfigTab(QWidget):
         self.ip_info_title = QLabel("📊 当前IP信息")
         self.ip_info_title.setObjectName("ip_info_title")
         
-        # IP信息展示容器 - 可选中文字但不可编辑，支持Ctrl+C复制
-        self.ip_info_display = QTextEdit()
+        # IP信息展示容器 - 可选中文字但不可编辑，支持Ctrl+C复制，禁用右键菜单
+        self.ip_info_display = CustomTextEdit()
         self.ip_info_display.setObjectName("ip_info_display")
         self.ip_info_display.setReadOnly(True)  # 只读模式，支持文字选择和复制
         self.ip_info_display.setToolTip("网卡详细信息，可选中文字并使用Ctrl+C复制")
@@ -1036,3 +1075,77 @@ class NetworkConfigTab(QWidget):
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Unchecked)
             self.extra_ip_list.addItem(item)
+
+    def _setup_adapter_combo_hover_tooltip(self):
+        """
+        设置网络适配器下拉框的悬停提示功能
+        
+        这个方法的设计目标是解决用户体验问题：
+        - 问题：网卡名称通常很长，在下拉框中显示时会被截断，用户看不到完整名称
+        - 解决方案：当鼠标悬停在下拉框上时，动态显示当前选中网卡的完整名称
+        
+        技术实现细节：
+        1. 为下拉框安装事件过滤器，监听鼠标进入和离开事件
+        2. 当鼠标进入时，获取当前选中的网卡名称并设置为工具提示
+        3. 当鼠标离开时，恢复默认的工具提示文本
+        
+        注意：这里监听的是下拉框本身的悬停，不是下拉列表项的悬停
+        """
+        # 安装事件过滤器，让当前Tab页面来处理下拉框的鼠标事件
+        # 事件过滤器是Qt中处理特定组件事件的高级技术
+        self.adapter_combo.installEventFilter(self)
+        
+        # 保存默认的工具提示文本，用于鼠标离开时恢复
+        # 这样可以在不影响原有提示的情况下，提供动态的悬停体验
+        self._default_adapter_tooltip = "选择要配置的网络适配器"
+    
+    def eventFilter(self, obj, event):
+        """
+        事件过滤器方法 - 专门处理网络适配器下拉框的鼠标悬停事件
+        
+        这是Qt事件处理机制的核心方法。当安装了事件过滤器的组件收到事件时，
+        会先调用这个方法进行预处理，然后再决定是否继续传递给组件本身。
+        
+        参数说明：
+        - obj: 触发事件的对象，在这里应该是adapter_combo下拉框
+        - event: 事件对象，包含事件类型、鼠标位置等详细信息
+        
+        返回值说明：
+        - True: 表示事件已被处理，不再传递给原组件
+        - False: 表示事件未被处理，继续传递给原组件进行正常处理
+        
+        Args:
+            obj: 事件源对象
+            event: 事件对象
+            
+        Returns:
+            bool: 事件是否被处理
+        """
+        # 首先检查事件是否来自我们关注的下拉框组件
+        # 这个检查很重要，因为事件过滤器可能会收到其他组件的事件
+        if obj == self.adapter_combo:
+            
+            # 处理鼠标进入事件：当鼠标移动到下拉框上时触发
+            if event.type() == QEvent.Enter:
+                # 获取当前选中的网卡名称
+                # currentText()方法返回下拉框中当前显示的文本
+                current_adapter_name = self.adapter_combo.currentText()
+                
+                # 只有当确实选中了网卡时才更新工具提示
+                # 这避免了在没有数据时显示空的工具提示
+                if current_adapter_name and current_adapter_name.strip():
+                    # 动态设置工具提示为完整的网卡名称
+                    # 这样用户就能看到被截断的完整网卡名称了
+                    self.adapter_combo.setToolTip(f"当前网卡：{current_adapter_name}")
+                
+            # 处理鼠标离开事件：当鼠标从下拉框上移开时触发
+            elif event.type() == QEvent.Leave:
+                # 恢复默认的工具提示文本
+                # 这确保了悬停功能不会永久改变工具提示内容
+                self.adapter_combo.setToolTip(self._default_adapter_tooltip)
+        
+        # 调用父类的事件过滤器方法，确保其他事件正常处理
+        # 这是事件过滤器的标准做法：处理完自己关心的事件后，让其他事件继续流转
+        return super().eventFilter(obj, event)
+
+
