@@ -230,13 +230,14 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             # 状态信息已集成到详细信息中，无需单独获取
             # （状态判断逻辑已集成到AdapterInfoService的get_adapter_detailed_info方法中）
             
-            # 获取性能信息（如果有性能服务）
-            if self._performance_service and aggregated_info['basic_info']:
-                # 性能服务需要NetConnectionID（连接名称）而不是friendly_name
-                adapter_name = aggregated_info['basic_info'].get('NetConnectionID', '')
-                if adapter_name:
-                    link_speed = self._performance_service.get_link_speed_info(adapter_name)
-                    aggregated_info['performance_info'] = {'link_speed': link_speed}
+            # 链路速度信息已在AdapterInfoService中获取，无需重复获取
+            # 直接从detailed_info中提取性能信息用于数据完整性
+            if aggregated_info.get('detailed_info') and hasattr(aggregated_info['detailed_info'], 'link_speed'):
+                link_speed = aggregated_info['detailed_info'].link_speed
+                aggregated_info['performance_info'] = {'link_speed': link_speed}
+                self.logger.info(f"从详细信息中提取链路速度: {link_speed}")
+            else:
+                self.logger.warning("详细信息中没有链路速度信息")
             
             # 缓存当前网卡信息
             self._current_adapter_info = aggregated_info

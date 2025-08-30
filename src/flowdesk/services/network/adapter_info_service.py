@@ -83,8 +83,17 @@ class AdapterInfoService(NetworkServiceBase):
             
             self._log_operation_start("获取网卡详细信息", adapter_name=adapter_name)
             
-            # 获取IP配置信息
+            # 获取IP配置信息（包含链路速度）
             ip_config = self._get_adapter_ip_config(adapter_name)
+            
+            # 确保链路速度信息在创建AdapterInfo对象前已获取
+            if not ip_config.get('link_speed'):
+                # 直接通过性能服务获取链路速度，确保数据完整性
+                from .adapter_performance_service import AdapterPerformanceService
+                performance_service = AdapterPerformanceService()
+                link_speed = performance_service.get_link_speed_info(adapter_name)
+                ip_config['link_speed'] = link_speed
+                self.logger.info(f"补充获取网卡 {adapter_name} 链路速度: {link_speed}")
             
             # 增强DNS配置获取 - 使用netsh命令作为补充数据源
             # 遵循开闭原则，通过新增功能而不修改现有逻辑来增强DNS获取能力

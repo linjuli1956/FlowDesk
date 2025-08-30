@@ -259,26 +259,10 @@ class MainWindow(QMainWindow):
             self._on_adapter_selected
         )
         
-        # 网卡信息更新完成：服务层刷新网卡信息完成 -> UI更新显示信息
-        def handle_adapter_info_updated(aggregated_info):
-            try:
-                # 直接在这里实现状态徽章更新逻辑
-                detailed_info = aggregated_info.get('detailed_info')
-                if not detailed_info:
-                    return
-                
-                # 提取状态信息
-                connection_status = detailed_info.status if hasattr(detailed_info, 'status') else "未知"
-                ip_mode = "DHCP" if (hasattr(detailed_info, 'dhcp_enabled') and detailed_info.dhcp_enabled) else "静态IP"
-                link_speed = detailed_info.link_speed if (hasattr(detailed_info, 'link_speed') and detailed_info.link_speed) else "未知"
-                
-                # 更新状态徽章
-                self.network_config_tab.update_status_badges(connection_status, ip_mode, link_speed)
-                
-            except Exception as e:
-                self.logger.error(f"状态徽章更新时发生异常: {str(e)}")
-        
-        self.network_service.adapter_info_updated.connect(handle_adapter_info_updated)
+        # 网卡信息更新完成：服务层刷新网卡信息完成 -> UI更新IP信息显示和状态徽章
+        self.network_service.adapter_info_updated.connect(
+            self._on_adapter_info_updated
+        )
         
         # IP配置信息更新：服务层解析IP配置 -> UI更新输入框和信息显示
         self.network_service.ip_info_updated.connect(
@@ -290,10 +274,6 @@ class MainWindow(QMainWindow):
             self._on_extra_ips_updated
         )
         
-        # 网卡信息更新：服务层聚合信息完成 -> UI更新IP信息显示
-        self.network_service.adapter_info_updated.connect(
-            self._on_adapter_info_updated
-        )
         
         # 网卡刷新完成：服务层刷新完成 -> UI显示刷新成功提示
         self.network_service.adapter_refreshed.connect(
@@ -636,37 +616,103 @@ class MainWindow(QMainWindow):
     
     def _on_adapter_info_updated(self, aggregated_info):
         """
-        处理网卡信息更新信号的回调方法
+        处理网卡信息更新信号的统一协调方法
         
-        当服务层完成网卡信息刷新后，通过adapter_info_updated信号
-        触发此方法，更新UI显示的网卡状态徽章和详细信息。
+        这个方法作为网卡信息更新的统一入口，负责协调状态徽章和IP信息显示的更新。
+        严格遵循单一职责原则，将不同类型的UI更新分发到专门的处理方法。
+        
+        数据流程：
+        1. 接收服务层聚合的网卡信息
+        2. 提取详细信息对象
+        3. 分别调用状态徽章和IP信息显示更新方法
         
         Args:
-            aggregated_info (dict): 聚合的网卡信息字典，包含基本信息、详细信息、性能信息等
+            aggregated_info: 包含网卡各类信息的聚合字典
         """
-        self.logger.info(f"_on_adapter_info_updated方法被调用 - 参数类型: {type(aggregated_info)}")
         try:
-            self.logger.info(f"收到网卡信息更新信号: {aggregated_info.get('adapter_id', 'Unknown') if isinstance(aggregated_info, dict) else 'Not a dict'}")
+            self.logger.debug(f"[调试] _on_adapter_info_updated被调用，aggregated_info类型: {type(aggregated_info)}")
             
-            # 从聚合信息中提取详细信息
+            # 提取详细信息对象
             detailed_info = aggregated_info.get('detailed_info')
             if not detailed_info:
-                self.logger.warning("网卡详细信息为空，跳过状态徽章更新")
+                self.logger.warning("聚合信息中缺少详细信息，跳过UI更新")
                 return
             
-            # 提取状态信息
-            connection_status = detailed_info.status if hasattr(detailed_info, 'status') else "未知"
-            ip_mode = "DHCP" if (hasattr(detailed_info, 'dhcp_enabled') and detailed_info.dhcp_enabled) else "静态IP"
-            link_speed = detailed_info.link_speed if (hasattr(detailed_info, 'link_speed') and detailed_info.link_speed) else "未知"
+            self.logger.debug(f"[调试] 提取到detailed_info，类型: {type(detailed_info)}")
+            self.logger.debug(f"[调试] detailed_info属性: status={getattr(detailed_info, 'status', 'N/A')}, link_speed={getattr(detailed_info, 'link_speed', 'N/A')}, dhcp_enabled={getattr(detailed_info, 'dhcp_enabled', 'N/A')}")
             
-            self.logger.info(f"状态徽章更新 - 连接状态: '{connection_status}', IP模式: '{ip_mode}', 链路速度: '{link_speed}'")
+            # 更新状态徽章：提取状态信息并更新UI显示
+            self.logger.debug("[调试] 即将调用_update_status_badges_from_info")
+            self._update_status_badges_from_info(detailed_info)
             
-            # 更新状态徽章
-            self.network_config_tab.update_status_badges(connection_status, ip_mode, link_speed)
-            self.logger.info(f"已调用update_status_badges - 状态: {connection_status}, IP模式: {ip_mode}, 链路速度: {link_speed}")
+            # 更新IP信息展示区域：格式化详细信息并更新显示
+            self.logger.debug("[调试] 即将调用_update_ip_info_display_from_info")
+            self._update_ip_info_display_from_info(detailed_info)
+            
+            self.logger.info(f"网卡信息UI更新完成: {getattr(detailed_info, 'name', '未知网卡')}")
             
         except Exception as e:
-            self.logger.error(f"网卡信息更新处理失败，错误详情: {str(e)}")
+            self.logger.error(f"网卡信息更新处理失败: {str(e)}")
+            import traceback
+            self.logger.error(f"异常堆栈: {traceback.format_exc()}")
+
+    def _update_status_badges_from_info(self, detailed_info):
+        """
+        从详细信息中提取状态数据并更新状态徽章
+        
+        这个方法专门负责状态徽章的更新逻辑，将业务数据转换为UI显示格式。
+        严格遵循单一职责原则，只处理状态徽章相关的UI更新。
+        
+        Args:
+            detailed_info: 网卡详细信息对象
+        """
+        try:
+            self.logger.debug(f"[调试] _update_status_badges_from_info开始执行")
+            
+            # 提取连接状态：优先使用服务层判断的状态
+            connection_status = detailed_info.status if hasattr(detailed_info, 'status') else "未知"
+            self.logger.debug(f"[调试] 提取连接状态: {connection_status}")
+            
+            # 提取IP模式：基于DHCP启用状态判断
+            ip_mode = "DHCP" if (hasattr(detailed_info, 'dhcp_enabled') and detailed_info.dhcp_enabled) else "静态IP"
+            self.logger.debug(f"[调试] 提取IP模式: {ip_mode}")
+            
+            # 提取链路速度：优先使用性能服务获取的速度信息
+            link_speed = detailed_info.link_speed if (hasattr(detailed_info, 'link_speed') and detailed_info.link_speed) else "未知"
+            self.logger.debug(f"[调试] 提取链路速度: {link_speed}")
+            
+            # 调用UI组件更新状态徽章
+            self.logger.debug(f"[调试] 即将调用network_config_tab.update_status_badges")
+            self.network_config_tab.update_status_badges(connection_status, ip_mode, link_speed)
+            
+            self.logger.info(f"状态徽章已更新 - 连接状态: {connection_status}, IP模式: {ip_mode}, 链路速度: {link_speed}")
+            
+        except Exception as e:
+            self.logger.error(f"状态徽章更新失败: {str(e)}")
+            import traceback
+            self.logger.error(f"状态徽章更新异常堆栈: {traceback.format_exc()}")
+    
+    def _update_ip_info_display_from_info(self, detailed_info):
+        """
+        从详细信息中格式化IP信息并更新显示区域
+        
+        这个方法专门负责IP信息展示区域的更新，将网卡详细信息
+        格式化为用户友好的显示格式并更新UI组件。
+        
+        Args:
+            detailed_info: 网卡详细信息对象
+        """
+        try:
+            # 格式化网卡信息为显示文本
+            formatted_info = self._format_adapter_info_for_display(detailed_info)
+            
+            # 更新IP信息展示区域
+            self.network_config_tab.update_ip_info_display(formatted_info)
+            
+            self.logger.info("IP信息展示区域已更新")
+            
+        except Exception as e:
+            self.logger.error(f"IP信息显示更新失败: {str(e)}")
             import traceback
             self.logger.error(f"异常堆栈: {traceback.format_exc()}")
     
@@ -742,49 +788,6 @@ class MainWindow(QMainWindow):
         except Exception as e:
             self.logger.error(f"更新额外IP列表失败: {str(e)}")
     
-    def _on_adapter_info_updated(self, aggregated_info):
-        """
-        处理网卡信息更新信号的UI显示逻辑
-        
-        当服务层聚合网卡信息完成后，更新UI显示所有相关信息，
-        包括基本信息、详细配置、状态和性能等。
-        
-        Args:
-            aggregated_info (Dict): 聚合的网卡信息字典
-        """
-        try:
-            detailed_info = aggregated_info.get('detailed_info')
-            if detailed_info:
-                # 集成性能信息到AdapterInfo对象
-                performance_info = aggregated_info.get('performance_info')
-                if performance_info:
-                    link_speed = performance_info.get('link_speed', '未知')
-                    # 动态设置link_speed属性
-                    setattr(detailed_info, 'link_speed', link_speed)
-                
-                # 更新IP信息显示
-                self._update_ip_display_from_detailed_info(detailed_info)
-                
-                # 更新当前网卡标签
-                self.network_config_tab.update_current_adapter_label(detailed_info.friendly_name)
-                
-                # 更新状态徽章
-                if not detailed_info.is_enabled:
-                    status_text = "已禁用"
-                    is_connected_for_badge = False
-                else:
-                    status_text = "已连接" if detailed_info.is_connected else "未连接"
-                    is_connected_for_badge = detailed_info.is_connected
-                
-                self.network_config_tab.update_status_badge(status_text, is_connected_for_badge)
-                
-                # 更新额外IP列表显示
-                self._update_extra_ip_list_display(detailed_info)
-                
-                self.logger.info(f"网卡信息已更新显示: {detailed_info.friendly_name}")
-                
-        except Exception as e:
-            self.logger.error(f"处理网卡信息更新失败: {str(e)}")
     
     def _update_ip_display_from_detailed_info(self, adapter_info):
         """
