@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 业务服务层 (Services)
 
@@ -22,7 +23,8 @@
 # 导入核心服务 - 当前阶段需要系统托盘服务、样式表服务和网络服务
 from .system_tray_service import SystemTrayService
 from .stylesheet_service import StylesheetService
-from .network_service import NetworkService
+# 从网络模块导入NetworkService门面
+from .network import NetworkService
 
 # 其他服务将在后续开发阶段逐步添加
 # from .base_service import BaseService

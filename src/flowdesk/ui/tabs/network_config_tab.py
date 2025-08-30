@@ -128,6 +128,11 @@ class NetworkConfigTab(QWidget):
         self.adapter_combo.setObjectName("adapter_combo")
         self.adapter_combo.setToolTip("选择要配置的网络适配器")
         
+        # 添加调试日志：监控下拉框选择事件
+        import logging
+        self._logger = logging.getLogger(__name__)
+        self._logger.info("NetworkConfigTab初始化 - 网卡选择下拉框已创建")
+        
         # 为下拉框安装自定义的悬停提示功能
         # 设计思路：当鼠标悬停在下拉框上时，动态显示当前选中网卡的完整名称
         # 这解决了长网卡名称在下拉框中显示不全的用户体验问题
@@ -162,7 +167,7 @@ class NetworkConfigTab(QWidget):
         self.ip_mode_badge = QLabel("🌐 静态IP")
         self.ip_mode_badge.setObjectName("ip_mode_badge")
         
-        self.link_speed_badge = QLabel("⚡ 1000Mbps")
+        self.link_speed_badge = QLabel("⚡ 未知")
         self.link_speed_badge.setObjectName("link_speed_badge")
         
         # 网卡操作按钮组 - 渐变色设计
@@ -483,7 +488,7 @@ class NetworkConfigTab(QWidget):
         """
         # 网卡选择变更
         self.adapter_combo.currentTextChanged.connect(
-            lambda text: self.adapter_selected.emit(text)
+            lambda text: self._on_adapter_combo_changed(text)
         )
         
         # 刷新网卡列表
@@ -1036,9 +1041,25 @@ class NetworkConfigTab(QWidget):
             ip_mode (str): IP配置模式（如DHCP、静态IP）
             link_speed (str): 网络链路速度
         """
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"NetworkConfigTab.update_status_badges调用 - 连接状态: {connection_status}, IP模式: {ip_mode}, 链路速度: {link_speed}")
+        
         self.connection_status_badge.setText(f"🔗 {connection_status}")
         self.ip_mode_badge.setText(f"🌐 {ip_mode}")
         self.link_speed_badge.setText(f"⚡ {link_speed}")
+        
+        logger.info(f"状态徽章文本已更新 - 连接: '{self.connection_status_badge.text()}', IP: '{self.ip_mode_badge.text()}', 速度: '{self.link_speed_badge.text()}'")
+    
+    def _on_adapter_combo_changed(self, text):
+        """
+        网卡选择下拉框变更事件处理方法
+        
+        添加调试日志来追踪网卡选择事件的触发情况。
+        """
+        self._logger.info(f"NetworkConfigTab._on_adapter_combo_changed调用 - 选择的网卡: '{text}'")
+        self.adapter_selected.emit(text)
+        self._logger.info(f"已发射adapter_selected信号 - 网卡: '{text}'")
 
     def update_ip_config_inputs(self, config_data):
         """
