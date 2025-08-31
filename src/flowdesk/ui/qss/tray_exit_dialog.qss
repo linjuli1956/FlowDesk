@@ -1,28 +1,39 @@
 /*
 托盘退出确认对话框样式文件
-实现语义化彩色渐变按钮设计
+实现俏皮有趣的彩色渐变按钮设计
 
 设计原则：
 1. 语义化颜色：退出按钮红色、最小化按钮绿色、取消按钮蓝色
 2. 渐变效果：所有按钮使用渐变色提升视觉效果
 3. 悬停状态：鼠标悬停时颜色加深，提供清晰反馈
-4. 统一尺寸：按钮固定尺寸，确保界面整齐
+4. 俏皮布局：主按钮更大，副按钮并排，层次分明
 */
 
 /* === 托盘退出对话框主容器 === */
 #tray_exit_dialog {
     background-color: #f8f9fa;
     border: 2px solid #dee2e6;
-    border-radius: 12px;
+    border-radius: 16px;
+    padding: 8px;
 }
 
-/* === 提示消息标签 === */
-#tray_exit_message {
+/* === 主标题样式 === */
+#tray_exit_title {
     color: #2c3e50;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
-    padding: 10px;
+    padding: 8px 16px;
     background-color: transparent;
+}
+
+/* === 副标题样式 === */
+#tray_exit_subtitle {
+    color: #6c757d;
+    font-size: 13px;
+    font-weight: normal;
+    padding: 4px 16px;
+    background-color: transparent;
+    font-style: italic;
 }
 
 /* === 通用按钮基类样式 === */

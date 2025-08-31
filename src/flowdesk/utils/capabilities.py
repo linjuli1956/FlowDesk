@@ -33,7 +33,12 @@ from typing import Dict, Any, Optional
 import logging
 
 # 获取日志记录器
-logger = logging.getLogger(__name__)
+from flowdesk.utils.logger import get_logger
+from flowdesk.models import (
+    SystemCapabilities, PlatformInfo, PythonVersionInfo, 
+    WindowsVersionInfo, NetworkCapabilities, HardwareMonitorCapabilities
+)
+logger = get_logger(__name__)
 
 
 def check_admin_privileges() -> bool:
@@ -102,40 +107,50 @@ def get_system_capabilities() -> Dict[str, Any]:
             print("⚠️ 建议升级到Windows 10以获得最佳体验")
     """
     try:
-        capabilities = {}
+        # 创建平台信息数据类
+        platform_info = PlatformInfo(
+            system=platform.system(),
+            release=platform.release(),
+            version=platform.version(),
+            machine=platform.machine(),
+            processor=platform.processor()
+        )
         
-        # 基础平台信息
-        capabilities['platform'] = {
-            'system': platform.system(),           # 操作系统名称 (Windows/Linux/Darwin)
-            'release': platform.release(),         # 系统版本号
-            'version': platform.version(),         # 详细版本信息
-            'machine': platform.machine(),         # 硬件架构 (AMD64/x86)
-            'processor': platform.processor()      # 处理器信息
-        }
-        
-        # Python环境信息
-        capabilities['python_version'] = {
-            'major': sys.version_info.major,       # Python主版本号
-            'minor': sys.version_info.minor,       # Python次版本号
-            'micro': sys.version_info.micro,       # Python修订版本号
-            'full': sys.version                    # 完整版本字符串
-        }
+        # 创建Python版本信息数据类
+        python_version_info = PythonVersionInfo(
+            major=sys.version_info.major,
+            minor=sys.version_info.minor,
+            micro=sys.version_info.micro,
+            full=sys.version
+        )
         
         # 权限状态检测
-        capabilities['admin_privileges'] = check_admin_privileges()
+        admin_privileges = check_admin_privileges()
         
         # Windows特定信息
+        windows_version_info = None
         if platform.system() == "Windows":
-            capabilities['windows_version'] = _get_windows_version()
+            windows_version_info = _get_windows_version()
         
         # PyQt5可用性检测
-        capabilities['pyqt_available'] = _check_pyqt_availability()
+        pyqt_available = _check_pyqt_availability()
         
         # 网络工具可用性检测
-        capabilities['network_tools'] = _check_network_tools()
+        network_tools = _check_network_tools()
         
         # 硬件监控可用性检测
-        capabilities['hardware_monitor'] = _check_hardware_monitor()
+        hardware_monitor = _check_hardware_monitor()
+        
+        # 创建系统能力数据类
+        capabilities = SystemCapabilities(
+            platform=platform_info,
+            python_version=python_version_info,
+            admin_privileges=admin_privileges,
+            pyqt_available=pyqt_available,
+            network_tools=network_tools,
+            hardware_monitor=hardware_monitor,
+            windows_version=windows_version_info
+        )
         
         logger.info("系统能力检测完成")
         return capabilities
@@ -143,17 +158,28 @@ def get_system_capabilities() -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"系统能力检测失败: {e}")
         # 返回最小可用的能力信息
-        return {
-            'platform': {'system': platform.system()},
-            'python_version': {'major': sys.version_info.major},
-            'admin_privileges': False,
-            'pyqt_available': False,
-            'network_tools': {},
-            'hardware_monitor': {}
-        }
+        return SystemCapabilities(
+            platform=PlatformInfo(
+                system=platform.system(),
+                release='unknown',
+                version='unknown', 
+                machine='unknown',
+                processor='unknown'
+            ),
+            python_version=PythonVersionInfo(
+                major=sys.version_info.major,
+                minor=0,
+                micro=0,
+                full='unknown'
+            ),
+            admin_privileges=False,
+            pyqt_available=False,
+            network_tools=NetworkCapabilities(),
+            hardware_monitor=HardwareMonitorCapabilities(dll_path='', available=False)
+        )
 
 
-def _get_windows_version() -> Dict[str, Any]:
+def _get_windows_version() -> WindowsVersionInfo:
     """
     获取详细的Windows版本信息
     
@@ -173,52 +199,52 @@ def _get_windows_version() -> Dict[str, Any]:
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, 
                            r"SOFTWARE\Microsoft\Windows NT\CurrentVersion")
         
-        version_info = {}
+        major = None
+        minor = None
+        build = None
+        display_version = None
         
         try:
             # 读取主要版本号
-            version_info['major'] = winreg.QueryValueEx(key, "CurrentMajorVersionNumber")[0]
-            version_info['minor'] = winreg.QueryValueEx(key, "CurrentMinorVersionNumber")[0]
+            major = winreg.QueryValueEx(key, "CurrentMajorVersionNumber")[0]
+            minor = winreg.QueryValueEx(key, "CurrentMinorVersionNumber")[0]
         except FileNotFoundError:
             # Windows 7及更早版本使用不同的注册表项
             version = winreg.QueryValueEx(key, "CurrentVersion")[0]
             version_parts = version.split('.')
-            version_info['major'] = int(version_parts[0])
-            version_info['minor'] = int(version_parts[1]) if len(version_parts) > 1 else 0
+            major = int(version_parts[0])
+            minor = int(version_parts[1]) if len(version_parts) > 1 else 0
         
         # 读取构建号
         try:
-            version_info['build'] = winreg.QueryValueEx(key, "CurrentBuildNumber")[0]
+            build = winreg.QueryValueEx(key, "CurrentBuildNumber")[0]
         except FileNotFoundError:
-            version_info['build'] = "未知"
+            build = "未知"
         
-        # 读取产品名称
+        # 读取产品名称作为显示版本
         try:
-            version_info['product_name'] = winreg.QueryValueEx(key, "ProductName")[0]
+            display_version = winreg.QueryValueEx(key, "ProductName")[0]
         except FileNotFoundError:
-            version_info['product_name'] = "Windows"
+            display_version = "Windows"
         
         winreg.CloseKey(key)
         
-        # 判断Windows版本类别
-        if version_info['major'] >= 10:
-            version_info['category'] = 'modern'  # Windows 10/11
-        elif version_info['major'] == 6 and version_info['minor'] >= 1:
-            version_info['category'] = 'legacy'  # Windows 7/8/8.1
-        else:
-            version_info['category'] = 'unsupported'  # Windows Vista及更早
-        
-        return version_info
+        # 创建Windows版本信息数据类
+        return WindowsVersionInfo(
+            major=major,
+            minor=minor,
+            build=build,
+            display_version=display_version
+        )
         
     except Exception as e:
         logger.warning(f"Windows版本检测失败: {e}")
-        return {
-            'major': 10,  # 默认假设为Windows 10
-            'minor': 0,
-            'build': "未知",
-            'product_name': "Windows",
-            'category': 'modern'
-        }
+        return WindowsVersionInfo(
+            major=10,  # 默认假设为Windows 10
+            minor=0,
+            build="未知",
+            display_version="Windows"
+        )
 
 
 def _check_pyqt_availability() -> Dict[str, Any]:
@@ -273,21 +299,23 @@ def _check_module(module_name: str) -> bool:
 def _check_system_tray() -> bool:
     """检测系统托盘功能是否可用"""
     try:
-        from PyQt5.QtWidgets import QApplication, QSystemTrayIcon
+        # 移除PyQt依赖，基于系统平台判断
+        import platform
+        system = platform.system().lower()
         
-        # 需要QApplication实例才能检测系统托盘
-        app = QApplication.instance()
-        if app is None:
-            # 如果没有QApplication实例，假设系统托盘可用
+        # Windows和Linux通常支持系统托盘，macOS需要特殊处理
+        if system in ['windows', 'linux']:
             return True
-        
-        return QSystemTrayIcon.isSystemTrayAvailable()
+        elif system == 'darwin':  # macOS
+            return True  # macOS通常支持系统托盘
+        else:
+            return False  # 其他系统保守返回False
         
     except Exception:
         return False
 
 
-def _check_network_tools() -> Dict[str, bool]:
+def _check_network_tools() -> NetworkCapabilities:
     """
     检测网络工具的可用性
     
@@ -297,26 +325,23 @@ def _check_network_tools() -> Dict[str, bool]:
     返回值：
         Dict[str, bool]: 网络工具可用性状态
     """
-    tools = {}
+    # 检测各种网络工具的可用性
+    ping_available = _check_command_availability('ping')
+    tracert_available = _check_command_availability('tracert')
+    netstat_available = _check_command_availability('netstat')
+    ipconfig_available = _check_command_availability('ipconfig')
+    nslookup_available = _check_command_availability('nslookup')
     
-    # 检测Windows网络命令
-    network_commands = [
-        'ping',      # 网络连通性测试
-        'ipconfig',  # IP配置查看和修改
-        'netsh',     # 网络配置工具
-        'nslookup',  # DNS查询工具
-        'tracert',   # 路由跟踪
-        'arp',       # ARP表管理
-        'netstat'    # 网络连接状态
-    ]
-    
-    for cmd in network_commands:
-        tools[cmd] = _check_command_availability(cmd)
-    
-    return tools
+    return NetworkCapabilities(
+        ping=ping_available,
+        tracert=tracert_available,
+        netstat=netstat_available,
+        ipconfig=ipconfig_available,
+        nslookup=nslookup_available
+    )
 
 
-def _check_hardware_monitor() -> Dict[str, Any]:
+def _check_hardware_monitor() -> HardwareMonitorCapabilities:
     """
     检测硬件监控功能的可用性
     
@@ -326,24 +351,16 @@ def _check_hardware_monitor() -> Dict[str, Any]:
     返回值：
         Dict[str, Any]: 硬件监控可用性信息
     """
-    monitor_info = {}
-    
     # 检测LibreHardwareMonitor DLL文件
     dll_path = os.path.join(os.path.dirname(__file__), 
                            '..', '..', '..', 'assets', 'LibreHardwareMonitor')
     
-    monitor_info['libre_hardware_monitor'] = {
-        'dll_path': dll_path,
-        'available': os.path.exists(os.path.join(dll_path, 'LibreHardwareMonitorLib.dll'))
-    }
+    dll_available = os.path.exists(os.path.join(dll_path, 'LibreHardwareMonitorLib.dll'))
     
-    # 检测WMI可用性（Windows Management Instrumentation）
-    monitor_info['wmi_available'] = _check_module('wmi') if platform.system() == "Windows" else False
-    
-    # 检测psutil可用性（跨平台系统监控）
-    monitor_info['psutil_available'] = _check_module('psutil')
-    
-    return monitor_info
+    return HardwareMonitorCapabilities(
+        dll_path=dll_path,
+        available=dll_available
+    )
 
 
 def _check_command_availability(command: str) -> bool:

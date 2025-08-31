@@ -10,7 +10,7 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 
 from .network_service_base import NetworkServiceBase
-from ...models.adapter_info import AdapterInfo
+from flowdesk.models import AdapterInfo, AdapterStatusInfo, AdapterConfigInfo
 
 
 class AdapterInfoService(NetworkServiceBase):

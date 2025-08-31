@@ -11,6 +11,7 @@ UI层依赖此服务获得统一的网络操作接口，其他服务通过此模
 from typing import Optional, Dict, Any, List
 
 from .network_service_base import NetworkServiceBase
+from ...models.common import AggregatedAdapterInfo, PerformanceInfo
 
 
 class NetworkUICoordinatorService(NetworkServiceBase):
@@ -208,54 +209,54 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             self.operation_progress.emit("正在刷新网卡信息...")
             self._log_operation_start("刷新当前网卡", adapter_id=self._current_adapter_id)
             
-            # 初始化聚合信息字典
-            aggregated_info = {
-                'adapter_id': self._current_adapter_id,
-                'basic_info': None,
-                'detailed_info': None,
-                'status_info': None,
-                'performance_info': None
-            }
-            
             # 获取基本信息（如果有发现服务）
+            basic_info = None
             if self._discovery_service:
                 basic_info = self._discovery_service.get_adapter_basic_info(self._current_adapter_id)
-                aggregated_info['basic_info'] = basic_info
             
             # 获取详细信息（如果有信息服务）
+            detailed_info = None
             if self._info_service:
                 detailed_info = self._info_service.get_adapter_detailed_info(self._current_adapter_id)
-                aggregated_info['detailed_info'] = detailed_info
             
-            # 状态信息已集成到详细信息中，无需单独获取
-            # （状态判断逻辑已集成到AdapterInfoService的get_adapter_detailed_info方法中）
-            
-            # 链路速度信息已在AdapterInfoService中获取，无需重复获取
-            # 直接从detailed_info中提取性能信息用于数据完整性
-            if aggregated_info.get('detailed_info') and hasattr(aggregated_info['detailed_info'], 'link_speed'):
-                link_speed = aggregated_info['detailed_info'].link_speed
-                aggregated_info['performance_info'] = {'link_speed': link_speed}
+            # 创建性能信息数据类
+            performance_info = None
+            if detailed_info and hasattr(detailed_info, 'link_speed'):
+                link_speed = detailed_info.link_speed
+                performance_info = PerformanceInfo(link_speed=link_speed)
                 self.logger.info(f"从详细信息中提取链路速度: {link_speed}")
             else:
                 self.logger.warning("详细信息中没有链路速度信息")
+            
+            # 创建聚合信息数据类
+            aggregated_info = AggregatedAdapterInfo(
+                adapter_id=self._current_adapter_id,
+                basic_info=basic_info,
+                detailed_info=detailed_info,
+                status_info=None,  # 状态信息已集成到详细信息中
+                performance_info=performance_info
+            )
             
             # 缓存当前网卡信息
             self._current_adapter_info = aggregated_info
             
             # 发射聚合信息更新信号
-            self.logger.info(f"发射adapter_info_updated信号 - 网卡ID: {aggregated_info.get('adapter_id', 'Unknown')}")
+            self.logger.info(f"发射adapter_info_updated信号 - 网卡ID: {aggregated_info.adapter_id}")
             self.adapter_info_updated.emit(aggregated_info)
             
-            # 从详细信息中提取IP配置信息并发射ip_info_updated信号
-            detailed_info = aggregated_info.get('detailed_info')
+            # 发射格式化的状态徽章信息（Service层负责业务逻辑）
             if detailed_info:
-                # 使用正规的IPConfigInfo数据类，符合frozen dataclass规范
-                from ...models.adapter_info import IPConfigInfo
-                
+                badge_info = self._format_status_badges_for_ui(detailed_info)
+                self.status_badges_updated.emit(*badge_info)
+            
+            # 如果有详细信息，处理IP配置和额外IP信息
+            if detailed_info:
+                # 创建IP配置数据
+                from flowdesk.models import IPConfigInfo
                 ip_config_data = IPConfigInfo(
                     adapter_id=self._current_adapter_id,
-                    ip_address=detailed_info.get_primary_ip() if hasattr(detailed_info, 'get_primary_ip') else (detailed_info.ip_addresses[0] if detailed_info.ip_addresses else ''),
-                    subnet_mask=detailed_info.get_primary_subnet_mask() if hasattr(detailed_info, 'get_primary_subnet_mask') else (detailed_info.subnet_masks[0] if detailed_info.subnet_masks else ''),
+                    ip_address=detailed_info.get_primary_ip() or '',
+                    subnet_mask=detailed_info.get_primary_subnet_mask() or '',
                     gateway=detailed_info.gateway or '',
                     dns_primary=detailed_info.dns_servers[0] if detailed_info.dns_servers else '',
                     dns_secondary=detailed_info.dns_servers[1] if len(detailed_info.dns_servers) > 1 else '',
@@ -323,12 +324,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             # 调试信息：检查格式化后的文本
             self.logger.info(f"格式化后的信息文本: {info_text[:200]}...")  # 只显示前200个字符
             
-            # 复制到剪贴板
-            from PyQt5.QtWidgets import QApplication
-            clipboard = QApplication.clipboard()
-            clipboard.setText(info_text)
-            
-            # 发射复制完成信号
+            # 发射复制完成信号，由UI层处理剪贴板操作
             self.network_info_copied.emit(info_text)
             self._log_operation_success("复制网卡信息", "信息已复制到剪贴板")
             
@@ -358,24 +354,126 @@ class NetworkUICoordinatorService(NetworkServiceBase):
         if not detailed_info:
             return "网卡详细信息不可用"
         
-        # 直接使用 MainWindow 的显示格式逻辑，确保与容器内展示完全一致
+        # Service层负责格式化业务逻辑，避免UI层依赖
         try:
-            # 导入 MainWindow 类并使用其格式化方法
-            from ...ui.main_window import MainWindow
+            return self._format_adapter_info_for_display(detailed_info)
+        except Exception as e:
+            self.logger.error(f"格式化网卡信息失败: {str(e)}")
+            return "网卡信息格式化失败"
+    
+    def format_adapter_info_for_display(self, adapter_info):
+        """
+        公共方法：格式化网卡信息用于UI显示
+        
+        供UI层调用的公共接口，将网卡信息格式化为显示文本。
+        
+        Args:
+            adapter_info: AdapterInfo对象或聚合信息字典
             
-            # 创建一个临时的 MainWindow 实例来调用格式化方法
-            # 注意：这里不初始化完整的 MainWindow，只是为了调用格式化方法
-            temp_main_window = MainWindow.__new__(MainWindow)
-            temp_main_window.logger = self.logger  # 设置日志器避免错误
+        Returns:
+            str: 格式化后的显示文本
+        """
+        try:
+            # 从聚合信息中提取详细信息
+            if isinstance(adapter_info, dict):
+                detailed_info = adapter_info.get('detailed_info')
+            else:
+                detailed_info = getattr(adapter_info, 'detailed_info', adapter_info)
             
-            # 使用 MainWindow 的格式化方法
-            formatted_text = temp_main_window._format_adapter_info_for_display(detailed_info)
+            if not detailed_info:
+                return "网卡信息不可用"
             
-            return formatted_text
+            return self._format_adapter_info_for_display(detailed_info)
             
         except Exception as e:
-            self.logger.error(f"使用 MainWindow 格式化方法失败: {str(e)}")
+            self.logger.error(f"格式化网卡信息失败: {str(e)}")
+            return "网卡信息格式化失败"
+    
+    def _format_adapter_info_for_display(self, adapter_info):
+        """
+        格式化网卡信息用于UI显示
+        
+        将AdapterInfo对象格式化为用户友好的文本格式，
+        供UI层在信息展示区域显示使用。
+        
+        Args:
+            adapter_info: AdapterInfo对象
             
+        Returns:
+            str: 格式化后的显示文本
+        """
+        try:
+            # 构建详细的网卡信息显示文本
+            info_lines = []
+            info_lines.append(f"网卡描述: {adapter_info.description or '未知'}")
+            info_lines.append(f"友好名称: {adapter_info.friendly_name}")
+            info_lines.append(f"物理地址: {adapter_info.mac_address or '未知'}")
+            
+            # 智能状态显示：优先显示禁用状态，其次显示连接状态
+            if not adapter_info.is_enabled:
+                connection_status = "已禁用"
+            elif adapter_info.is_connected:
+                connection_status = "已连接"
+            else:
+                connection_status = "未连接"
+            info_lines.append(f"连接状态: {connection_status}")
+            
+            info_lines.append(f"接口类型: {adapter_info.interface_type or '未知'}")
+            
+            # 链路速度显示
+            if adapter_info.link_speed and adapter_info.link_speed != '未知':
+                info_lines.append(f"链路速度: {adapter_info.link_speed}")
+            else:
+                info_lines.append("链路速度: 未知")
+            info_lines.append("")
+            
+            # IP配置信息
+            info_lines.append("=== IP配置信息 ===")
+            primary_ip = adapter_info.get_primary_ip()
+            primary_mask = adapter_info.get_primary_subnet_mask()
+            if primary_ip:
+                info_lines.append(f"主IP地址: {primary_ip}")
+                info_lines.append(f"子网掩码: {primary_mask}")
+            else:
+                info_lines.append("主IP地址: 未配置")
+            
+            # 额外IPv4地址
+            extra_ips = adapter_info.get_extra_ips()
+            if extra_ips:
+                info_lines.append("")
+                info_lines.append("额外IPv4地址:")
+                for ip, mask in extra_ips:
+                    info_lines.append(f"  • {ip}/{mask}")
+            
+            # 网关和DNS配置
+            info_lines.append("")
+            info_lines.append("=== 网络配置 ===")
+            info_lines.append(f"默认网关: {adapter_info.gateway or '未配置'}")
+            info_lines.append(f"DHCP状态: {'启用' if adapter_info.dhcp_enabled else '禁用'}")
+            
+            primary_dns = adapter_info.get_primary_dns()
+            secondary_dns = adapter_info.get_secondary_dns()
+            info_lines.append(f"主DNS服务器: {primary_dns or '未配置'}")
+            info_lines.append(f"备用DNS服务器: {secondary_dns or '未配置'}")
+            
+            # IPv6地址信息
+            if adapter_info.ipv6_addresses:
+                info_lines.append("")
+                info_lines.append("=== IPv6配置信息 ===")
+                for i, ipv6_addr in enumerate(adapter_info.ipv6_addresses):
+                    if i == 0:
+                        info_lines.append(f"主IPv6地址: {ipv6_addr}")
+                    else:
+                        info_lines.append(f"IPv6地址{ i + 1 }: {ipv6_addr}")
+            
+            # 添加时间戳
+            info_lines.append("")
+            info_lines.append(f"最后更新: {adapter_info.last_updated.strftime('%Y-%m-%d %H:%M:%S')}")
+            
+            return "\n".join(info_lines)
+            
+        except Exception as e:
+            self.logger.error(f"格式化网卡信息失败: {str(e)}")
             # 备用方案：简化的格式化
             def safe_get(obj, attr, default='未知'):
                 if obj is None:
@@ -395,6 +493,46 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             ]
             
             return "\n".join(info_lines)
+    
+    def _format_status_badges_for_ui(self, adapter_info):
+        """
+        格式化状态徽章信息供UI层显示
+        
+        Service层负责所有业务逻辑判断，包括Emoji图标选择和状态属性映射。
+        UI层只需要接收格式化好的显示文本和属性值。
+        
+        Args:
+            adapter_info: AdapterInfo对象
+            
+        Returns:
+            tuple: (连接显示文本, 连接属性, IP模式显示文本, IP模式属性, 链路速度显示文本)
+        """
+        # 连接状态格式化（Service层业务逻辑）
+        if not adapter_info.is_enabled:
+            connection_display = "🚫 已禁用"
+            connection_attr = "disabled"
+        elif adapter_info.is_connected:
+            connection_display = "🔌 已连接"
+            connection_attr = "connected"
+        else:
+            connection_display = "🔌 未连接"
+            connection_attr = "disconnected"
+        
+        # IP模式格式化（Service层业务逻辑）
+        if adapter_info.dhcp_enabled:
+            ip_mode_display = "🔄 DHCP"
+            ip_mode_attr = "dhcp"
+        else:
+            ip_mode_display = "🔧 静态IP"
+            ip_mode_attr = "static"
+        
+        # 链路速度格式化（Service层业务逻辑）
+        if adapter_info.link_speed and adapter_info.link_speed != "未知":
+            link_speed_display = f"⚡ {adapter_info.link_speed}"
+        else:
+            link_speed_display = "⚡ 未知"
+        
+        return (connection_display, connection_attr, ip_mode_display, ip_mode_attr, link_speed_display)
     
     def set_current_adapter(self, adapter_id: str):
         """

@@ -28,7 +28,7 @@ QLabel {
 }
 
 /* === 标题标签样式 - 严格宽度控制防止溢出 === */
-#ip_info_title, #network_mgmt_title, #extra_ip_title {
+#ip_info_title, #network_mgmt_title, #extra_ip_title, #ip_info_label {
     color: #34495e;
     font-size: 14px;
     font-weight: bold;
@@ -39,6 +39,40 @@ QLabel {
     margin: 0px 0px;
     /* 遵循严格自适应布局原则，由容器控制宽度 */
     /* Qt不支持word-wrap，使用QLabel的自动换行功能 */
+}
+
+/* === 网络状态徽章颜色设计 === */
+/* 连接状态徽章 - 根据状态显示不同颜色 */
+#connection_status_badge[status="connected"] {
+    color: #16a085;  /* 绿色 - 已连接 */
+    font-weight: bold;
+}
+
+#connection_status_badge[status="disconnected"] {
+    color: #e67e22;  /* 橙色 - 未连接 */
+    font-weight: bold;
+}
+
+#connection_status_badge[status="disabled"] {
+    color: #e74c3c;  /* 红色 - 已禁用 */
+    font-weight: bold;
+}
+
+/* IP模式徽章 - 根据模式显示不同颜色 */
+#ip_mode_badge[mode="dhcp"] {
+    color: #3498db;  /* 蓝色 - DHCP */
+    font-weight: bold;
+}
+
+#ip_mode_badge[mode="static"] {
+    color: #9b59b6;  /* 紫色 - 静态IP */
+    font-weight: bold;
+}
+
+/* 链路速度徽章 - 统一颜色 */
+#link_speed_badge {
+    color: #f39c12;  /* 金色 - 链路速度 */
+    font-weight: bold;
 }
 
 #extra_ip_title {
@@ -55,7 +89,8 @@ QLabel {
     padding: 7px 12px;  /* 适中垂直内边距，与输入框保持一致 */
     font-weight: bold;
     color: #374151;
-    min-width: 80px;
+    min-width: 75px;  /* 减少标签宽度，为输入框腾出空间 */
+    max-width: 75px;  /* 设置最大宽度，确保统一宽度 */
     min-height: 20px;  /* 适中最小高度，与输入框匹配 */
     margin: 2px 0px;  /* 保持上下外边距，与输入框保持一致 */
 }
@@ -101,6 +136,7 @@ QLineEdit:hover {
     border: 2px solid #93c5fd;  /* 浅蓝色边框，代表主要IP配置 */
     padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
     min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
+    min-width: 110px;  /* 增加输入框宽度，可完整显示长IP地址 */
 }
 
 #ip_address_input:focus {
@@ -116,6 +152,7 @@ QLineEdit:hover {
     border: 2px solid #86efac;  /* 浅绿色边框，代表网络配置 */
     padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
     min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
+    min-width: 110px;  /* 增加输入框宽度，可完整显示长IP地址 */
 }
 
 #subnet_mask_input:focus {
@@ -131,6 +168,7 @@ QLineEdit:hover {
     border: 2px solid #c4b5fd;  /* 浅紫色边框，代表网关路由 */
     padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
     min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
+    min-width: 110px;  /* 增加输入框宽度，可完整显示长IP地址 */
 }
 
 #gateway_input:focus {
@@ -146,6 +184,7 @@ QLineEdit:hover {
     border: 2px solid #fdba74;  /* 浅橙色边框，代表主DNS服务 */
     padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
     min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
+    min-width: 110px;  /* 增加输入框宽度，可完整显示长IP地址 */
 }
 
 #primary_dns_input:focus {
@@ -161,6 +200,7 @@ QLineEdit:hover {
     border: 2px solid #f9a8d4;  /* 浅粉色边框，代表备用DNS服务 */
     padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
     min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
+    min-width: 110px;  /* 增加输入框宽度，可完整显示长IP地址 */
 }
 
 #secondary_dns_input:focus {
@@ -222,6 +262,7 @@ QLineEdit:hover {
     background-color: #dbeafe;
     color: #1d4ed8;
 }
+
 
 /* === IP信息展示容器 - 可选中文字但不可编辑，默认带颜色外框 === */
 #ip_info_display {

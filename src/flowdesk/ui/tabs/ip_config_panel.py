@@ -94,41 +94,46 @@ class IPConfigPanel(QWidget):
         self.ip_config_frame.setObjectName("ip_config_frame")
         # 移除最小高度限制，让弹性布局生效
         
-        # IP配置输入框组 - 支持智能缩放
-        self.ip_address_label = QLabel("IP地址：")
+        # IP配置输入框组 - 支持智能缩放，统一标签宽度确保对齐
+        self.ip_address_label = QLabel("🌐 IP地址：")
         self.ip_address_label.setObjectName("config_label")
+        # 移除固定宽度设置，让标签自然宽度
         # 移除硬编码高度，由QSS统一控制样式
         self.ip_address_input = QLineEdit()
         self.ip_address_input.setObjectName("ip_address_input")
         self.ip_address_input.setPlaceholderText("例如：192.168.1.100")
         # 移除硬编码高度，由QSS统一控制样式
         
-        self.subnet_mask_label = QLabel("子网掩码：")
+        self.subnet_mask_label = QLabel("🔢 子网掩码：")
         self.subnet_mask_label.setObjectName("config_label")
+        # 移除固定宽度设置，让标签自然宽度
         # 移除硬编码高度，由QSS统一控制样式
         self.subnet_mask_input = QLineEdit()
         self.subnet_mask_input.setObjectName("subnet_mask_input")
         self.subnet_mask_input.setPlaceholderText("例如：255.255.255.0")
         # 移除硬编码高度，由QSS统一控制样式
         
-        self.gateway_label = QLabel("网关：")
+        self.gateway_label = QLabel("📶🖧  网关：")
         self.gateway_label.setObjectName("config_label")
+        # 移除固定宽度设置，让标签自然宽度
         # 移除硬编码高度，由QSS统一控制样式
         self.gateway_input = QLineEdit()
         self.gateway_input.setObjectName("gateway_input")
         self.gateway_input.setPlaceholderText("例如：192.168.1.1")
         # 移除硬编码高度，由QSS统一控制样式
         
-        self.primary_dns_label = QLabel("主DNS：")
+        self.primary_dns_label = QLabel("🌍 主DNS：")
         self.primary_dns_label.setObjectName("config_label")
+        # 移除固定宽度设置，让标签自然宽度
         # 移除硬编码高度，由QSS统一控制样式
         self.primary_dns_input = QLineEdit()
         self.primary_dns_input.setObjectName("primary_dns_input")
         self.primary_dns_input.setPlaceholderText("例如：8.8.8.8")
         # 移除硬编码高度，由QSS统一控制样式
         
-        self.secondary_dns_label = QLabel("备用DNS：")
+        self.secondary_dns_label = QLabel("🌏 备用DNS：")
         self.secondary_dns_label.setObjectName("config_label")
+        # 移除固定宽度设置，让标签自然宽度
         # 移除硬编码高度，由QSS统一控制样式
         self.secondary_dns_input = QLineEdit()
         self.secondary_dns_input.setObjectName("secondary_dns_input")
@@ -136,12 +141,12 @@ class IPConfigPanel(QWidget):
         # 移除硬编码高度，由QSS统一控制样式
         
         # 当前网卡显示
-        self.current_adapter_label = QLabel("当前网卡：本地连接")
+        self.current_adapter_label = QLabel("🌤️ 当前网卡：本地连接")
         self.current_adapter_label.setObjectName("current_adapter_label")
         # 移除固定高度，使用弹性布局
         
         # 确定修改按钮 - 居中显示
-        self.apply_config_btn = QPushButton("修改IP地址")
+        self.apply_config_btn = QPushButton("✅ 修改IP地址")
         self.apply_config_btn.setObjectName("apply_config_btn")
         # 移除固定高度，使用弹性布局
         
@@ -191,7 +196,7 @@ class IPConfigPanel(QWidget):
         form_layout = QFormLayout()
         form_layout.setSpacing(20)  # 增加输入框间距以分散显示
         form_layout.setVerticalSpacing(20)  # 设置更大的垂直间距
-        form_layout.setLabelAlignment(Qt.AlignRight | Qt.AlignVCenter)  # 标签右对齐居中
+        # 移除样式设置，由QSS统一管理对齐和间距
         form_layout.setRowWrapPolicy(QFormLayout.DontWrapRows)  # 确保行不换行
         form_layout.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)  # 输入框可扩展
         form_layout.setContentsMargins(0, 0, 0, 0)  # 移除表单内边距
@@ -361,7 +366,7 @@ class IPConfigPanel(QWidget):
         Args:
             adapter_name (str): 网卡简称
         """
-        self.current_adapter_label.setText(f"当前网卡：{adapter_name}")
+        self.current_adapter_label.setText(f"🌤️ 当前网卡：{adapter_name}")
     
     def update_extra_ip_list(self, ip_list):
         """

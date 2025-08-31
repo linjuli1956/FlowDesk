@@ -20,7 +20,6 @@ FlowDesk样式表管理服务
 import os
 import logging
 from typing import List, Optional
-from PyQt5.QtWidgets import QApplication
 
 
 class StylesheetService:
@@ -63,6 +62,7 @@ class StylesheetService:
             "network_tools_tab.qss",    # 网络工具Tab专用样式
             "rdp_tab.qss",              # 远程桌面Tab专用样式
             "hardware_tab.qss",         # 硬件信息Tab专用样式
+            "system_tray_menu.qss",     # 系统托盘右键菜单样式
             "tray_exit_dialog.qss",     # 托盘退出对话框样式
             "add_ip_dialog.qss",        # 添加IP对话框专用样式
             "main_window.qss",          # 主窗口特定样式
@@ -125,7 +125,7 @@ class StylesheetService:
         
         return combined_styles
     
-    def apply_stylesheets(self, app: QApplication) -> None:
+    def apply_stylesheets(self, app) -> None:
         """
         将合并后的样式表应用到应用程序
         
@@ -134,7 +134,7 @@ class StylesheetService:
         这是整个样式系统的入口点。
         
         Args:
-            app (QApplication): Qt应用程序实例
+            app: Qt应用程序实例（移除PyQt类型依赖）
         """
         try:
             # 加载并合并所有样式文件
@@ -155,7 +155,7 @@ class StylesheetService:
             # 这样即使样式有问题，UI功能仍然可用
             app.setStyleSheet("")
     
-    def reload_stylesheets(self, app: QApplication) -> None:
+    def reload_stylesheets(self, app) -> None:
         """
         重新加载样式表（用于开发调试）
         
@@ -164,7 +164,7 @@ class StylesheetService:
         样式调试和实时预览场景。
         
         Args:
-            app (QApplication): Qt应用程序实例
+            app: Qt应用程序实例（移除PyQt类型依赖）
         """
         self.logger.info("重新加载样式表...")
         self.apply_stylesheets(app)

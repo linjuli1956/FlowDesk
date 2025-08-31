@@ -9,6 +9,8 @@ import subprocess
 import re
 from typing import Dict, Tuple, Optional
 
+from flowdesk.utils.logger import get_logger
+from flowdesk.models import AdapterStatusInfo
 from .network_service_base import NetworkServiceBase
 
 
@@ -163,10 +165,11 @@ class AdapterStatusService(NetworkServiceBase):
                 - connect_status: 连接状态（已连接/已断开连接/未知）
         """
         # 初始化状态信息，默认为未知状态
-        status_info = {
-            'admin_status': '未知',
-            'connect_status': '未知'
-        }
+        status_info = AdapterStatusInfo(
+            admin_status='未知',
+            connect_status='未知',
+            interface_name=''
+        )
         
         try:
             # 执行netsh命令获取所有网络接口的状态信息
@@ -209,22 +212,27 @@ class AdapterStatusService(NetworkServiceBase):
                             connect_status_raw = line_parts[1].strip()    # 连接状态
                             
                             # 解析管理状态（第一列）- 网卡是否被启用
+                            admin_status = '未知'
                             if '已启用' in admin_status_raw or 'Enabled' in admin_status_raw:
-                                status_info['admin_status'] = '已启用'
+                                admin_status = '已启用'
                             elif '已禁用' in admin_status_raw or 'Disabled' in admin_status_raw:
-                                status_info['admin_status'] = '已禁用'
-                            else:
-                                status_info['admin_status'] = '未知'
+                                admin_status = '已禁用'
                             
                             # 解析连接状态（第二列）- 网卡是否已连接
+                            connect_status = '未知'
                             if '已连接' in connect_status_raw or 'Connected' in connect_status_raw:
-                                status_info['connect_status'] = '已连接'
+                                connect_status = '已连接'
                             elif '已断开连接' in connect_status_raw or 'Disconnected' in connect_status_raw or '未连接' in connect_status_raw or 'Not connected' in connect_status_raw:
-                                status_info['connect_status'] = '已断开连接'
-                            else:
-                                status_info['connect_status'] = '未知'
+                                connect_status = '已断开连接'
                             
-                            self.logger.debug(f"网卡 {adapter_name} 状态解析成功: 管理状态={status_info['admin_status']}, 连接状态={status_info['connect_status']}")
+                            # 创建新的状态信息实例
+                            status_info = AdapterStatusInfo(
+                                admin_status=admin_status,
+                                connect_status=connect_status,
+                                interface_name=interface_name
+                            )
+                            
+                            self.logger.debug(f"网卡 {adapter_name} 状态解析成功: 管理状态={status_info.admin_status}, 连接状态={status_info.connect_status}")
                             break
                 else:
                     # 如果没有找到匹配的网卡，记录警告信息

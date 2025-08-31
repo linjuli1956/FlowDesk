@@ -100,6 +100,10 @@ class AdapterInfoPanel(QWidget):
         self.refresh_btn.setToolTip("刷新网卡列表和状态信息")
         self.refresh_btn.setFixedSize(80, 30)  # 固定按钮尺寸
         
+        # 当前IP信息标题标签
+        self.ip_info_label = QLabel("📋 当前IP信息")
+        self.ip_info_label.setObjectName("ip_info_label")
+        
         # IP信息展示区域 - 支持智能缩放，高度可随容器调整
         self.ip_info_display = NoContextMenuTextEdit()
         self.ip_info_display.setObjectName("ip_info_display")
@@ -125,13 +129,13 @@ class AdapterInfoPanel(QWidget):
         self.link_speed_badge.setFixedSize(80, 25)
         
         # 网卡操作按钮组
-        self.enable_adapter_btn = QPushButton("🔌 启用")
+        self.enable_adapter_btn = QPushButton("🔌 启用网卡")
         self.enable_adapter_btn.setObjectName("enable_adapter_btn")
-        self.enable_adapter_btn.setFixedSize(80, 30)
+        self.enable_adapter_btn.setFixedSize(90, 30)
         
-        self.disable_adapter_btn = QPushButton("🚫 禁用")
+        self.disable_adapter_btn = QPushButton("🚫 禁用网卡")
         self.disable_adapter_btn.setObjectName("disable_adapter_btn")
-        self.disable_adapter_btn.setFixedSize(80, 30)
+        self.disable_adapter_btn.setFixedSize(90, 30)
         
         self.set_static_btn = QPushButton("🔧 静态IP")
         self.set_static_btn.setObjectName("set_static_btn")
@@ -155,7 +159,7 @@ class AdapterInfoPanel(QWidget):
         # 主布局 - 垂直排列
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(10, 10, 10, 10)
-        main_layout.setSpacing(10)
+        main_layout.setSpacing(8)  # 减少整体间距为标题腾出空间
         
         # 网卡选择区域 - 水平布局
         adapter_selection_layout = QHBoxLayout()
@@ -163,10 +167,16 @@ class AdapterInfoPanel(QWidget):
         adapter_selection_layout.addWidget(self.refresh_btn, 0)    # 按钮固定尺寸
         main_layout.addLayout(adapter_selection_layout)
         
-        # IP信息显示区域 - 占据主要空间
+        # 当前IP信息标题标签 - 紧贴网卡选择区域
+        main_layout.addWidget(self.ip_info_label)
+        
+        # IP信息显示区域 - 占据主要空间，保持原有高度
         main_layout.addWidget(self.ip_info_display, 1)
         
-        # 状态徽章区域 - 水平排列
+        # 添加弹性空间，将状态徽章和按钮区域推到底部
+        main_layout.addStretch(0)
+        
+        # 状态徽章区域 - 水平排列，固定在底部区域
         status_layout = QHBoxLayout()
         status_layout.addWidget(self.connection_status_badge)
         status_layout.addWidget(self.ip_mode_badge)
@@ -257,15 +267,32 @@ class AdapterInfoPanel(QWidget):
         """
         self.ip_info_display.setPlainText(formatted_info)
     
-    def update_status_badges(self, connection_status, ip_mode, link_speed):
+    def update_status_badges(self, connection_display_text, connection_status_attr, 
+                           ip_mode_display_text, ip_mode_attr, link_speed_display_text):
         """
-        更新状态徽章显示
+        更新网络状态徽章显示
+        
+        UI层只负责接收Service层格式化好的显示文本和属性，直接设置到控件上。
+        不包含任何业务逻辑判断，严格遵循UI层只收信号的原则。
         
         Args:
-            connection_status (str): 连接状态
-            ip_mode (str): IP模式
-            link_speed (str): 链路速度
+            connection_display_text (str): Service层格式化的连接状态显示文本（含Emoji）
+            connection_status_attr (str): 连接状态属性值（用于QSS选择器）
+            ip_mode_display_text (str): Service层格式化的IP模式显示文本（含Emoji）
+            ip_mode_attr (str): IP模式属性值（用于QSS选择器）
+            link_speed_display_text (str): Service层格式化的链路速度显示文本（含Emoji）
         """
-        self.connection_status_badge.setText(connection_status)
-        self.ip_mode_badge.setText(ip_mode)
-        self.link_speed_badge.setText(link_speed)
+        # 直接设置Service层格式化好的显示文本
+        self.connection_status_badge.setText(connection_display_text)
+        self.connection_status_badge.setProperty("status", connection_status_attr)
+        
+        self.ip_mode_badge.setText(ip_mode_display_text)
+        self.ip_mode_badge.setProperty("mode", ip_mode_attr)
+        
+        self.link_speed_badge.setText(link_speed_display_text)
+        
+        # 刷新样式以应用新的属性选择器
+        self.connection_status_badge.style().unpolish(self.connection_status_badge)
+        self.connection_status_badge.style().polish(self.connection_status_badge)
+        self.ip_mode_badge.style().unpolish(self.ip_mode_badge)
+        self.ip_mode_badge.style().polish(self.ip_mode_badge)

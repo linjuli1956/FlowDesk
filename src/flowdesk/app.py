@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flowdesk.ui.main_window import MainWindow
 from flowdesk.services.system_tray_service import SystemTrayService
+from flowdesk.services.tray_ui_service import TrayUIService
 from flowdesk.services.stylesheet_service import StylesheetService
 from flowdesk.utils.resource_path import resource_path
 from flowdesk.utils.logger import setup_logging, get_logger
@@ -128,7 +129,17 @@ class FlowDeskApplication:
             
             # 创建并初始化系统托盘服务
             self.tray_service = SystemTrayService(self.main_window)
-            self.tray_service.initialize()
+            self.tray_ui_service = TrayUIService(self.main_window)
+            
+            # 连接业务逻辑服务和UI服务
+            self._connect_tray_services()
+            
+            # 初始化托盘服务
+            if self.tray_service.initialize():
+                # 如果托盘可用，设置UI
+                if self.tray_service.is_tray_available():
+                    self.tray_ui_service.setup_system_tray()
+                    self._connect_tray_ui_signals()
             
             # 显示主窗口
             self.main_window.show()
@@ -142,7 +153,26 @@ class FlowDeskApplication:
             
         except Exception as e:
             self.logger.error(f"组件初始化失败: {e}")
-            sys.exit(1)
+            return 1
+    
+    def _connect_tray_services(self):
+        """连接托盘业务逻辑服务和UI服务的信号"""
+        # 业务逻辑服务信号 -> UI服务方法
+        self.tray_service.show_window_requested.connect(self.main_window.show)
+        self.tray_service.minimize_to_tray_requested.connect(self.main_window.hide)
+        self.tray_service.exit_requested.connect(self.app.quit)
+        # 连接显示退出对话框信号
+        self.tray_service.show_exit_dialog_requested.connect(self.tray_ui_service.show_exit_dialog)
+    
+    def _connect_tray_ui_signals(self):
+        """连接托盘UI服务的信号到业务逻辑"""
+        # UI服务信号 -> 主窗口方法（直接处理）
+        self.tray_ui_service.show_window_requested.connect(self.main_window.show)
+        self.tray_ui_service.exit_requested.connect(self.app.quit)
+        self.tray_ui_service.minimize_to_tray_requested.connect(self.main_window.hide)
+        
+        # 连接主窗口的关闭事件到托盘服务，需要处理返回值
+        self.main_window.close_requested.connect(self._handle_window_close_request)
     
     def show_main_window(self):
         """
@@ -153,9 +183,13 @@ class FlowDeskApplication:
         """
         if self.main_window:
             self.main_window.show()
-            self.main_window.raise_()  # 将窗口提升到最前面
-            self.main_window.activateWindow()  # 激活窗口获得焦点
-            self.logger.info("主窗口已显示")
+            self.main_window.raise_()
+            self.main_window.activateWindow()
+    
+    def _handle_window_close_request(self):
+        """处理主窗口关闭请求"""
+        # 委托给托盘服务处理，托盘服务会根据可用性决定行为
+        self.tray_service.handle_window_close_request()
     
     def on_application_quit(self):
         """

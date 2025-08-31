@@ -51,6 +51,7 @@ class NetworkServiceBase(QObject):
     
     # UI交互相关信号
     network_info_copied = pyqtSignal(str)        # 网卡信息复制完成信号，参数：复制的文本内容
+    status_badges_updated = pyqtSignal(str, str, str, str, str)  # 状态徽章更新信号，参数：连接显示文本, 连接属性, IP模式显示文本, IP模式属性, 链路速度显示文本
     operation_status = pyqtSignal(str, bool)     # 操作状态反馈信号，参数：操作描述, 成功标识
     operation_progress = pyqtSignal(str)         # 操作进度更新信号，参数：进度描述
     error_occurred = pyqtSignal(str, str)        # 错误发生信号，参数：错误类型, 错误描述

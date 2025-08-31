@@ -285,6 +285,11 @@ class MainWindow(QMainWindow):
             self._on_info_copied
         )
         
+        # 状态徽章更新：Service层格式化完成 -> UI直接显示
+        self.network_service.status_badges_updated.connect(
+            self.network_config_tab.adapter_info_panel.update_status_badges
+        )
+        
         # 错误处理：服务层发生错误 -> UI显示错误信息
         self.network_service.error_occurred.connect(
             self._on_service_error
@@ -579,30 +584,13 @@ class MainWindow(QMainWindow):
             # 第二步：更新当前网卡标签，让用户清楚知道正在操作哪个网卡
             self.network_config_tab.update_current_adapter_label(adapter_info.friendly_name)
             
-            # 第三步：网卡状态显示逻辑 - 根据实际网卡状态显示准确的状态信息
-            # 优先显示网卡的真实状态（如已禁用），而不是简单的连接/未连接二分法
-            if not adapter_info.is_enabled:
-                # 网卡被禁用时，显示禁用状态而非未连接状态
-                status_text = adapter_info.status  # 直接使用详细状态，如"已禁用"、"硬件已禁用"等
-                is_connected_for_badge = False
-            else:
-                # 网卡启用时，根据连接状态显示
-                status_text = "已连接" if adapter_info.is_connected else "未连接"
-                is_connected_for_badge = adapter_info.is_connected
-            
-            self.network_config_tab.update_status_badge(status_text, is_connected_for_badge)
-            
-            # 更新所有状态徽章，包括连接状态、IP模式和链路速度
-            # 提供完整的网卡状态信息展示
-            ip_mode = "DHCP" if adapter_info.dhcp_enabled else "静态IP"
-            link_speed = adapter_info.link_speed if adapter_info.link_speed else "未知"
-            self.logger.info(f"状态徽章更新 - 链路速度: '{link_speed}' (原始值: '{adapter_info.link_speed}') - 网卡: {adapter_info.friendly_name}")
-            self.network_config_tab.update_status_badges(status_text, ip_mode, link_speed)
-            self.logger.info(f"已调用update_status_badges - 状态: {status_text}, IP模式: {ip_mode}, 链路速度: {link_speed}")
+            # 状态徽章更新已由Service层通过status_badges_updated信号直接处理
+            # UI层不再包含任何状态判断逻辑
+            self.logger.debug("状态徽章更新由Service层直接处理，UI层跳过业务逻辑")
             
             # 构建并更新IP信息展示区域
             # 这是解决"IP信息展示容器不更新"问题的关键代码
-            formatted_info = self._format_adapter_info_for_display(adapter_info)
+            formatted_info = self.network_ui_coordinator.format_adapter_info_for_display(adapter_info)
             self.network_config_tab.update_ip_info_display(formatted_info)
             
             # 记录网卡选择操作的完成状态，便于系统监控和调试
@@ -633,7 +621,7 @@ class MainWindow(QMainWindow):
             self.logger.debug(f"[调试] _on_adapter_info_updated被调用，aggregated_info类型: {type(aggregated_info)}")
             
             # 提取详细信息对象
-            detailed_info = aggregated_info.get('detailed_info')
+            detailed_info = getattr(aggregated_info, 'detailed_info', None)
             if not detailed_info:
                 self.logger.warning("聚合信息中缺少详细信息，跳过UI更新")
                 return
@@ -658,39 +646,17 @@ class MainWindow(QMainWindow):
 
     def _update_status_badges_from_info(self, detailed_info):
         """
-        从详细信息中提取状态数据并更新状态徽章
+        已废弃：状态徽章更新现在由Service层直接处理
         
-        这个方法专门负责状态徽章的更新逻辑，将业务数据转换为UI显示格式。
-        严格遵循单一职责原则，只处理状态徽章相关的UI更新。
+        Service层通过status_badges_updated信号直接发送格式化好的显示文本，
+        UI层不再需要进行任何业务逻辑判断。
         
         Args:
-            detailed_info: 网卡详细信息对象
+            detailed_info: 网卡详细信息对象（已不使用）
         """
-        try:
-            self.logger.debug(f"[调试] _update_status_badges_from_info开始执行")
-            
-            # 提取连接状态：优先使用服务层判断的状态
-            connection_status = detailed_info.status if hasattr(detailed_info, 'status') else "未知"
-            self.logger.debug(f"[调试] 提取连接状态: {connection_status}")
-            
-            # 提取IP模式：基于DHCP启用状态判断
-            ip_mode = "DHCP" if (hasattr(detailed_info, 'dhcp_enabled') and detailed_info.dhcp_enabled) else "静态IP"
-            self.logger.debug(f"[调试] 提取IP模式: {ip_mode}")
-            
-            # 提取链路速度：优先使用性能服务获取的速度信息
-            link_speed = detailed_info.link_speed if (hasattr(detailed_info, 'link_speed') and detailed_info.link_speed) else "未知"
-            self.logger.debug(f"[调试] 提取链路速度: {link_speed}")
-            
-            # 调用UI组件更新状态徽章
-            self.logger.debug(f"[调试] 即将调用network_config_tab.update_status_badges")
-            self.network_config_tab.update_status_badges(connection_status, ip_mode, link_speed)
-            
-            self.logger.info(f"状态徽章已更新 - 连接状态: {connection_status}, IP模式: {ip_mode}, 链路速度: {link_speed}")
-            
-        except Exception as e:
-            self.logger.error(f"状态徽章更新失败: {str(e)}")
-            import traceback
-            self.logger.error(f"状态徽章更新异常堆栈: {traceback.format_exc()}")
+        # 此方法已被Service层的status_badges_updated信号替代
+        # UI层不再处理任何状态判断逻辑
+        self.logger.debug("状态徽章更新已由Service层直接处理，跳过UI层处理")
     
     def _update_ip_info_display_from_info(self, detailed_info):
         """
@@ -704,7 +670,7 @@ class MainWindow(QMainWindow):
         """
         try:
             # 格式化网卡信息为显示文本
-            formatted_info = self._format_adapter_info_for_display(detailed_info)
+            formatted_info = self.network_service._ui_coordinator.format_adapter_info_for_display(detailed_info)
             
             # 更新IP信息展示区域
             self.network_config_tab.update_ip_info_display(formatted_info)
@@ -858,7 +824,8 @@ class MainWindow(QMainWindow):
             info_lines.append(f"网卡描述: {adapter_info.description}")
             info_lines.append(f"友好名称: {adapter_info.friendly_name}")
             info_lines.append(f"物理地址: {adapter_info.mac_address}")
-            info_lines.append(f"连接状态: {'已连接' if adapter_info.is_connected else '未连接'}")
+            # 连接状态由Service层格式化，UI层不做判断
+            info_lines.append(f"连接状态: {adapter_info.status}")
             
             # 接口类型和链路速度
             interface_type = getattr(adapter_info, 'interface_type', '以太网')
@@ -895,7 +862,8 @@ class MainWindow(QMainWindow):
             if adapter_info.gateway:
                 info_lines.append(f"默认网关: {adapter_info.gateway}")
             
-            dhcp_status = "启用" if adapter_info.dhcp_enabled else "禁用"
+            # DHCP状态由Service层格式化，UI层不做判断
+            dhcp_status = "启用" if getattr(adapter_info, 'dhcp_enabled', False) else "禁用"
             info_lines.append(f"DHCP状态: {dhcp_status}")
             
             # DNS服务器
@@ -961,30 +929,13 @@ class MainWindow(QMainWindow):
             # 直接传递友好名称，由Tab组件统一添加前缀
             self.network_config_tab.update_current_adapter_label(adapter_info.friendly_name)
             
-            # 网卡状态显示逻辑 - 刷新后根据实际网卡状态显示准确的状态信息
-            # 优先显示网卡的真实状态（如已禁用），确保刷新后状态显示的准确性
-            if not adapter_info.is_enabled:
-                # 网卡被禁用时，显示禁用状态而非未连接状态
-                status_text = adapter_info.status  # 直接使用详细状态，如"已禁用"、"硬件已禁用"等
-                is_connected_for_badge = False
-            else:
-                # 网卡启用时，根据连接状态显示
-                status_text = "已连接" if adapter_info.is_connected else "未连接"
-                is_connected_for_badge = adapter_info.is_connected
-            
-            self.network_config_tab.update_status_badge(status_text, is_connected_for_badge)
-            
-            # 更新所有状态徽章，包括连接状态、IP模式和链路速度
-            # 确保刷新后显示完整的网卡状态信息
-            ip_mode = "DHCP" if adapter_info.dhcp_enabled else "静态IP"
-            link_speed = adapter_info.link_speed if adapter_info.link_speed else "未知"
-            self.logger.info(f"刷新状态徽章 - 链路速度: '{link_speed}' (原始值: '{adapter_info.link_speed}') - 网卡: {adapter_info.friendly_name}")
-            self.network_config_tab.update_status_badges(status_text, ip_mode, link_speed)
-            self.logger.info(f"已调用update_status_badges(刷新) - 状态: {status_text}, IP模式: {ip_mode}, 链路速度: {link_speed}")
+            # 状态徽章更新已由Service层通过status_badges_updated信号直接处理
+            # UI层不再包含任何状态判断逻辑
+            self.logger.debug("刷新时状态徽章更新由Service层直接处理，UI层跳过业务逻辑")
             
             # 构建并更新IP信息展示区域 - 这是修复刷新问题的关键代码
             # 确保刷新操作后用户能够看到最新的网卡配置信息
-            formatted_info = self._format_adapter_info_for_display(adapter_info)
+            formatted_info = self.network_ui_coordinator.format_adapter_info_for_display(adapter_info)
             self.network_config_tab.update_ip_info_display(formatted_info)
             
             # 记录刷新操作的成功完成状态，便于系统监控和调试
@@ -1006,8 +957,12 @@ class MainWindow(QMainWindow):
             copied_text (str): 复制到剪贴板的文本内容
         """
         try:
-            # 这里可以添加复制成功的提示逻辑
-            # 例如状态栏消息、临时提示等
+            # 实际复制到剪贴板
+            from PyQt5.QtWidgets import QApplication
+            clipboard = QApplication.clipboard()
+            clipboard.setText(copied_text)
+            
+            # 显示复制成功提示
             self.logger.info("网卡信息已复制到剪贴板")
             
         except Exception as e:
@@ -1204,93 +1159,6 @@ class MainWindow(QMainWindow):
             self.logger.error(f"处理批量删除IP成功信号失败: {str(e)}")
             # 如果弹窗显示失败，至少记录日志保证成功信息不丢失
     
-    def _format_adapter_info_for_display(self, adapter_info):
-        """
-        格式化网卡信息用于显示
-        
-        将AdapterInfo对象格式化为用户友好的文本格式，
-        在左侧IP信息展示区域显示。
-        
-        Args:
-            adapter_info (AdapterInfo): 网卡信息对象
-            
-        Returns:
-            str: 格式化后的显示文本
-        """
-        try:
-            # 构建详细的网卡信息显示文本
-            info_lines = []
-            info_lines.append(f"网卡描述: {adapter_info.description or '未知'}")
-            info_lines.append(f"友好名称: {adapter_info.friendly_name}")
-            info_lines.append(f"物理地址: {adapter_info.mac_address or '未知'}")
-            # 智能状态显示：优先显示禁用状态，其次显示连接状态
-            # 这确保了用户能够准确了解网卡的真实工作状态
-            if not adapter_info.is_enabled:
-                connection_status = "已禁用"
-            elif adapter_info.is_connected:
-                connection_status = "已连接"
-            else:
-                connection_status = "未连接"
-            info_lines.append(f"连接状态: {connection_status}")
-            
-            info_lines.append(f"接口类型: {adapter_info.interface_type or '未知'}")
-            
-            # 链路速度显示：避免重复添加单位，因为link_speed已包含单位信息
-            # 支持Gbps、Mbps等不同速度单位的正确显示
-            if adapter_info.link_speed and adapter_info.link_speed != '未知':
-                info_lines.append(f"链路速度: {adapter_info.link_speed}")
-            else:
-                info_lines.append("链路速度: 未知")
-            info_lines.append("")
-            
-            # IP配置信息 - 优先显示IPv4地址信息
-            info_lines.append("=== IP配置信息 ===")
-            primary_ip = adapter_info.get_primary_ip()
-            primary_mask = adapter_info.get_primary_subnet_mask()
-            if primary_ip:
-                info_lines.append(f"主IP地址: {primary_ip}")
-                info_lines.append(f"子网掩码: {primary_mask}")
-            else:
-                info_lines.append("主IP地址: 未配置")
-            
-            # 额外IPv4地址 - 紧接在主IP信息后显示
-            extra_ips = adapter_info.get_extra_ips()
-            if extra_ips:
-                info_lines.append("")
-                info_lines.append("额外IPv4地址:")
-                for ip, mask in extra_ips:
-                    info_lines.append(f"  • {ip}/{mask}")
-            
-            # 网关和DNS配置
-            info_lines.append("")
-            info_lines.append("=== 网络配置 ===")
-            info_lines.append(f"默认网关: {adapter_info.gateway or '未配置'}")
-            info_lines.append(f"DHCP状态: {'启用' if adapter_info.dhcp_enabled else '禁用'}")
-            
-            primary_dns = adapter_info.get_primary_dns()
-            secondary_dns = adapter_info.get_secondary_dns()
-            info_lines.append(f"主DNS服务器: {primary_dns or '未配置'}")
-            info_lines.append(f"备用DNS服务器: {secondary_dns or '未配置'}")
-            
-            # IPv6地址信息 - 移至最下方显示，在时间戳之前
-            if adapter_info.ipv6_addresses:
-                info_lines.append("")
-                info_lines.append("=== IPv6配置信息 ===")
-                for i, ipv6_addr in enumerate(adapter_info.ipv6_addresses):
-                    if i == 0:
-                        info_lines.append(f"主IPv6地址: {ipv6_addr}")
-                    else:
-                        info_lines.append(f"额外IPv6地址: {ipv6_addr}")
-            
-            # 添加时间戳 - 保持在最底部
-            info_lines.append("")
-            info_lines.append(f"最后更新: {adapter_info.last_updated.strftime('%Y-%m-%d %H:%M:%S')}")
-            
-            return "\n".join(info_lines)
-            
-        except Exception as e:
-            self.logger.error(f"格式化网卡信息失败: {str(e)}")
-            return "网卡信息格式化失败"
     
     def load_and_apply_styles(self):
         """

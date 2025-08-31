@@ -107,19 +107,9 @@ class NetworkConfigHandlers:
 
     def _validate_network_config(self, ip_address, subnet_mask, gateway, primary_dns, secondary_dns):
         """
-        网络配置参数的全面验证方法
+        网络配置参数验证方法 - 委托给Service层处理
         
-        作用说明：
-        这个方法实现了对五个网络配置输入框数据的全面验证逻辑，包括必填字段检查、
-        IP地址格式验证、子网掩码有效性验证、网关与IP地址网段匹配验证等。
-        设计遵循面向对象的单一职责原则，专门负责数据验证逻辑。
-        
-        验证规则：
-        1. IP地址和子网掩码为必填项
-        2. 所有IP地址必须符合IPv4格式规范
-        3. 子网掩码必须是有效的掩码格式
-        4. 网关地址必须与IP地址在同一网段
-        5. DNS服务器地址必须是有效的IPv4地址
+        UI层只负责调用Service层的验证方法，不包含业务逻辑。
         
         Args:
             ip_address (str): IPv4地址字符串
@@ -131,68 +121,10 @@ class NetworkConfigHandlers:
         Returns:
             dict: 验证结果字典，包含is_valid(bool)和error_message(str)字段
         """
-        from ...utils.network_utils import validate_ip_address, validate_subnet_mask, calculate_network_info
-        
-        # 第一层验证：必填字段检查
-        if not ip_address or not subnet_mask:
-            return {
-                'is_valid': False,
-                'error_message': '请输入IP地址和子网掩码！\n这两个字段是网络配置的必需参数。'
-            }
-        
-        # 第二层验证：IP地址格式检查
-        if not validate_ip_address(ip_address):
-            return {
-                'is_valid': False,
-                'error_message': f'IP地址格式无效：{ip_address}\n请输入有效的IPv4地址，如：192.168.1.100'
-            }
-        
-        # 第三层验证：子网掩码格式检查
-        if not validate_subnet_mask(subnet_mask):
-            return {
-                'is_valid': False,
-                'error_message': f'子网掩码格式无效：{subnet_mask}\n请输入有效的子网掩码，如：255.255.255.0 或 /24'
-            }
-        
-        # 第四层验证：网关地址检查（如果提供）
-        if gateway:
-            if not validate_ip_address(gateway):
-                return {
-                    'is_valid': False,
-                    'error_message': f'网关地址格式无效：{gateway}\n请输入有效的IPv4地址，如：192.168.1.1'
-                }
-            
-            # 验证网关是否与IP地址在同一网段
-            try:
-                ip_net_info = calculate_network_info(ip_address, subnet_mask)
-                gw_net_info = calculate_network_info(gateway, subnet_mask)
-                if ip_net_info['network'] != gw_net_info['network']:
-                    return {
-                        'is_valid': False,
-                        'error_message': f'网关地址与IP地址不在同一网段！\nIP：{ip_address}\n网关：{gateway}\n子网掩码：{subnet_mask}'
-                    }
-            except Exception:
-                # 如果网络计算失败，跳过网段验证
-                pass
-        
-        # 第五层验证：DNS服务器地址检查（如果提供）
-        if primary_dns and not validate_ip_address(primary_dns):
-            return {
-                'is_valid': False,
-                'error_message': f'主DNS服务器地址格式无效：{primary_dns}\n请输入有效的IPv4地址，如：8.8.8.8'
-            }
-        
-        if secondary_dns and not validate_ip_address(secondary_dns):
-            return {
-                'is_valid': False,
-                'error_message': f'备用DNS服务器地址格式无效：{secondary_dns}\n请输入有效的IPv4地址，如：8.8.4.4'
-            }
-        
-        # 所有验证通过
-        return {
-            'is_valid': True,
-            'error_message': ''
-        }
+        # 委托给Service层处理验证逻辑，UI层不包含业务逻辑
+        return self.parent().network_service.validate_network_config(
+            ip_address, subnet_mask, gateway, primary_dns, secondary_dns
+        )
     
     def _build_confirmation_message(self, adapter_name, ip_address, subnet_mask, gateway, primary_dns, secondary_dns):
         """

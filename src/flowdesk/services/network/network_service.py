@@ -118,6 +118,12 @@ class NetworkService(NetworkServiceBase):
         self._ui_coordinator.operation_progress.connect(self.operation_progress)
         self._ui_coordinator.error_occurred.connect(self.error_occurred)
         
+        # 连接复制信息信号（修复复制功能）
+        self._ui_coordinator.network_info_copied.connect(self.network_info_copied)
+        
+        # 连接状态徽章更新信号（Service层格式化后传递给UI层）
+        self._ui_coordinator.status_badges_updated.connect(self.status_badges_updated)
+        
         # 连接IP配置服务的信号
         self._ip_config_service.ip_config_applied.connect(self.ip_config_applied)
         
@@ -129,7 +135,8 @@ class NetworkService(NetworkServiceBase):
     
     def _debug_adapter_info_signal(self, aggregated_info):
         """调试adapter_info_updated信号转发"""
-        self.logger.info(f"NetworkService收到adapter_info_updated信号 - 网卡ID: {aggregated_info.get('adapter_id', 'Unknown')}")
+        adapter_id = getattr(aggregated_info, 'adapter_id', 'Unknown')
+        self.logger.info(f"NetworkService收到adapter_info_updated信号 - 网卡ID: {adapter_id}")
         self.logger.info(f"NetworkService即将转发adapter_info_updated信号给UI层")
         # 手动发射信号确保转发
         self.logger.info(f"手动发射adapter_info_updated信号")
@@ -476,5 +483,92 @@ class NetworkService(NetworkServiceBase):
             Dict[str, bool]: 各服务的可用状态字典
         """
         return self._ui_coordinator.get_service_status()
+    
+    def validate_network_config(self, ip_address, subnet_mask, gateway=None, primary_dns=None, secondary_dns=None):
+        """
+        网络配置参数的全面验证方法
+        
+        验证网络配置的所有参数，包括IP地址、子网掩码、网关和DNS服务器。
+        
+        Args:
+            ip_address (str): IPv4地址字符串
+            subnet_mask (str): 子网掩码字符串
+            gateway (str, optional): 网关地址字符串
+            primary_dns (str, optional): 主DNS服务器地址
+            secondary_dns (str, optional): 备用DNS服务器地址
+            
+        Returns:
+            dict: 验证结果字典，包含is_valid(bool)和error_message(str)字段
+        """
+        try:
+            from ...utils.network_utils import validate_ip_address, validate_subnet_mask, calculate_network_info
+            
+            # 第一层验证：必填字段检查
+            if not ip_address or not subnet_mask:
+                return {
+                    'is_valid': False,
+                    'error_message': '请输入IP地址和子网掩码！\n这两个字段是网络配置的必需参数。'
+                }
+            
+            # 第二层验证：IP地址格式检查
+            if not validate_ip_address(ip_address):
+                return {
+                    'is_valid': False,
+                    'error_message': f'IP地址格式无效：{ip_address}\n请输入有效的IPv4地址，如：192.168.1.100'
+                }
+            
+            # 第三层验证：子网掩码格式检查
+            if not validate_subnet_mask(subnet_mask):
+                return {
+                    'is_valid': False,
+                    'error_message': f'子网掩码格式无效：{subnet_mask}\n请输入有效的子网掩码，如：255.255.255.0 或 /24'
+                }
+            
+            # 第四层验证：网关地址检查（如果提供）
+            if gateway:
+                if not validate_ip_address(gateway):
+                    return {
+                        'is_valid': False,
+                        'error_message': f'网关地址格式无效：{gateway}\n请输入有效的IPv4地址，如：192.168.1.1'
+                    }
+                
+                # 验证网关是否与IP地址在同一网段
+                try:
+                    ip_net_info = calculate_network_info(ip_address, subnet_mask)
+                    gw_net_info = calculate_network_info(gateway, subnet_mask)
+                    if ip_net_info['network'] != gw_net_info['network']:
+                        return {
+                            'is_valid': False,
+                            'error_message': f'网关地址与IP地址不在同一网段！\nIP：{ip_address}\n网关：{gateway}\n子网掩码：{subnet_mask}'
+                        }
+                except Exception:
+                    # 如果网络计算失败，跳过网段验证
+                    pass
+            
+            # 第五层验证：DNS服务器地址检查（如果提供）
+            if primary_dns and not validate_ip_address(primary_dns):
+                return {
+                    'is_valid': False,
+                    'error_message': f'主DNS服务器地址格式无效：{primary_dns}\n请输入有效的IPv4地址，如：8.8.8.8'
+                }
+            
+            if secondary_dns and not validate_ip_address(secondary_dns):
+                return {
+                    'is_valid': False,
+                    'error_message': f'备用DNS服务器地址格式无效：{secondary_dns}\n请输入有效的IPv4地址，如：8.8.4.4'
+                }
+            
+            # 所有验证通过
+            return {
+                'is_valid': True,
+                'error_message': ''
+            }
+            
+        except Exception as e:
+            self.logger.error(f"网络配置验证失败: {str(e)}")
+            return {
+                'is_valid': False,
+                'error_message': '网络配置验证过程中发生错误，请检查输入参数。'
+            }
     
     # endregion
