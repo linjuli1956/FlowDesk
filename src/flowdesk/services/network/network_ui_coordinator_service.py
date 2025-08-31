@@ -303,6 +303,13 @@ class NetworkUICoordinatorService(NetworkServiceBase):
         try:
             self._log_operation_start("复制网卡信息")
             
+            # 调试信息：检查当前网卡信息状态
+            self.logger.info(f"当前网卡ID: {self._current_adapter_id}")
+            self.logger.info(f"当前网卡信息是否为空: {self._current_adapter_info is None}")
+            if self._current_adapter_info:
+                self.logger.info(f"当前网卡信息类型: {type(self._current_adapter_info)}")
+                self.logger.info(f"当前网卡信息键: {list(self._current_adapter_info.keys()) if isinstance(self._current_adapter_info, dict) else 'Not a dict'}")
+            
             if not self._current_adapter_info:
                 self.logger.warning("未选择当前网卡，无法复制信息")
                 self.error_occurred.emit("操作失败", "请先选择一个网卡")
@@ -310,6 +317,9 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             
             # 格式化网卡信息为可读文本
             info_text = self._format_adapter_info_for_copy(self._current_adapter_info)
+            
+            # 调试信息：检查格式化后的文本
+            self.logger.info(f"格式化后的信息文本: {info_text[:200]}...")  # 只显示前200个字符
             
             # 复制到剪贴板
             from PyQt5.QtWidgets import QApplication
@@ -329,36 +339,60 @@ class NetworkUICoordinatorService(NetworkServiceBase):
         """
         格式化网卡信息为可复制的文本格式
         
+        与容器内展示的格式完全一致，使用相同的显示逻辑。
+        
         Args:
-            adapter_info: 网卡详细信息对象
+            adapter_info: 聚合的网卡信息字典，包含 basic_info, detailed_info 等子对象
             
         Returns:
-            str: 格式化的网卡信息文本
+            str: 格式化的网卡信息文本，与容器内展示一致
         """
         if not adapter_info:
             return "无网卡信息"
             
-        # 构建格式化的信息文本
-        info_lines = [
-            f"网卡名称: {getattr(adapter_info, 'friendly_name', '未知')}",
-            f"硬件描述: {getattr(adapter_info, 'description', '未知')}",
-            f"MAC地址: {getattr(adapter_info, 'mac_address', '未知')}",
-            f"状态: {getattr(adapter_info, 'status', '未知')}",
-            f"连接类型: {getattr(adapter_info, 'interface_type', '未知')}",
-        ]
+        # 从聚合信息中提取 detailed_info
+        detailed_info = adapter_info.get('detailed_info') if isinstance(adapter_info, dict) else getattr(adapter_info, 'detailed_info', None)
         
-        # 添加IP配置信息
-        if hasattr(adapter_info, 'ip_config') and adapter_info.ip_config:
-            ip_config = adapter_info.ip_config
-            info_lines.extend([
-                f"IP地址: {getattr(ip_config, 'ip_address', '未设置')}",
-                f"子网掩码: {getattr(ip_config, 'subnet_mask', '未设置')}",
-                f"默认网关: {getattr(ip_config, 'gateway', '未设置')}",
-                f"主DNS: {getattr(ip_config, 'primary_dns', '未设置')}",
-                f"备用DNS: {getattr(ip_config, 'secondary_dns', '未设置')}"
-            ])
+        if not detailed_info:
+            return "网卡详细信息不可用"
         
-        return "\n".join(info_lines)
+        # 直接使用 MainWindow 的显示格式逻辑，确保与容器内展示完全一致
+        try:
+            # 导入 MainWindow 类并使用其格式化方法
+            from ...ui.main_window import MainWindow
+            
+            # 创建一个临时的 MainWindow 实例来调用格式化方法
+            # 注意：这里不初始化完整的 MainWindow，只是为了调用格式化方法
+            temp_main_window = MainWindow.__new__(MainWindow)
+            temp_main_window.logger = self.logger  # 设置日志器避免错误
+            
+            # 使用 MainWindow 的格式化方法
+            formatted_text = temp_main_window._format_adapter_info_for_display(detailed_info)
+            
+            return formatted_text
+            
+        except Exception as e:
+            self.logger.error(f"使用 MainWindow 格式化方法失败: {str(e)}")
+            
+            # 备用方案：简化的格式化
+            def safe_get(obj, attr, default='未知'):
+                if obj is None:
+                    return default
+                if isinstance(obj, dict):
+                    return obj.get(attr, default)
+                else:
+                    return getattr(obj, attr, default)
+            
+            info_lines = [
+                f"网卡描述: {safe_get(detailed_info, 'description')}",
+                f"友好名称: {safe_get(detailed_info, 'friendly_name')}",
+                f"物理地址: {safe_get(detailed_info, 'mac_address')}",
+                f"连接状态: {safe_get(detailed_info, 'status')}",
+                f"接口类型: {safe_get(detailed_info, 'interface_type')}",
+                f"链路速度: {safe_get(detailed_info, 'link_speed')}"
+            ]
+            
+            return "\n".join(info_lines)
     
     def set_current_adapter(self, adapter_id: str):
         """

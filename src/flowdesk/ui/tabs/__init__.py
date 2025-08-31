@@ -18,6 +18,9 @@ Tab页面列表：
 """
 
 from .network_config_tab import NetworkConfigTab
+from .adapter_info_panel import AdapterInfoPanel
+from .ip_config_panel import IPConfigPanel
+from .network_config_handlers import NetworkConfigHandlers
 
 # 其他Tab页面暂未实现，后续开发时添加
 # from .network_tools_tab import NetworkToolsTab
@@ -26,6 +29,9 @@ from .network_config_tab import NetworkConfigTab
 
 __all__ = [
     'NetworkConfigTab',
+    'AdapterInfoPanel',
+    'IPConfigPanel', 
+    'NetworkConfigHandlers',
     # 'NetworkToolsTab', 
     # 'RdpTab',
     # 'HardwareTab'

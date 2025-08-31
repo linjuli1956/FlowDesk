@@ -47,17 +47,17 @@ QLabel {
     color: #be185d;
 }
 
-/* === 配置标签样式 - 增加高度和内边距，添加外边距增强间距 === */
+/* === 配置标签样式 - 适中高度和内边距，与输入框高度匹配 === */
 #config_label {
     background-color: white;
     border: 1px solid #d1d5db;
     border-radius: 4px;
-    padding: 8px 12px;  /* 增加内边距，提高标签高度 */
+    padding: 7px 12px;  /* 适中垂直内边距，与输入框保持一致 */
     font-weight: bold;
     color: #374151;
     min-width: 80px;
-    min-height: 24px;  /* 设置最小高度 */
-    margin: 4px 0px;  /* 添加上下外边距，进一步增强垂直间距 */
+    min-height: 20px;  /* 适中最小高度，与输入框匹配 */
+    margin: 2px 0px;  /* 保持上下外边距，与输入框保持一致 */
 }
 
 /* === 当前网卡标签样式 - 减少高度，文字加粗浅色底色 === */
@@ -74,16 +74,16 @@ QLabel {
     line-height: 1.2;  /* 减少行高压缩空间 */
 }
 
-/* === 通用输入框样式 - 适中高度和内边距，平衡美观与空间利用 === */
+/* === 通用输入框样式 - 适中高度和内边距，平衡美观与紧凑 === */
 QLineEdit {
     background-color: white;
     border: 1px solid #e5e7eb;  /* 减少边框宽度从2px到1px */
     border-radius: 6px;
-    padding: 8px 12px;  /* 适中内边距：8px，平衡高度与舒适度 */
+    padding: 7px 12px;  /* 适中垂直内边距：6px → 7px，稍微增加高度 */
     font-size: 13px;  /* 保持13px字体大小 */
     color: #374151;
-    min-height: 22px;  /* 微调增加高度：20px → 22px */
-    margin: 3px 0px;  /* 保持3px上下外边距 */
+    min-height: 20px;  /* 适中最小高度：18px → 20px，平衡紧凑与可读性 */
+    margin: 2px 0px;  /* 保持2px上下外边距 */
 }
 
 QLineEdit:focus {
@@ -99,8 +99,8 @@ QLineEdit:hover {
 /* IP地址输入框 - 浅蓝色边框 */
 #ip_address_input {
     border: 2px solid #93c5fd;  /* 浅蓝色边框，代表主要IP配置 */
-    padding: 8px 12px;  /* 与通用样式保持一致 */
-    min-height: 22px;  /* 与通用样式保持一致 */
+    padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
+    min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
 }
 
 #ip_address_input:focus {
@@ -114,8 +114,8 @@ QLineEdit:hover {
 /* 子网掩码输入框 - 浅绿色边框 */
 #subnet_mask_input {
     border: 2px solid #86efac;  /* 浅绿色边框，代表网络配置 */
-    padding: 8px 12px;  /* 与通用样式保持一致 */
-    min-height: 22px;  /* 与通用样式保持一致 */
+    padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
+    min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
 }
 
 #subnet_mask_input:focus {
@@ -129,8 +129,8 @@ QLineEdit:hover {
 /* 网关输入框 - 浅紫色边框 */
 #gateway_input {
     border: 2px solid #c4b5fd;  /* 浅紫色边框，代表网关路由 */
-    padding: 8px 12px;  /* 与通用样式保持一致 */
-    min-height: 22px;  /* 与通用样式保持一致 */
+    padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
+    min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
 }
 
 #gateway_input:focus {
@@ -144,8 +144,8 @@ QLineEdit:hover {
 /* 主DNS输入框 - 浅橙色边框 */
 #primary_dns_input {
     border: 2px solid #fdba74;  /* 浅橙色边框，代表主DNS服务 */
-    padding: 8px 12px;  /* 与通用样式保持一致 */
-    min-height: 22px;  /* 与通用样式保持一致 */
+    padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
+    min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
 }
 
 #primary_dns_input:focus {
@@ -159,8 +159,8 @@ QLineEdit:hover {
 /* 备用DNS输入框 - 浅粉色边框 */
 #secondary_dns_input {
     border: 2px solid #f9a8d4;  /* 浅粉色边框，代表备用DNS服务 */
-    padding: 8px 12px;  /* 与通用样式保持一致 */
-    min-height: 22px;  /* 与通用样式保持一致 */
+    padding: 7px 12px;  /* 适中垂直内边距，与通用样式保持一致 */
+    min-height: 20px;  /* 适中最小高度，与通用样式保持一致 */
 }
 
 #secondary_dns_input:focus {
@@ -452,10 +452,11 @@ QPushButton:disabled {
         stop:0 #d97706, stop:1 #b45309);
 }
 
-/* === 复制信息按钮 - 蓝色渐变 === */
+/* === 复制信息按钮 - 蓝色渐变，占满整行宽度 === */
 #copy_info_btn {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
         stop:0 #60a5fa, stop:1 #3b82f6);
+    min-width: 200px;  /* 设置最小宽度确保按钮足够宽 */
 }
 
 #copy_info_btn:hover {

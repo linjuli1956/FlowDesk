@@ -544,7 +544,7 @@ class MainWindow(QMainWindow):
             
             # 将处理后的显示名称传递给UI层进行界面更新
             # UI层只负责接收数据并更新显示，不进行任何业务逻辑处理
-            self.network_config_tab.update_adapter_list(adapter_display_names)
+            self.network_config_tab.update_adapter_list_with_mapping(adapters)
             
             # 记录成功操作的详细信息，便于系统监控和问题排查
             self.logger.info(f"网卡列表更新完成：成功加载 {len(adapters)} 个网络适配器到下拉框")
