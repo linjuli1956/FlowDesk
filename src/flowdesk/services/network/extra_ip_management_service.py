@@ -94,7 +94,7 @@ class ExtraIPManagementService(NetworkServiceBase):
                     
                     if success:
                         success_count += 1
-                        self.logger.info(f"✅ 成功添加额外IP: {ip_address}/{subnet_mask}")
+                        self.logger.debug(f"✅ 成功添加额外IP: {ip_address}/{subnet_mask}")
                     else:
                         failed_configs.append(f"{ip_address}/{subnet_mask}")
                         self.logger.warning(f"❌ 添加额外IP失败: {ip_address}/{subnet_mask}")
@@ -182,7 +182,7 @@ class ExtraIPManagementService(NetworkServiceBase):
                     
                     if success:
                         success_count += 1
-                        self.logger.info(f"✅ 成功删除额外IP: {ip_address}/{subnet_mask}")
+                        self.logger.debug(f"✅ 成功删除额外IP: {ip_address}/{subnet_mask}")
                     else:
                         failed_configs.append(f"{ip_address}/{subnet_mask}")
                         self.logger.warning(f"❌ 删除额外IP失败: {ip_address}/{subnet_mask}")
@@ -228,7 +228,7 @@ class ExtraIPManagementService(NetworkServiceBase):
             adapters: 网卡信息列表，每个元素包含网卡的基本信息
         """
         self._adapters = adapters
-        self.logger.info(f"更新网卡信息缓存，共 {len(adapters)} 个网卡")
+        self.logger.debug(f"更新网卡信息缓存，共 {len(adapters)} 个网卡")
     
     # endregion
     
@@ -244,7 +244,7 @@ class ExtraIPManagementService(NetworkServiceBase):
         Returns:
             Dict[str, Any]: 匹配的网卡信息，未找到返回None
         """
-        self.logger.info(f"正在查找网卡: '{adapter_name}'")
+        self.logger.debug(f"正在查找网卡: '{adapter_name}'")
         
         for adapter in self._adapters:
             # 处理AdapterInfo对象和字典两种格式
@@ -253,14 +253,14 @@ class ExtraIPManagementService(NetworkServiceBase):
                 if (adapter.friendly_name == adapter_name or 
                     adapter.description == adapter_name or 
                     adapter.name == adapter_name):
-                    self.logger.info(f"成功匹配网卡: '{adapter_name}' -> 友好名称: '{adapter.friendly_name}'")
+                    self.logger.debug(f"成功匹配网卡: '{adapter_name}' -> 友好名称: '{adapter.friendly_name}'")
                     return adapter
             else:
                 # 字典格式（向后兼容）
                 if (adapter.get('friendly_name') == adapter_name or 
                     adapter.get('description') == adapter_name or 
                     adapter.get('name') == adapter_name):
-                    self.logger.info(f"成功匹配网卡: '{adapter_name}' -> 友好名称: '{adapter.get('friendly_name')}'")
+                    self.logger.debug(f"成功匹配网卡: '{adapter_name}' -> 友好名称: '{adapter.get('friendly_name')}'")
                     return adapter
         
         return None
@@ -298,7 +298,7 @@ class ExtraIPManagementService(NetworkServiceBase):
             
             # 检查命令执行结果
             if result.returncode == 0:
-                self.logger.info(f"成功添加额外IP: {ip_address}/{subnet_mask} 到网卡 {adapter_friendly_name}")
+                self.logger.debug(f"成功添加额外IP: {ip_address}/{subnet_mask} 到网卡 {adapter_friendly_name}")
                 return True
             else:
                 # 详细记录netsh命令执行信息
@@ -351,7 +351,7 @@ class ExtraIPManagementService(NetworkServiceBase):
             
             # 检查命令执行结果
             if result.returncode == 0:
-                self.logger.info(f"成功删除额外IP: {ip_address}/{subnet_mask} 从网卡 {adapter_friendly_name}")
+                self.logger.debug(f"成功删除额外IP: {ip_address}/{subnet_mask} 从网卡 {adapter_friendly_name}")
                 return True
             else:
                 # 详细记录netsh命令执行信息

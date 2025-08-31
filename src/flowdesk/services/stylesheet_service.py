@@ -69,7 +69,7 @@ class StylesheetService:
             "main_window.qss",          # 主窗口特定样式
         ]
         
-        self.logger.info(f"样式表管理服务初始化完成 - {'Win7兼容模式' if use_win7_compatibility else '标准模式'}")
+        self.logger.debug(f"样式表管理服务初始化完成 - {'Win7兼容模式' if use_win7_compatibility else '标准模式'}")
     
     def load_stylesheets(self) -> str:
         """
@@ -121,7 +121,7 @@ class StylesheetService:
                     # 主样式文件加载失败是致命错误，必须抛出异常
                     raise
         
-        self.logger.info(f"样式表合并完成，已加载文件: {', '.join(loaded_files)}")
+        self.logger.debug(f"样式表合并完成，已加载文件: {', '.join(loaded_files)}")
         
         
         return combined_styles
@@ -148,7 +148,7 @@ class StylesheetService:
             # 缓存当前样式，便于后续操作（如热重载、调试等）
             self.current_stylesheet = combined_styles
             
-            self.logger.info("样式表应用成功")
+            self.logger.debug("样式表应用成功")
             
         except Exception as e:
             self.logger.error(f"应用样式表失败: {e}")
@@ -167,7 +167,7 @@ class StylesheetService:
         Args:
             app: Qt应用程序实例（移除PyQt类型依赖）
         """
-        self.logger.info("重新加载样式表...")
+        self.logger.debug("重新加载样式表...")
         self.apply_stylesheets(app)
     
     def add_stylesheet_file(self, filename: str, position: Optional[int] = None) -> None:
@@ -188,7 +188,7 @@ class StylesheetService:
         else:
             self.stylesheet_files.insert(position, filename)
         
-        self.logger.info(f"样式文件已添加到加载列表: {filename}")
+        self.logger.debug(f"样式文件已添加到加载列表: {filename}")
     
     def remove_stylesheet_file(self, filename: str) -> bool:
         """
@@ -206,7 +206,7 @@ class StylesheetService:
         """
         try:
             self.stylesheet_files.remove(filename)
-            self.logger.info(f"样式文件已从加载列表移除: {filename}")
+            self.logger.debug(f"样式文件已从加载列表移除: {filename}")
             return True
         except ValueError:
             self.logger.warning(f"要移除的样式文件不在列表中: {filename}")
@@ -262,6 +262,6 @@ class StylesheetService:
         if problematic_files:
             self.logger.warning(f"发现问题文件: {', '.join(problematic_files)}")
         else:
-            self.logger.info("所有QSS文件验证通过")
+            self.logger.debug("所有QSS文件验证通过")
             
         return problematic_files

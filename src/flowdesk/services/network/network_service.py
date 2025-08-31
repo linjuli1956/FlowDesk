@@ -76,7 +76,7 @@ class NetworkService(NetworkServiceBase):
         self._current_adapter_id = None
         self._adapters = []
         
-        self.logger.info("网络服务门面初始化完成，所有专业服务已就绪")
+        self.logger.debug("网络服务门面初始化完成，所有专业服务已就绪")
     
     # region 服务初始化
     
@@ -95,7 +95,7 @@ class NetworkService(NetworkServiceBase):
         self._ui_coordinator.set_ip_config_service(self._ip_config_service)
         self._ui_coordinator.set_extra_ip_service(self._extra_ip_service)
         
-        self.logger.info("服务依赖关系建立完成")
+        self.logger.debug("服务依赖关系建立完成")
     
     def _connect_service_signals(self):
         """
@@ -131,15 +131,15 @@ class NetworkService(NetworkServiceBase):
         self._extra_ip_service.extra_ips_added.connect(self.extra_ips_added)
         self._extra_ip_service.extra_ips_removed.connect(self.extra_ips_removed)
         
-        self.logger.info("网络服务信号连接完成")
+        self.logger.debug("网络服务信号连接完成")
     
     def _debug_adapter_info_signal(self, aggregated_info):
         """调试adapter_info_updated信号转发"""
         adapter_id = getattr(aggregated_info, 'adapter_id', 'Unknown')
-        self.logger.info(f"NetworkService收到adapter_info_updated信号 - 网卡ID: {adapter_id}")
-        self.logger.info(f"NetworkService即将转发adapter_info_updated信号给UI层")
+        self.logger.debug(f"NetworkService收到adapter_info_updated信号 - 网卡ID: {adapter_id}")
+        self.logger.debug(f"NetworkService即将转发adapter_info_updated信号给UI层")
         # 手动发射信号确保转发
-        self.logger.info(f"手动发射adapter_info_updated信号")
+        self.logger.debug(f"手动发射adapter_info_updated信号")
         self.adapter_info_updated.emit(aggregated_info)
     
     def _update_adapters_cache(self, adapters):
@@ -155,7 +155,7 @@ class NetworkService(NetworkServiceBase):
         """
         try:
             self._adapters = adapters if adapters else []
-            self.logger.info(f"网卡缓存已更新，当前缓存网卡数量: {len(self._adapters)}")
+            self.logger.debug(f"网卡缓存已更新，当前缓存网卡数量: {len(self._adapters)}")
             
             # 调试输出缓存的网卡信息
             for adapter in self._adapters:
@@ -393,7 +393,7 @@ class NetworkService(NetworkServiceBase):
         """
         try:
             print(f"[调试] NetworkService.add_selected_extra_ips被调用 - 网卡: {adapter_name}, IP数量: {len(ip_configs)}, IP列表: {ip_configs}")
-            self.logger.info(f"开始批量添加额外IP - 网卡: {adapter_name}, IP数量: {len(ip_configs)}")
+            self.logger.debug(f"开始批量添加额外IP - 网卡: {adapter_name}, IP数量: {len(ip_configs)}")
             
             # 委托给UI协调器处理
             self._ui_coordinator.add_selected_extra_ips(adapter_name, ip_configs)

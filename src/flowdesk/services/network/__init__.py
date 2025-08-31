@@ -49,8 +49,8 @@ __all__ = [
 # 模块初始化日志
 import logging
 logger = logging.getLogger(__name__)
-logger.info(f"FlowDesk网络服务模块已加载 - 版本 {__version__}")
-logger.info(f"可用服务类数量: {len(__all__)}")
+logger.debug(f"FlowDesk网络服务模块已加载 - 版本 {__version__}")
+logger.debug(f"可用服务类数量: {len(__all__)}")
 
 # 向后兼容性说明
 """

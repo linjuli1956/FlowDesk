@@ -64,7 +64,7 @@ class UIStateManager:
             self.main_window.network_config_tab.update_adapter_list_with_mapping(adapters)
             
             # 记录成功操作的详细信息，便于系统监控和问题排查
-            self.logger.info(f"网卡列表更新完成：成功加载 {len(adapters)} 个网络适配器到下拉框")
+            self.logger.debug(f"网卡列表更新完成：成功加载 {len(adapters)} 个网络适配器到下拉框")
             
         except Exception as e:
             # 异常处理：确保单个网卡信息错误不影响整体功能
@@ -107,7 +107,7 @@ class UIStateManager:
                 self.main_window.network_config_tab.update_ip_info_display(formatted_info)
             
             # 记录网卡选择操作的完成状态，便于系统监控和调试
-            self.logger.info(f"网卡选择界面更新完成: {adapter_info.friendly_name}")
+            self.logger.debug(f"网卡选择界面更新完成: {adapter_info.friendly_name}")
             
         except Exception as e:
             # 异常处理：确保UI更新错误不影响核心功能
@@ -150,7 +150,7 @@ class UIStateManager:
             self.logger.debug("[调试] 即将调用_update_ip_info_display_from_info")
             self._update_ip_info_display_from_info(detailed_info)
             
-            self.logger.info(f"网卡信息UI更新完成: {getattr(detailed_info, 'name', '未知网卡')}")
+            self.logger.debug(f"网卡信息UI更新完成: {getattr(detailed_info, 'name', '未知网卡')}")
             
         except Exception as e:
             self.logger.error(f"网卡信息更新处理失败: {str(e)}")
@@ -189,7 +189,7 @@ class UIStateManager:
                 # 更新IP信息展示区域
                 self.main_window.network_config_tab.update_ip_info_display(formatted_info)
                 
-                self.logger.info("IP信息展示区域已更新")
+                self.logger.debug("IP信息展示区域已更新")
             
         except Exception as e:
             self.logger.error(f"IP信息显示更新失败: {str(e)}")
@@ -221,12 +221,12 @@ class UIStateManager:
         try:
             # 直接传递IPConfigInfo对象到UI层，符合架构规范
             # UI层只接收数据对象，不进行业务逻辑处理
-            self.logger.info(f"[调试] 准备更新IP配置输入框，IPConfigInfo对象: {ip_config}")
+            self.logger.debug(f"[调试] 准备更新IP配置输入框，IPConfigInfo对象: {ip_config}")
             self.main_window.network_config_tab.update_ip_config_inputs(ip_config)
-            self.logger.info(f"[调试] IP配置输入框更新完成")
+            self.logger.debug(f"[调试] IP配置输入框更新完成")
             
             # 记录IP配置更新的成功状态，便于系统监控和调试
-            self.logger.info(f"IP配置界面更新完成: {ip_config.ip_address or '无IP地址'}")
+            self.logger.debug(f"IP配置界面更新完成: {ip_config.ip_address or '无IP地址'}")
             
         except Exception as e:
             # 异常处理：确保IP配置更新错误不影响其他功能
@@ -248,7 +248,7 @@ class UIStateManager:
             if extra_ips and isinstance(extra_ips[0], str):
                 # 如果接收到的是字符串列表（格式："ip/mask"），直接使用
                 ip_list = extra_ips
-                self.logger.info(f"接收到字符串格式的额外IP列表: {ip_list}")
+                self.logger.debug(f"接收到字符串格式的额外IP列表: {ip_list}")
             else:
                 # 如果接收到的是ExtraIP对象列表，格式化为字符串
                 ip_list = []
@@ -256,12 +256,12 @@ class UIStateManager:
                     if hasattr(extra_ip, 'ip_address') and hasattr(extra_ip, 'subnet_mask'):
                         ip_info = f"{extra_ip.ip_address}/{extra_ip.subnet_mask}"
                         ip_list.append(ip_info)
-                self.logger.info(f"格式化ExtraIP对象为字符串列表: {ip_list}")
+                self.logger.debug(f"格式化ExtraIP对象为字符串列表: {ip_list}")
             
             # 更新额外IP列表
             self.main_window.network_config_tab.update_extra_ip_list(ip_list)
             
-            self.logger.info(f"额外IP列表已更新，共 {len(extra_ips)} 个")
+            self.logger.debug(f"额外IP列表已更新，共 {len(extra_ips)} 个")
             
         except Exception as e:
             self.logger.error(f"更新额外IP列表失败: {str(e)}")
@@ -301,7 +301,7 @@ class UIStateManager:
                 self.main_window.network_config_tab.update_ip_info_display(formatted_info)
             
             # 记录刷新操作的成功完成状态，便于系统监控和调试
-            self.logger.info(f"网卡刷新界面更新完成: {adapter_info.friendly_name}")
+            self.logger.debug(f"网卡刷新界面更新完成: {adapter_info.friendly_name}")
             
         except Exception as e:
             # 异常处理：确保刷新错误不影响其他功能的正常运行

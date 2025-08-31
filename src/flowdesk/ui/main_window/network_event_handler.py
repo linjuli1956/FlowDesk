@@ -67,16 +67,16 @@ class NetworkEventHandler:
                 if adapter.name == display_name or adapter.description == display_name or adapter.friendly_name == display_name:
                     # 找到匹配的网卡，立即更新状态徽章以减少卡顿感
                     # 先使用缓存的网卡信息快速更新状态徽章
-                    self.logger.info(f"找到匹配网卡，立即更新状态徽章: {adapter.id}")
+                    self.logger.debug(f"找到匹配网卡，立即更新状态徽章: {adapter.id}")
                     
                     # 移除立即更新逻辑，避免显示过时的缓存数据
                     # 直接依赖服务层的完整刷新流程，确保显示最新的链路速度信息
                     
                     # 然后调用服务层的选择方法进行完整刷新
                     # 这将触发一系列的信号发射，最终更新UI显示
-                    self.logger.info(f"调用select_adapter进行完整刷新: {adapter.id}")
+                    self.logger.debug(f"调用select_adapter进行完整刷新: {adapter.id}")
                     self.network_service.select_adapter(adapter.id)
-                    self.logger.info(f"用户选择网卡：{display_name}")
+                    self.logger.debug(f"用户选择网卡：{display_name}")
                     return
             
             # 如果没有找到匹配的网卡，记录警告信息便于调试
@@ -187,7 +187,7 @@ class NetworkEventHandler:
                         else:
                             current_dns1 = dns_part
                 
-                self.logger.info(f"从左侧信息区域解析当前配置 - IP: '{current_ip}', 子网: '{current_subnet}', "
+                self.logger.debug(f"从左侧信息区域解析当前配置 - IP: '{current_ip}', 子网: '{current_subnet}', "
                                f"网关: '{current_gateway}', DNS1: '{current_dns1}', DNS2: '{current_dns2}'")
             except Exception as e:
                 self.logger.error(f"从信息显示区域解析配置失败: {e}")
@@ -198,9 +198,9 @@ class NetworkEventHandler:
                 current_dns1 = target_adapter.get_primary_dns()
                 current_dns2 = target_adapter.get_secondary_dns()
             
-            self.logger.info(f"当前网卡配置 - IP: '{current_ip}', 子网: '{current_subnet}', "
+            self.logger.debug(f"当前网卡配置 - IP: '{current_ip}', 子网: '{current_subnet}', "
                             f"网关: '{current_gateway}', DNS1: '{current_dns1}', DNS2: '{current_dns2}'")
-            self.logger.info(f"网卡原始信息 - ip_addresses: {target_adapter.ip_addresses}, "
+            self.logger.debug(f"网卡原始信息 - ip_addresses: {target_adapter.ip_addresses}, "
                             f"subnet_masks: {target_adapter.subnet_masks}, "
                             f"gateway: '{target_adapter.gateway}', "
                             f"dns_servers: {target_adapter.dns_servers}")
@@ -213,11 +213,11 @@ class NetworkEventHandler:
             new_dns2 = secondary_dns or ""
             
             # 记录新旧配置对比
-            self.logger.info(f"配置对比 - 当前IP: '{current_ip}' vs 新IP: '{new_ip}'")
-            self.logger.info(f"配置对比 - 当前子网: '{current_subnet}' vs 新子网: '{new_subnet}'")
-            self.logger.info(f"配置对比 - 当前网关: '{current_gateway}' vs 新网关: '{new_gateway}'")
-            self.logger.info(f"配置对比 - 当前DNS1: '{current_dns1}' vs 新DNS1: '{new_dns1}'")
-            self.logger.info(f"配置对比 - 当前DNS2: '{current_dns2}' vs 新DNS2: '{new_dns2}'")
+            self.logger.debug(f"配置对比 - 当前IP: '{current_ip}' vs 新IP: '{new_ip}'")
+            self.logger.debug(f"配置对比 - 当前子网: '{current_subnet}' vs 新子网: '{new_subnet}'")
+            self.logger.debug(f"配置对比 - 当前网关: '{current_gateway}' vs 新网关: '{new_gateway}'")
+            self.logger.debug(f"配置对比 - 当前DNS1: '{current_dns1}' vs 新DNS1: '{new_dns1}'")
+            self.logger.debug(f"配置对比 - 当前DNS2: '{current_dns2}' vs 新DNS2: '{new_dns2}'")
             
             # 创建IP配置确认数据模型
             confirmation_data = IPConfigConfirmation(
@@ -237,7 +237,7 @@ class NetworkEventHandler:
             
             # 检查是否有实际变更
             if not confirmation_data.has_changes():
-                self.logger.info("检测到无实际配置变更，仍显示确认弹窗")
+                self.logger.debug("检测到无实际配置变更，仍显示确认弹窗")
             
             # 显示IP配置确认弹窗
             confirm_dialog = IPConfigConfirmDialog(confirmation_data, self.main_window)
@@ -252,11 +252,11 @@ class NetworkEventHandler:
             
             # 连接取消信号到日志记录
             confirm_dialog.cancelled.connect(
-                lambda: self.logger.info(f"用户取消IP配置修改: {adapter_display_name}")
+                lambda: self.logger.debug(f"用户取消IP配置修改: {adapter_display_name}")
             )
             
             # 显示弹窗（模态）
-            self.logger.info(f"显示IP配置确认弹窗: {adapter_display_name}")
+            self.logger.debug(f"显示IP配置确认弹窗: {adapter_display_name}")
             confirm_dialog.exec_()
                 
         except Exception as e:
@@ -284,7 +284,7 @@ class NetworkEventHandler:
         """
         try:
             # 记录IP配置应用操作的开始
-            self.logger.info(f"用户确认后开始应用IP配置到网卡 {adapter_display_name}: "
+            self.logger.debug(f"用户确认后开始应用IP配置到网卡 {adapter_display_name}: "
                            f"IP={ip_address}, 掩码={subnet_mask}")
             
             # 调用服务层的IP配置应用方法
@@ -299,7 +299,7 @@ class NetworkEventHandler:
             )
             
             if success:
-                self.logger.info(f"IP配置应用成功: {adapter_display_name}")
+                self.logger.debug(f"IP配置应用成功: {adapter_display_name}")
             else:
                 self.logger.warning(f"IP配置应用失败: {adapter_display_name}")
                 
@@ -373,7 +373,7 @@ class NetworkEventHandler:
         """
         try:
             # 记录IP配置成功的详细信息供开发者调试使用
-            self.logger.info(f"IP配置应用成功: {success_message}")
+            self.logger.debug(f"IP配置应用成功: {success_message}")
             
             # 显示用户友好的成功弹窗
             
@@ -417,7 +417,7 @@ class NetworkEventHandler:
         """
         try:
             # 记录操作进度的详细信息
-            self.logger.info(f"操作进度: {progress_message}")
+            self.logger.debug(f"操作进度: {progress_message}")
             
             # 这里可以添加用户友好的进度提示逻辑
             # 例如进度条、状态栏消息、加载动画等
@@ -457,7 +457,7 @@ class NetworkEventHandler:
             )
             
             # 记录成功操作日志，便于运维监控和问题追踪
-            self.logger.info(f"批量添加额外IP操作成功: {success_message}")
+            self.logger.debug(f"批量添加额外IP操作成功: {success_message}")
             
         except Exception as e:
             # 异常处理：确保弹窗显示失败不会影响主程序运行
@@ -496,7 +496,7 @@ class NetworkEventHandler:
             )
             
             # 记录成功操作日志，便于运维监控和问题追踪
-            self.logger.info(f"批量删除额外IP操作成功: {success_message}")
+            self.logger.debug(f"批量删除额外IP操作成功: {success_message}")
             
         except Exception as e:
             # 异常处理：确保弹窗显示失败不会影响主程序运行

@@ -196,7 +196,7 @@ class IPConfigurationService(NetworkServiceBase):
             
             # 记录即将执行的完整命令
             cmd_str = ' '.join(f'"{arg}"' if ' ' in str(arg) else str(arg) for arg in cmd)
-            self.logger.info(f"执行IP配置命令: {cmd_str}")
+            self.logger.debug(f"执行IP配置命令: {cmd_str}")
             
             # 执行系统命令
             result = subprocess.run(
@@ -205,14 +205,14 @@ class IPConfigurationService(NetworkServiceBase):
             )
             
             # 记录命令执行结果
-            self.logger.info(f"netsh命令执行完成 - 返回码: {result.returncode}")
+            self.logger.debug(f"netsh命令执行完成 - 返回码: {result.returncode}")
             if result.stderr.strip():
                 self.logger.warning(f"命令错误输出: {result.stderr.strip()}")
             
             # 检查命令执行结果
             if result.returncode == 0:
                 success_msg = f"✅ IP地址配置成功应用到网卡 '{connection_name}'"
-                self.logger.info(success_msg)
+                self.logger.debug(success_msg)
                 return True
             else:
                 # 命令执行失败，分析具体原因
@@ -263,7 +263,7 @@ class IPConfigurationService(NetworkServiceBase):
                     connection_name, 'static', primary_dns
                 ]
                 
-                self.logger.info(f"执行主DNS配置: {primary_dns}")
+                self.logger.debug(f"执行主DNS配置: {primary_dns}")
                 
                 result_primary = subprocess.run(
                     cmd_primary, capture_output=True, text=True, timeout=5,
@@ -272,7 +272,7 @@ class IPConfigurationService(NetworkServiceBase):
                 
                 if result_primary.returncode == 0:
                     success_count += 1
-                    self.logger.info(f"✅ 主DNS服务器配置成功: {primary_dns}")
+                    self.logger.debug(f"✅ 主DNS服务器配置成功: {primary_dns}")
                 else:
                     error_msg = f"❌ 主DNS服务器配置失败 - 连接: '{connection_name}'"
                     if result_primary.stderr:
@@ -289,7 +289,7 @@ class IPConfigurationService(NetworkServiceBase):
                     connection_name, secondary_dns, 'index=2'
                 ]
                 
-                self.logger.info(f"执行辅助DNS配置: {secondary_dns}")
+                self.logger.debug(f"执行辅助DNS配置: {secondary_dns}")
                 
                 result_secondary = subprocess.run(
                     cmd_secondary, capture_output=True, text=True, timeout=8,
@@ -298,14 +298,14 @@ class IPConfigurationService(NetworkServiceBase):
                 
                 if result_secondary.returncode == 0:
                     success_count += 1
-                    self.logger.info(f"✅ 辅助DNS服务器配置成功: {secondary_dns}")
+                    self.logger.debug(f"✅ 辅助DNS服务器配置成功: {secondary_dns}")
                 else:
                     warning_msg = f"⚠️ 辅助DNS服务器配置失败 - 连接: '{connection_name}'"
                     self.logger.warning(warning_msg)
             
             # 评估DNS配置的整体结果
             if success_count > 0:
-                self.logger.info(f"DNS配置成功，共配置 {success_count}/{total_operations} 个DNS服务器")
+                self.logger.debug(f"DNS配置成功，共配置 {success_count}/{total_operations} 个DNS服务器")
                 return True
             else:
                 self.logger.error("DNS配置完全失败")

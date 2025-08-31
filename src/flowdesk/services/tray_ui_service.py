@@ -116,7 +116,7 @@ class TrayExitDialog(QDialog):
     def _handle_choice(self, choice: str):
         """处理用户选择"""
         self.user_choice = choice
-        self.logger.info(f"用户选择: {choice}")
+        self.logger.debug(f"用户选择: {choice}")
         self.accept()
     
     def get_user_choice(self) -> str:
@@ -174,7 +174,7 @@ class TrayUIService(QObject):
             # 显示托盘图标
             self.tray_icon.show()
             
-            self.logger.info("系统托盘设置成功")
+            self.logger.debug("系统托盘设置成功")
             return True
             
         except Exception as e:

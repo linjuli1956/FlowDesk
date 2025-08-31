@@ -93,7 +93,7 @@ class AdapterInfoService(NetworkServiceBase):
                 performance_service = AdapterPerformanceService()
                 link_speed = performance_service.get_link_speed_info(adapter_name)
                 ip_config['link_speed'] = link_speed
-                self.logger.info(f"补充获取网卡 {adapter_name} 链路速度: {link_speed}")
+                self.logger.debug(f"补充获取网卡 {adapter_name} 链路速度: {link_speed}")
             
             # 增强DNS配置获取 - 使用netsh命令作为补充数据源
             # 遵循开闭原则，通过新增功能而不修改现有逻辑来增强DNS获取能力
@@ -123,7 +123,7 @@ class AdapterInfoService(NetworkServiceBase):
             # 备用状态判断机制 - 当netsh命令获取失败时使用wmic状态码
             # 遵循依赖倒置原则，提供多种状态获取方式的抽象
             if interface_status['admin_status'] == '未知' and interface_status['connect_status'] == '未知':
-                self.logger.info(f"网卡 {adapter_name} netsh状态获取失败，使用wmic状态码作为备用方案")
+                self.logger.debug(f"网卡 {adapter_name} netsh状态获取失败，使用wmic状态码作为备用方案")
                 
                 # 原有的wmic状态码解析逻辑作为备用方案
                 status_code = basic_info.get('NetConnectionStatus', '0')
@@ -455,7 +455,7 @@ class AdapterInfoService(NetworkServiceBase):
         
         # 记录最终获取到的配置信息
         if config['ip_addresses'] or config['ipv6_addresses']:
-            self.logger.info(f"成功使用ipconfig补充网卡 {adapter_name} 的完整配置信息")
+            self.logger.debug(f"成功使用ipconfig补充网卡 {adapter_name} 的完整配置信息")
         
         return config
     
@@ -672,7 +672,7 @@ class AdapterInfoService(NetworkServiceBase):
                     performance_service = AdapterPerformanceService()
                     link_speed = performance_service.get_link_speed_info(adapter_name)
                     config['link_speed'] = link_speed
-                    self.logger.info(f"成功获取网卡 {adapter_name} 链路速度: {link_speed}")
+                    self.logger.debug(f"成功获取网卡 {adapter_name} 链路速度: {link_speed}")
                     
             else:
                 self.logger.warning(f"ipconfig命令执行失败，返回码: {result.returncode}")

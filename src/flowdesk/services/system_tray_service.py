@@ -65,7 +65,7 @@ class SystemTrayService(QObject):
             
             if self._is_tray_available:
                 self._is_tray_enabled = True
-                self.logger.info("系统托盘服务初始化成功")
+                self.logger.debug("系统托盘服务初始化成功")
             else:
                 self.logger.warning("系统托盘不可用，服务将以降级模式运行")
             
@@ -88,12 +88,12 @@ class SystemTrayService(QObject):
         """启用托盘服务"""
         if self._is_tray_available:
             self._is_tray_enabled = True
-            self.logger.info("托盘服务已启用")
+            self.logger.debug("托盘服务已启用")
     
     def disable_tray(self):
         """禁用托盘服务"""
         self._is_tray_enabled = False
-        self.logger.info("托盘服务已禁用")
+        self.logger.debug("托盘服务已禁用")
     
     def handle_window_close_request(self) -> str:
         """

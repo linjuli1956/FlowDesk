@@ -91,7 +91,7 @@ class NetworkServiceBase(QObject):
         """
         # 格式化参数信息用于日志记录
         params_str = ', '.join([f"{k}={v}" for k, v in kwargs.items()]) if kwargs else "无参数"
-        self.logger.info(f"[{self._service_name}] 开始执行操作: {operation_name} ({params_str})")
+        self.logger.debug(f"[{self._service_name}] 开始执行操作: {operation_name} ({params_str})")
     
     def _log_operation_success(self, operation_name: str, result_summary: str = "") -> None:
         """
@@ -102,7 +102,7 @@ class NetworkServiceBase(QObject):
             result_summary: 操作结果的简要描述
         """
         summary_text = f" - {result_summary}" if result_summary else ""
-        self.logger.info(f"[{self._service_name}] 操作成功完成: {operation_name}{summary_text}")
+        self.logger.debug(f"[{self._service_name}] 操作成功完成: {operation_name}{summary_text}")
     
     def _log_operation_error(self, operation_name: str, error: Exception) -> None:
         """

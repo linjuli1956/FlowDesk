@@ -69,7 +69,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             service: AdapterDiscoveryService实例
         """
         self._discovery_service = service
-        self.logger.info("已注入网卡发现服务")
+        self.logger.debug("已注入网卡发现服务")
     
     def set_info_service(self, service):
         """
@@ -79,7 +79,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             service: AdapterInfoService实例
         """
         self._info_service = service
-        self.logger.info("已注入网卡信息服务")
+        self.logger.debug("已注入网卡信息服务")
     
     def set_status_service(self, service):
         """
@@ -89,7 +89,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             service: AdapterStatusService实例
         """
         self._status_service = service
-        self.logger.info("已注入网卡状态服务")
+        self.logger.debug("已注入网卡状态服务")
     
     def set_performance_service(self, service):
         """
@@ -99,7 +99,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             service: AdapterPerformanceService实例
         """
         self._performance_service = service
-        self.logger.info("已注入网卡性能服务")
+        self.logger.debug("已注入网卡性能服务")
     
     def set_ip_config_service(self, service):
         """
@@ -109,7 +109,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             service: IPConfigurationService实例
         """
         self._ip_config_service = service
-        self.logger.info("已注入IP配置服务")
+        self.logger.debug("已注入IP配置服务")
     
     def set_extra_ip_service(self, service):
         """
@@ -119,7 +119,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             service: ExtraIPManagementService实例
         """
         self._extra_ip_service = service
-        self.logger.info("已注入额外IP管理服务")
+        self.logger.debug("已注入额外IP管理服务")
     
     # endregion
     
@@ -168,7 +168,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
                 # 自动选中第一个网卡（参照源文件逻辑）
                 # 由于列表已经按优先级排序，第一个网卡就是最佳选择
                 if adapters and not self._current_adapter_id:
-                    self.logger.info(f"自动选择第一个网卡: {adapters[0].friendly_name}")
+                    self.logger.debug(f"自动选择第一个网卡: {adapters[0].friendly_name}")
                     self.set_current_adapter(adapters[0].id)
                 
                 self._log_operation_success("刷新网卡列表", f"成功获取{len(adapters)}个网卡")
@@ -224,7 +224,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             if detailed_info and hasattr(detailed_info, 'link_speed'):
                 link_speed = detailed_info.link_speed
                 performance_info = PerformanceInfo(link_speed=link_speed)
-                self.logger.info(f"从详细信息中提取链路速度: {link_speed}")
+                self.logger.debug(f"从详细信息中提取链路速度: {link_speed}")
             else:
                 self.logger.warning("详细信息中没有链路速度信息")
             
@@ -241,7 +241,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             self._current_adapter_info = aggregated_info
             
             # 发射聚合信息更新信号
-            self.logger.info(f"发射adapter_info_updated信号 - 网卡ID: {aggregated_info.adapter_id}")
+            self.logger.debug(f"发射adapter_info_updated信号 - 网卡ID: {aggregated_info.adapter_id}")
             self.adapter_info_updated.emit(aggregated_info)
             
             # 发射格式化的状态徽章信息（Service层负责业务逻辑）
@@ -264,7 +264,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
                 )
                 
                 # 发射IP配置信息更新信号，用于填充右侧输入框
-                self.logger.info("发射ip_info_updated信号，用于更新右侧输入框")
+                self.logger.debug("发射ip_info_updated信号，用于更新右侧输入框")
                 self.ip_info_updated.emit(ip_config_data)
                 
                 # 发射额外IP列表更新信号，用于显示额外IP
@@ -277,15 +277,15 @@ class NetworkUICoordinatorService(NetworkServiceBase):
                         for ip, mask in extra_ips:
                             formatted_extra_ips.append(f"{ip}/{mask}")
                         
-                        self.logger.info(f"发射extra_ips_updated信号，共{len(extra_ips)}个额外IP: {formatted_extra_ips}")
+                        self.logger.debug(f"发射extra_ips_updated信号，共{len(extra_ips)}个额外IP: {formatted_extra_ips}")
                         self.extra_ips_updated.emit(formatted_extra_ips)
                     else:
                         # 如果没有额外IP，发射空列表清空显示
-                        self.logger.info("发射空的extra_ips_updated信号，清空额外IP显示")
+                        self.logger.debug("发射空的extra_ips_updated信号，清空额外IP显示")
                         self.extra_ips_updated.emit([])
                 else:
                     # 如果没有get_extra_ips方法，发射空列表
-                    self.logger.info("AdapterInfo对象没有get_extra_ips方法，发射空列表")
+                    self.logger.debug("AdapterInfo对象没有get_extra_ips方法，发射空列表")
                     self.extra_ips_updated.emit([])
             
             self._log_operation_success("刷新当前网卡", "信息更新完成")
@@ -307,11 +307,11 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             self._log_operation_start("复制网卡信息")
             
             # 调试信息：检查当前网卡信息状态
-            self.logger.info(f"当前网卡ID: {self._current_adapter_id}")
-            self.logger.info(f"当前网卡信息是否为空: {self._current_adapter_info is None}")
+            self.logger.debug(f"当前网卡ID: {self._current_adapter_id}")
+            self.logger.debug(f"当前网卡信息是否为空: {self._current_adapter_info is None}")
             if self._current_adapter_info:
-                self.logger.info(f"当前网卡信息类型: {type(self._current_adapter_info)}")
-                self.logger.info(f"当前网卡信息键: {list(self._current_adapter_info.keys()) if isinstance(self._current_adapter_info, dict) else 'Not a dict'}")
+                self.logger.debug(f"当前网卡信息类型: {type(self._current_adapter_info)}")
+                self.logger.debug(f"当前网卡信息键: {list(self._current_adapter_info.keys()) if isinstance(self._current_adapter_info, dict) else 'Not a dict'}")
             
             if not self._current_adapter_info:
                 self.logger.warning("未选择当前网卡，无法复制信息")
@@ -322,7 +322,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             info_text = self._format_adapter_info_for_copy(self._current_adapter_info)
             
             # 调试信息：检查格式化后的文本
-            self.logger.info(f"格式化后的信息文本: {info_text[:200]}...")  # 只显示前200个字符
+            self.logger.debug(f"格式化后的信息文本: {info_text[:200]}...")  # 只显示前200个字符
             
             # 发射复制完成信号，由UI层处理剪贴板操作
             self.network_info_copied.emit(info_text)

@@ -102,7 +102,7 @@ class AdapterStatusService(NetworkServiceBase):
                 self.logger.debug(f"网卡 {adapter_name} 精确状态分析: 管理状态={interface_status['admin_status']}, 连接状态={interface_status['connect_status']}, 最终状态={final_status}")
             else:
                 # 第三步：netsh获取失败，使用备用wmic状态码方案
-                self.logger.info(f"网卡 {adapter_name} netsh状态获取失败，使用wmic状态码作为备用方案")
+                self.logger.debug(f"网卡 {adapter_name} netsh状态获取失败，使用wmic状态码作为备用方案")
                 final_status, is_enabled, is_connected = self._parse_wmic_status_code(backup_status_code, adapter_name)
             
             self._log_operation_success("获取网卡状态", f"网卡 {adapter_name}: {final_status}")
