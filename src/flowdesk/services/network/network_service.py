@@ -388,16 +388,18 @@ class NetworkService(NetworkServiceBase):
         批量添加额外IP的兼容接口方法
         
         Args:
-            adapter_name: 目标网卡的友好名称
-            ip_configs: IP配置字符串列表
+            adapter_name: 网卡友好名称
+            ip_configs: IP配置列表，格式为 ["ip/mask", ...]
         """
         try:
-            self._log_operation_start("批量添加额外IP", adapter_name=adapter_name)
+            print(f"[调试] NetworkService.add_selected_extra_ips被调用 - 网卡: {adapter_name}, IP数量: {len(ip_configs)}, IP列表: {ip_configs}")
+            self.logger.info(f"开始批量添加额外IP - 网卡: {adapter_name}, IP数量: {len(ip_configs)}")
             
-            # 委托给UI协调器执行统一的添加流程
-            self._ui_coordinator.add_extra_ips(adapter_name, ip_configs)
+            # 委托给UI协调器处理
+            self._ui_coordinator.add_selected_extra_ips(adapter_name, ip_configs)
             
         except Exception as e:
+            print(f"[调试] NetworkService.add_selected_extra_ips异常: {e}")
             self._log_operation_error("批量添加额外IP", e)
     
     def remove_selected_extra_ips(self, adapter_name: str, ip_configs: List[str]):

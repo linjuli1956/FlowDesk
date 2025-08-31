@@ -65,6 +65,7 @@ class StylesheetService:
             "system_tray_menu.qss",     # 系统托盘右键菜单样式
             "tray_exit_dialog.qss",     # 托盘退出对话框样式
             "add_ip_dialog.qss",        # 添加IP对话框专用样式
+            "ip_config_confirm_dialog.qss",  # IP配置确认弹窗专用样式
             "main_window.qss",          # 主窗口特定样式
         ]
         

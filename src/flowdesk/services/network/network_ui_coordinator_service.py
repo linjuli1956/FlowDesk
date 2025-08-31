@@ -635,6 +635,19 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             error_msg = f"协调批量添加额外IP时发生异常: {str(e)}"
             self.error_occurred.emit("系统异常", error_msg)
     
+    def add_selected_extra_ips(self, adapter_name: str, ip_configs: List[str]):
+        """
+        协调批量添加选中额外IP的接口方法（兼容性别名）
+        
+        这是add_extra_ips方法的别名，用于保持与UI层信号连接的兼容性。
+        
+        Args:
+            adapter_name (str): 目标网卡的友好名称
+            ip_configs (List[str]): IP配置列表
+        """
+        # 直接委托给add_extra_ips方法
+        self.add_extra_ips(adapter_name, ip_configs)
+    
     def remove_extra_ips(self, adapter_name: str, ip_configs: List[str]):
         """
         协调批量删除额外IP的统一接口方法
@@ -663,6 +676,19 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             self._log_operation_error("协调批量删除额外IP", e)
             error_msg = f"协调批量删除额外IP时发生异常: {str(e)}"
             self.error_occurred.emit("系统异常", error_msg)
+    
+    def remove_selected_extra_ips(self, adapter_name: str, ip_configs: List[str]):
+        """
+        协调批量删除选中额外IP的接口方法（兼容性别名）
+        
+        这是remove_extra_ips方法的别名，用于保持与UI层信号连接的兼容性。
+        
+        Args:
+            adapter_name (str): 目标网卡的友好名称
+            ip_configs (List[str]): 待删除的IP配置列表
+        """
+        # 直接委托给remove_extra_ips方法
+        self.remove_extra_ips(adapter_name, ip_configs)
     
     # endregion
     

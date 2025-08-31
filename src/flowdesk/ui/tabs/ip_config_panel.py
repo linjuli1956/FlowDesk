@@ -313,18 +313,51 @@ class IPConfigPanel(QWidget):
         """
         发射添加选中IP信号
         
-        获取额外IP列表中选中的项目并发射信号。
+        从额外IP列表中获取选中的IP地址，并发射信号给服务层进行批量添加操作。
         """
-        # 获取父容器的网卡选择信息
-        parent_tab = self.parent()
-        if hasattr(parent_tab, 'adapter_info_panel') and hasattr(parent_tab.adapter_info_panel, 'adapter_combo'):
-            current_adapter = parent_tab.adapter_info_panel.adapter_combo.currentText()
-        else:
-            current_adapter = ''
+        # 获取当前网卡名称 - 支持多种格式
+        label_text = self.current_adapter_label.text()
+        print(f"[调试] 原始标签内容: '{label_text}'")
+        
+        # 提取网卡名称，支持多种格式：
+        # "当前网卡: WLAN" 或 "🌤️ 当前网卡：WLAN" 等
+        current_adapter = ""
+        if "：" in label_text:  # 中文冒号
+            current_adapter = label_text.split("：")[-1].strip()
+        elif ": " in label_text:  # 英文冒号
+            current_adapter = label_text.split(": ")[-1].strip()
+        
+        print(f"[调试] 提取的网卡名称: '{current_adapter}'")
+        
+        if not current_adapter or current_adapter == "未选择":
+            print(f"[调试] 添加选中IP失败：当前网卡未选择，标签内容: {label_text}")
+            return
             
-        selected_items = self.extra_ip_list.selectedItems()
-        selected_ips = [item.text() for item in selected_items]
+        # 检查列表项总数和复选框勾选状态
+        total_items = self.extra_ip_list.count()
+        print(f"[调试] 额外IP列表总项数: {total_items}")
+        
+        # 获取复选框勾选的项目（不是高亮选中的项目）
+        checked_items = []
+        for i in range(total_items):
+            item = self.extra_ip_list.item(i)
+            if item:
+                is_checked = item.checkState() == Qt.Checked
+                print(f"[调试] 项目 {i}: '{item.text()}', 复选框勾选状态: {is_checked}")
+                if is_checked:
+                    checked_items.append(item)
+        
+        selected_ips = [item.text() for item in checked_items]
+        print(f"[调试] 复选框勾选的项目数: {len(checked_items)}")
+        
+        print(f"[调试] 准备添加选中IP - 网卡: {current_adapter}, 选中IP数量: {len(selected_ips)}, IP列表: {selected_ips}")
+        
+        if not selected_ips:
+            print("[调试] 添加选中IP失败：没有选中任何IP")
+            return
+            
         self.add_selected_ips.emit(current_adapter, selected_ips)
+        print(f"[调试] add_selected_ips信号已发射")
     
     def _emit_remove_selected_ips(self):
         """

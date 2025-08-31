@@ -1,0 +1,114 @@
+/* === IP配置确认弹窗样式 - Claymorphism设计风格 === */
+/* 严格遵循UI四大铁律：所有样式使用#ip_config_confirm_dialog前缀包裹，确保样式隔离 */
+
+/* 弹窗主体 - 浅色Claymorphism */
+#ip_config_confirm_dialog {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #f8f9fa, stop:0.5 #ffffff, stop:1 #f1f3f4);
+    border: 1px solid rgba(0, 123, 255, 0.2);
+    border-radius: 20px;
+}
+
+/* 网卡信息框架 - Claymorphism卡片 */
+#ip_config_confirm_dialog QFrame#adapter_info_frame {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(255, 255, 255, 0.9), stop:1 rgba(255, 255, 255, 0.7));
+    border: 1px solid rgba(0, 123, 255, 0.15);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+/* 网卡信息标签 */
+#ip_config_confirm_dialog QLabel#adapter_name_label,
+#ip_config_confirm_dialog QLabel#dhcp_status_label {
+    color: #495057;
+    font-size: 12px;
+    padding: 2px 4px;
+    background: transparent;
+}
+
+/* 配置变更标题 */
+#ip_config_confirm_dialog QLabel#changes_title_label {
+    color: #007bff;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 8px;
+    background: transparent;
+}
+
+/* 变更详情文本框 - Claymorphism风格 */
+#ip_config_confirm_dialog QTextEdit#changes_detail_text {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 rgba(255, 255, 255, 0.8), stop:1 rgba(248, 249, 250, 0.9));
+    border: 1px solid rgba(0, 123, 255, 0.15);
+    border-radius: 10px;
+    padding: 10px;
+    font-family: "Microsoft YaHei", sans-serif;
+    font-size: 12px;
+    color: #495057;
+}
+
+
+/* 警告标签 */
+#ip_config_confirm_dialog QLabel#warning_label {
+    color: #fd7e14;
+    font-size: 11px;
+    padding: 6px 8px;
+    background: transparent;
+}
+
+/* 确认按钮 - Claymorphism蓝色渐变，紧凑尺寸 */
+#ip_config_confirm_dialog QPushButton#dialog_confirm_button {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #007bff, stop:1 #0056b3);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 16px;
+    min-width: 65px;
+    min-height: 26px;
+    max-width: 85px;
+    max-height: 30px;
+}
+
+#ip_config_confirm_dialog QPushButton#dialog_confirm_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #0056b3, stop:1 #004085);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+#ip_config_confirm_dialog QPushButton#dialog_confirm_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #004085, stop:1 #002752);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* 取消按钮 - Claymorphism红色渐变，紧凑尺寸 */
+#ip_config_confirm_dialog QPushButton#dialog_cancel_button {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #dc3545, stop:1 #c82333);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 6px 16px;
+    min-width: 65px;
+    min-height: 26px;
+    max-width: 85px;
+    max-height: 30px;
+}
+
+#ip_config_confirm_dialog QPushButton#dialog_cancel_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #c82333, stop:1 #bd2130);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+#ip_config_confirm_dialog QPushButton#dialog_cancel_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #bd2130, stop:1 #a71e2a);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
