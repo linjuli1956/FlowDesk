@@ -202,7 +202,7 @@ class AdapterInfo:
         return "\n".join(lines)
 
 
-@dataclass
+@dataclass(frozen=True)
 class IPConfigInfo:
     """
     IP配置信息模型
@@ -220,7 +220,7 @@ class IPConfigInfo:
     dhcp_enabled: bool = False          # 是否使用DHCP
 
 
-@dataclass
+@dataclass(frozen=True)
 class ExtraIP:
     """
     额外IP地址信息模型
@@ -232,7 +232,7 @@ class ExtraIP:
     subnet_mask: str     # 子网掩码
 
 
-@dataclass
+@dataclass(frozen=True)
 class DnsConfig:
     """
     DNS配置信息模型

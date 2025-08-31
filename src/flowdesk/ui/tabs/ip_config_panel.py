@@ -341,18 +341,18 @@ class IPConfigPanel(QWidget):
                 checked_ips.append(item.text())
         self.remove_selected_ips.emit(current_adapter, checked_ips)
     
-    def update_ip_config_inputs(self, config_data):
+    def update_ip_config_inputs(self, ip_config_info):
         """
         更新IP配置输入框的显示内容
         
         Args:
-            config_data (dict): IP配置数据字典
+            ip_config_info (IPConfigInfo): IP配置信息对象（frozen dataclass）
         """
-        self.ip_address_input.setText(config_data.get('ip_address', ''))
-        self.subnet_mask_input.setText(config_data.get('subnet_mask', ''))
-        self.gateway_input.setText(config_data.get('gateway', ''))
-        self.primary_dns_input.setText(config_data.get('primary_dns', ''))
-        self.secondary_dns_input.setText(config_data.get('secondary_dns', ''))
+        self.ip_address_input.setText(ip_config_info.ip_address or '')
+        self.subnet_mask_input.setText(ip_config_info.subnet_mask or '')
+        self.gateway_input.setText(ip_config_info.gateway or '')
+        self.primary_dns_input.setText(ip_config_info.dns_primary or '')
+        self.secondary_dns_input.setText(ip_config_info.dns_secondary or '')
     
     def update_current_adapter_label(self, adapter_name):
         """

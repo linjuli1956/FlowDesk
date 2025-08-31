@@ -739,21 +739,10 @@ class MainWindow(QMainWindow):
             ip_config (IPConfigInfo): 包含完整IP配置信息的数据对象
         """
         try:
-            # 构建UI层需要的配置数据字典
-            # 这里进行数据格式转换，确保UI组件能够正确处理
-            config_data = {
-                'ip_address': ip_config.ip_address or '',  # 主IP地址，空值转换为空字符串
-                'subnet_mask': ip_config.subnet_mask or '',  # 子网掩码
-                'gateway': ip_config.gateway or '',  # 默认网关
-                'dns_primary': ip_config.dns_primary or '',  # 主DNS服务器
-                'dns_secondary': ip_config.dns_secondary or '',  # 备用DNS服务器
-                'dhcp_enabled': ip_config.dhcp_enabled  # DHCP启用状态
-            }
-            
-            # 调用UI层的配置更新方法，实现界面与数据的同步
-            # 这确保了用户看到的信息与实际网卡配置保持一致
-            self.logger.info(f"[调试] 准备更新IP配置输入框，数据: {config_data}")
-            self.network_config_tab.update_ip_config_inputs(config_data)
+            # 直接传递IPConfigInfo对象到UI层，符合架构规范
+            # UI层只接收数据对象，不进行业务逻辑处理
+            self.logger.info(f"[调试] 准备更新IP配置输入框，IPConfigInfo对象: {ip_config}")
+            self.network_config_tab.update_ip_config_inputs(ip_config)
             self.logger.info(f"[调试] IP配置输入框更新完成")
             
             # 记录IP配置更新的成功状态，便于系统监控和调试

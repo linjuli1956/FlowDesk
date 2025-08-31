@@ -249,16 +249,18 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             # 从详细信息中提取IP配置信息并发射ip_info_updated信号
             detailed_info = aggregated_info.get('detailed_info')
             if detailed_info:
-                # 构建IPConfigInfo格式的数据对象，用于UI层处理
-                # UI层期望的是具有ip_address、subnet_mask等属性的对象
-                ip_config_data = type('IPConfigInfo', (), {
-                    'ip_address': detailed_info.get_primary_ip() if hasattr(detailed_info, 'get_primary_ip') else (detailed_info.ip_addresses[0] if detailed_info.ip_addresses else ''),
-                    'subnet_mask': detailed_info.get_primary_subnet_mask() if hasattr(detailed_info, 'get_primary_subnet_mask') else (detailed_info.subnet_masks[0] if detailed_info.subnet_masks else ''),
-                    'gateway': detailed_info.gateway or '',
-                    'dns_primary': detailed_info.dns_servers[0] if detailed_info.dns_servers else '',
-                    'dns_secondary': detailed_info.dns_servers[1] if len(detailed_info.dns_servers) > 1 else '',
-                    'dhcp_enabled': detailed_info.dhcp_enabled
-                })()
+                # 使用正规的IPConfigInfo数据类，符合frozen dataclass规范
+                from ...models.adapter_info import IPConfigInfo
+                
+                ip_config_data = IPConfigInfo(
+                    adapter_id=self._current_adapter_id,
+                    ip_address=detailed_info.get_primary_ip() if hasattr(detailed_info, 'get_primary_ip') else (detailed_info.ip_addresses[0] if detailed_info.ip_addresses else ''),
+                    subnet_mask=detailed_info.get_primary_subnet_mask() if hasattr(detailed_info, 'get_primary_subnet_mask') else (detailed_info.subnet_masks[0] if detailed_info.subnet_masks else ''),
+                    gateway=detailed_info.gateway or '',
+                    dns_primary=detailed_info.dns_servers[0] if detailed_info.dns_servers else '',
+                    dns_secondary=detailed_info.dns_servers[1] if len(detailed_info.dns_servers) > 1 else '',
+                    dhcp_enabled=detailed_info.dhcp_enabled
+                )
                 
                 # 发射IP配置信息更新信号，用于填充右侧输入框
                 self.logger.info("发射ip_info_updated信号，用于更新右侧输入框")
