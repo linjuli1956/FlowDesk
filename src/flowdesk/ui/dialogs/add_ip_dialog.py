@@ -114,7 +114,7 @@ class AddIPDialog(QDialog):
         PyQt5的样式继承机制确保子组件自动获得父级样式，对话框作为QApplication
         的子组件，会自动应用通过app.setStyleSheet()设置的全局样式表。
         """
-        self.logger.info("样式表由StylesheetService统一管理，对话框自动继承全局样式")
+        self.logger.debug("样式表由StylesheetService统一管理，对话框自动继承全局样式")
 
     def _setup_dialog_properties(self):
         """

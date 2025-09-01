@@ -23,6 +23,7 @@
 # 导入核心服务 - 当前阶段需要系统托盘服务、样式表服务和网络服务
 from .system_tray_service import SystemTrayService
 from .stylesheet_service import StylesheetService
+from .status_bar_service import StatusBarService
 # 从网络模块导入NetworkService门面
 from .network import NetworkService
 
@@ -35,5 +36,6 @@ from .network import NetworkService
 __all__ = [
     'SystemTrayService',
     'StylesheetService',
+    'StatusBarService',
     'NetworkService'
 ]

@@ -26,7 +26,11 @@ from .resource_path import resource_path, get_app_data_dir, get_logs_dir
 # 日志管理 - 调试必需
 from .logger import get_logger, setup_logging, log_exception
 
+# 版本信息工具 - 状态栏必需
+from .version_utils import get_app_version, get_build_date, get_version_info, format_version_display
+
 __all__ = [
     'get_logger', 'setup_logging', 'log_exception',
-    'resource_path', 'get_app_data_dir', 'get_logs_dir'
+    'resource_path', 'get_app_data_dir', 'get_logs_dir',
+    'get_app_version', 'get_build_date', 'get_version_info', 'format_version_display'
 ]

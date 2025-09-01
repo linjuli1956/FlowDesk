@@ -4,7 +4,7 @@
 """
 
 from ...utils.logger import get_logger
-from ...services import NetworkService
+from ...services import NetworkService, StatusBarService
 
 
 class ServiceCoordinator:
@@ -30,6 +30,7 @@ class ServiceCoordinator:
         
         # 初始化服务层组件
         self.network_service = None
+        self.status_bar_service = None
     
     def initialize_services(self):
         """
@@ -43,15 +44,27 @@ class ServiceCoordinator:
             self.network_service = NetworkService()
             self.logger.info("网络服务初始化完成")
             
-            # 将网络服务实例设置到主窗口，供其他组件使用
+            # 创建状态栏服务实例
+            self.status_bar_service = StatusBarService()
+            self.logger.info("状态栏服务初始化完成")
+            
+            # 将服务实例设置到主窗口，供其他组件使用
             self.main_window.network_service = self.network_service
+            self.main_window.status_bar_service = self.status_bar_service
             
             # 连接网络配置Tab的信号槽
             self._connect_network_config_signals()
             
+            # 连接状态栏的信号槽
+            self._connect_status_bar_signals()
+            
             # 启动初始化：自动获取网卡信息
             self.network_service.get_all_adapters()
-            self.logger.info("网络配置Tab核心功能连接完成")
+            
+            # 启动状态栏初始化：显示应用启动状态
+            self.status_bar_service.set_status("🚀 应用启动完成", auto_clear_seconds=3)
+            
+            self.logger.info("所有服务核心功能连接完成")
             
         except Exception as e:
             error_msg = f"服务层初始化失败: {str(e)}"
@@ -94,9 +107,9 @@ class ServiceCoordinator:
             event_handler._on_apply_ip_config if event_handler else self._fallback_apply_ip_config
         )
         
-        # 批量添加选中IP：UI添加选中按钮 -> 服务层批量添加额外IP
+        # 批量添加选中IP：UI添加选中按钮 -> 事件处理器 -> 服务层批量添加额外IP
         self.main_window.network_config_tab.add_selected_ips.connect(
-            self.network_service.add_selected_extra_ips
+            event_handler._on_add_selected_extra_ips if event_handler else self._fallback_add_selected_ips
         )
         
         # 批量删除选中IP：UI删除选中按钮 -> 服务层批量删除额外IP
@@ -171,6 +184,24 @@ class ServiceCoordinator:
             event_handler._on_extra_ips_removed if event_handler else self._fallback_extra_ips_removed
         )
     
+    def _connect_status_bar_signals(self):
+        """
+        连接状态栏的信号槽通信
+        
+        实现状态栏服务与UI组件的信号连接：
+        - 状态信息更新信号 -> 状态栏UI更新
+        - 版本信息更新信号 -> 状态栏版本显示更新
+        """
+        # 状态信息更新：服务层状态变更 -> UI状态栏更新状态显示
+        self.status_bar_service.status_updated.connect(
+            self.main_window.status_bar.update_status
+        )
+        
+        # 版本信息更新：服务层版本变更 -> UI状态栏更新版本显示
+        self.status_bar_service.version_updated.connect(
+            self.main_window.status_bar.update_version
+        )
+    
     def cleanup_services(self):
         """
         清理服务层资源
@@ -179,8 +210,13 @@ class ServiceCoordinator:
         """
         try:
             if self.network_service:
-                # 这里可以添加服务层清理逻辑
-                self.logger.info("网络服务资源已清理")
+                # 这里可以添加网络服务清理逻辑
+                self.logger.debug("网络服务资源已清理")
+            
+            if self.status_bar_service:
+                # 清理状态栏服务资源
+                self.status_bar_service.cleanup()
+                self.logger.debug("状态栏服务资源已清理")
                 
         except Exception as e:
             self.logger.error(f"清理服务层资源失败: {e}")
@@ -193,10 +229,16 @@ class ServiceCoordinator:
         # 基本的网卡选择逻辑
         pass
     
-    def _fallback_apply_ip_config(self, config_data):
-        """IP配置应用的回退处理"""
-        self.logger.warning("事件处理器未初始化，使用回退方法处理IP配置")
-        # 基本的IP配置逻辑
+    def _fallback_apply_ip_config(self, *args):
+        """事件处理器不可用时的IP配置应用回退方法"""
+        self.logger.warning("事件处理器不可用，使用回退方法处理IP配置应用")
+        # 这里可以添加基本的IP配置应用逻辑
+    
+    def _fallback_add_selected_ips(self, adapter_name: str, ip_configs: list):
+        """事件处理器不可用时的添加额外IP回退方法"""
+        self.logger.warning("事件处理器不可用，使用回退方法处理添加额外IP")
+        if self.network_service:
+            self.network_service.add_selected_extra_ips(adapter_name, ip_configs)
         pass
     
     def _fallback_adapters_updated(self, adapters):
@@ -249,19 +291,19 @@ class ServiceCoordinator:
     def _fallback_ip_config_applied(self, success_message):
         """IP配置应用成功的回退处理"""
         self.logger.warning("事件处理器未初始化，使用回退方法处理IP配置成功")
-        self.logger.info(f"IP配置应用成功: {success_message}")
+        self.logger.debug(f"IP配置应用成功: {success_message}")
     
     def _fallback_operation_progress(self, progress_message):
         """操作进度更新的回退处理"""
         self.logger.warning("事件处理器未初始化，使用回退方法处理操作进度")
-        self.logger.info(f"操作进度: {progress_message}")
+        self.logger.debug(f"操作进度: {progress_message}")
     
     def _fallback_extra_ips_added(self, success_message):
         """批量额外IP添加的回退处理"""
         self.logger.warning("事件处理器未初始化，使用回退方法处理IP添加")
-        self.logger.info(f"批量添加IP成功: {success_message}")
+        self.logger.debug(f"批量添加IP成功: {success_message}")
     
     def _fallback_extra_ips_removed(self, success_message):
         """批量额外IP删除的回退处理"""
         self.logger.warning("事件处理器未初始化，使用回退方法处理IP删除")
-        self.logger.info(f"批量删除IP成功: {success_message}")
+        self.logger.debug(f"批量删除IP成功: {success_message}")

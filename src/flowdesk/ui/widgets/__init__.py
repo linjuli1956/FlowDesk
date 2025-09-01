@@ -19,10 +19,12 @@
 
 from .validators import IPAddressValidator, SubnetMaskValidator, DNSValidator
 from .custom_text_edit import NoContextMenuTextEdit
+from .status_bar_widget import StatusBarWidget
 
 __all__ = [
     'IPAddressValidator',
     'SubnetMaskValidator', 
     'DNSValidator',
-    'NoContextMenuTextEdit'
+    'NoContextMenuTextEdit',
+    'StatusBarWidget'
 ]

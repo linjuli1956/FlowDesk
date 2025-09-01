@@ -23,6 +23,7 @@ from .adapter_info import AdapterInfo, IPConfigInfo, DnsConfig
 from .rdp_session import RdpSession, RdpTarget
 from .hardware_metrics import HardwareMetrics, HardwareInfo, FloatWindowSettings
 from .network_tools import PingResult, TracertHop, SystemToolResult
+from .status_bar_info import StatusBarInfo, StatusBarTheme
 from .common import (
     ProgressInfo, ErrorInfo, Capabilities,
     AggregatedAdapterInfo, PerformanceInfo, 
@@ -36,6 +37,7 @@ __all__ = [
     'RdpSession', 'RdpTarget', 
     'HardwareMetrics', 'HardwareInfo', 'FloatWindowSettings',
     'PingResult', 'TracertHop', 'SystemToolResult',
+    'StatusBarInfo', 'StatusBarTheme',
     'ProgressInfo', 'ErrorInfo', 'Capabilities',
     'AggregatedAdapterInfo', 'PerformanceInfo',
     'NetworkCapabilities', 'HardwareMonitorCapabilities',

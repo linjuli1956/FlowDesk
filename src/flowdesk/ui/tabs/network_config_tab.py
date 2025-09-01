@@ -73,7 +73,7 @@ class NetworkConfigTab(QWidget):
         # 添加调试日志
         import logging
         self._logger = logging.getLogger(__name__)
-        self._logger.info("NetworkConfigTab重构版初始化完成")
+        self._logger.debug("NetworkConfigTab重构版初始化完成")
 
     def _init_panels(self):
         """
@@ -188,9 +188,9 @@ class NetworkConfigTab(QWidget):
         
         委托给左侧面板处理，保持原有的信号发射逻辑。
         """
-        self._logger.info(f"NetworkConfigTab._on_adapter_combo_changed调用 - 选择的网卡: '{text}'")
+        self._logger.debug(f"NetworkConfigTab._on_adapter_combo_changed调用 - 选择的网卡: '{text}'")
         self.adapter_selected.emit(text)
-        self._logger.info(f"已发射adapter_selected信号 - 网卡: '{text}'")
+        self._logger.debug(f"已发射adapter_selected信号 - 网卡: '{text}'")
 
     # === 公共接口方法：供服务层调用更新UI ===
 

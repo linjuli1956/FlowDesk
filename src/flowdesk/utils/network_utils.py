@@ -556,7 +556,7 @@ def parse_ipconfig_output(output: str) -> List[NetworkInterface]:
         if current_interface:
             interfaces.append(current_interface)
         
-        logger.info(f"解析到 {len(interfaces)} 个网络接口")
+        logger.debug(f"解析到 {len(interfaces)} 个网络接口")
         
     except Exception as e:
         logger.error(f"ipconfig输出解析失败: {e}")

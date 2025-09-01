@@ -1,0 +1,51 @@
+/* 
+状态栏专用样式文件
+为主窗口状态栏提供专业的视觉样式，包括背景、边框、字体颜色等设置
+*/
+
+/* 主状态栏容器样式 */
+#main_status_bar {
+    border-top: 1px solid #e0e0e0;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #f1f3f4 100%);
+    color: #333333;
+    font-size: 13px;
+    padding: 2px 8px;
+    min-height: 23px;
+    max-height: 25px;
+}
+
+/* 状态信息标签样式 - 加粗文字 */
+#status_label {
+    font-weight: bold;
+    color: #333333;
+    padding: 0px 4px;
+    border: none;
+    background: transparent;
+}
+
+/* 版本信息标签样式 - 淡蓝色文字 */
+#version_label {
+    color: #5dade2;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 0px 8px;
+    border: none;
+    background: transparent;
+}
+
+/* 状态栏在不同状态下的样式变化 */
+#main_status_bar[status="ready"] {
+    border-top-color: #28a745;
+}
+
+#main_status_bar[status="busy"] {
+    border-top-color: #ffc107;
+}
+
+#main_status_bar[status="error"] {
+    border-top-color: #dc3545;
+}
+
+#main_status_bar[status="success"] {
+    border-top-color: #28a745;
+}

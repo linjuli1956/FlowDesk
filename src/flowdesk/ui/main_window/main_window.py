@@ -77,8 +77,8 @@ class MainWindow(MainWindowBase):
             # 这必须在所有UI组件初始化完成后执行，避免信号发射时组件未就绪
             self.service_coordinator.initialize_services()
             
-            # 设置network_event_handler的network_service引用
-            self.network_event_handler.network_service = self.network_service
+            # 设置network_event_handler的network_service引用并连接信号
+            self.network_event_handler.set_network_service(self.network_service)
             
             self.logger.info("所有功能组件初始化完成")
             

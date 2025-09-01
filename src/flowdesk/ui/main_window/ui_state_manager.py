@@ -313,7 +313,7 @@ class UIStateManager:
         """
         处理信息复制完成信号
         
-        当服务层复制网卡信息到剪贴板完成后，显示复制成功提示。
+        当服务层复制网卡信息到剪贴板完成后，显示复制成功提示弹窗。
         
         Args:
             copied_text (str): 复制到剪贴板的文本内容
@@ -323,11 +323,70 @@ class UIStateManager:
             clipboard = QApplication.clipboard()
             clipboard.setText(copied_text)
             
-            # 显示复制成功提示
-            self.logger.info("网卡信息已复制到剪贴板")
+            # 显示复制成功提示弹窗
+            self._show_copy_success_message()
+            self.logger.debug("网卡信息已复制到剪贴板")
             
         except Exception as e:
             self.logger.error(f"处理信息复制信号失败: {str(e)}")
+            # 显示复制失败提示弹窗
+            self._show_copy_error_message(str(e))
+    
+    def _show_copy_success_message(self):
+        """
+        显示复制成功提示弹窗
+        
+        使用QMessageBox显示复制成功的用户友好提示，
+        遵循UI四大铁律和Claymorphism设计风格。
+        """
+        try:
+            from PyQt5.QtWidgets import QMessageBox
+            
+            # 创建成功提示消息框
+            msg_box = QMessageBox(self.main_window)
+            msg_box.setIcon(QMessageBox.Information)
+            msg_box.setWindowTitle("复制成功")
+            msg_box.setText("网卡信息已成功复制到剪贴板！")
+            msg_box.setStandardButtons(QMessageBox.Ok)
+            
+            # 设置按钮文本为中文，确保样式选择器生效
+            ok_button = msg_box.button(QMessageBox.Ok)
+            if ok_button:
+                ok_button.setText("确定")
+            
+            # 显示消息框（非阻塞）
+            msg_box.exec_()
+            
+        except Exception as e:
+            self.logger.error(f"显示复制成功消息失败: {str(e)}")
+    
+    def _show_copy_error_message(self, error_msg):
+        """
+        显示复制失败提示弹窗
+        
+        Args:
+            error_msg (str): 错误信息
+        """
+        try:
+            from PyQt5.QtWidgets import QMessageBox
+            
+            # 创建错误提示消息框
+            msg_box = QMessageBox(self.main_window)
+            msg_box.setIcon(QMessageBox.Warning)
+            msg_box.setWindowTitle("复制失败")
+            msg_box.setText(f"复制网卡信息时发生错误：\n{error_msg}")
+            msg_box.setStandardButtons(QMessageBox.Ok)
+            
+            # 设置按钮文本为中文，确保样式选择器生效
+            ok_button = msg_box.button(QMessageBox.Ok)
+            if ok_button:
+                ok_button.setText("确定")
+            
+            # 显示消息框（非阻塞）
+            msg_box.exec_()
+            
+        except Exception as e:
+            self.logger.error(f"显示复制错误消息失败: {str(e)}")
     
     def _sync_adapter_combo_selection(self, adapter_info):
         """

@@ -227,19 +227,56 @@ class AdapterInfoService(NetworkServiceBase):
         
         try:
             # 执行netsh interface show interface命令获取所有网卡的状态表格
-            result = subprocess.run(
-                ['netsh', 'interface', 'show', 'interface'],
-                capture_output=True, text=True, timeout=15, encoding='gbk', errors='ignore'
-            )
+            # 尝试多种编码方式确保中文正确显示
+            encodings_to_try = ['gbk', 'cp936', 'utf-8', 'ansi']
+            result = None
+            
+            for encoding in encodings_to_try:
+                try:
+                    result = subprocess.run(
+                        ['netsh', 'interface', 'show', 'interface'],
+                        capture_output=True, text=True, timeout=15, 
+                        encoding=encoding, errors='replace'
+                    )
+                    if result.returncode == 0 and '接口名称' in result.stdout:
+                        self.logger.debug(f"成功使用编码 {encoding} 解析netsh输出")
+                        break
+                except:
+                    continue
+            
+            if not result:
+                result = subprocess.run(
+                    ['netsh', 'interface', 'show', 'interface'],
+                    capture_output=True, text=True, timeout=15, encoding='gbk', errors='ignore'
+                )
             
             if result.returncode == 0:
                 output = result.stdout
                 
+                # 调试：输出完整的netsh命令结果
+                self.logger.debug(f"netsh interface show interface 完整输出:\n{output}")
+                
                 # 按行分割输出，查找目标网卡的状态信息
                 lines = output.strip().split('\n')
                 
-                # 跳过表头，查找包含目标网卡名称的行
+                # 调试：显示所有解析的行
+                self.logger.debug(f"解析到 {len(lines)} 行输出，目标网卡: '{adapter_name}'")
+                
+                # 提取所有可用的接口名称用于调试
+                available_interfaces = []
                 for line in lines:
+                    line = line.strip()
+                    if not line or '---' in line or line.startswith('管理员状态') or line.startswith('Admin State'):
+                        continue
+                    line_parts = line.split()
+                    if len(line_parts) >= 4:
+                        interface_name = ' '.join(line_parts[3:])
+                        available_interfaces.append(interface_name)
+                
+                self.logger.debug(f"🔍 可用接口列表: {available_interfaces}")
+                
+                # 跳过表头，查找包含目标网卡名称的行
+                for i, line in enumerate(lines):
                     line = line.strip()
                     if not line or '---' in line:  # 跳过空行和分隔线
                         continue
@@ -249,30 +286,38 @@ class AdapterInfoService(NetworkServiceBase):
                     if len(line_parts) >= 4:
                         interface_name = ' '.join(line_parts[3:])  # 接口名称是第4列及之后的所有内容
                         
+                        # 调试：显示每行的解析结果
+                        self.logger.debug(f"第{i}行解析: 接口名称='{interface_name}', 完整行='{line}'")
+                        
                         # 多种匹配策略：完全匹配、包含匹配、反向包含匹配
                         if (adapter_name == interface_name or 
                             adapter_name in interface_name or 
                             interface_name in adapter_name):
                             
-                            # 解析状态行的格式：管理状态 状态 类型 接口名称
-                            admin_status_raw = line_parts[0].strip()      # 管理状态
-                            connect_status_raw = line_parts[1].strip()    # 连接状态
+                            # 匹配成功，解析状态信息
+                            admin_state = line_parts[0]  # 管理状态
+                            operational_state = line_parts[1]  # 连接状态
                             
-                            # 解析管理状态（第一列）- 网卡是否被启用
-                            if '已启用' in admin_status_raw or 'Enabled' in admin_status_raw:
+                            self.logger.debug(f"✅ 匹配成功: 网卡 '{adapter_name}' -> 接口 '{interface_name}': "
+                                            f"管理状态={admin_state}, 连接状态={operational_state}")
+                            
+                            # 映射管理状态
+                            if admin_state == '已启用':
                                 status_info['admin_status'] = '已启用'
-                            elif '已禁用' in admin_status_raw or 'Disabled' in admin_status_raw:
+                            elif admin_state == '已禁用':
                                 status_info['admin_status'] = '已禁用'
                             else:
                                 status_info['admin_status'] = '未知'
                             
-                            # 解析连接状态（第二列）- 网卡是否已连接
-                            if '已连接' in connect_status_raw or 'Connected' in connect_status_raw:
+                            # 映射连接状态
+                            if operational_state == '已连接':
                                 status_info['connect_status'] = '已连接'
-                            elif '已断开连接' in connect_status_raw or 'Disconnected' in connect_status_raw or '未连接' in connect_status_raw or 'Not connected' in connect_status_raw:
-                                status_info['connect_status'] = '已断开连接'
+                            elif operational_state == '已断开连接':
+                                status_info['connect_status'] = '未连接'
                             else:
                                 status_info['connect_status'] = '未知'
+                            
+                            status_info['interface_name'] = interface_name
                             
                             self.logger.debug(f"网卡 {adapter_name} 状态解析成功: 管理状态={status_info['admin_status']}, 连接状态={status_info['connect_status']}")
                             break

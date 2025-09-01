@@ -12,6 +12,7 @@ from PyQt5.QtGui import QIcon, QCloseEvent
 from ...utils.resource_path import resource_path
 from ...utils.logger import get_logger
 from ..tabs.network_config_tab import NetworkConfigTab
+from ..widgets.status_bar_widget import StatusBarWidget
 
 
 class MainWindowBase(QMainWindow):
@@ -109,6 +110,10 @@ class MainWindowBase(QMainWindow):
         
         # 将Tab控件添加到主布局
         main_layout.addWidget(self.tab_widget)
+        
+        # 创建状态栏组件
+        self.status_bar = StatusBarWidget()
+        self.setStatusBar(self.status_bar)
         
         # 设置Tab控件为焦点控件
         self.tab_widget.setFocus()

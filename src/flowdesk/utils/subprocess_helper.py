@@ -131,7 +131,7 @@ def run_command(command: str,
     result = CommandResult(command=command)
     
     try:
-        logger.info(f"执行命令: {command}")
+        logger.debug(f"执行命令: {command}")
         
         # Windows系统编码处理
         if sys.platform.startswith('win') and encoding == 'utf-8':
@@ -161,7 +161,7 @@ def run_command(command: str,
             result.stderr = stderr.strip() if stderr else ""
             result.status = CommandStatus.COMPLETED
             
-            logger.info(f"命令执行完成，返回码: {result.return_code}")
+            logger.debug(f"命令执行完成，返回码: {result.return_code}")
             
         except subprocess.TimeoutExpired:
             # 命令超时处理
@@ -248,7 +248,7 @@ def run_command_async(command: str,
         result = CommandResult(command=command)
         
         try:
-            logger.info(f"异步执行命令: {command}")
+            logger.debug(f"异步执行命令: {command}")
             
             # Windows系统编码处理
             if sys.platform.startswith('win') and encoding == 'utf-8':
@@ -331,7 +331,7 @@ def run_command_async(command: str,
             result.stdout = '\n'.join(output_lines)
             result.stderr = '\n'.join(error_lines)
             
-            logger.info(f"异步命令执行完成，返回码: {result.return_code}")
+            logger.debug(f"异步命令执行完成，返回码: {result.return_code}")
             
         except Exception as e:
             result.status = CommandStatus.FAILED
@@ -416,7 +416,7 @@ def kill_process_by_name(process_name: str) -> CommandResult:
     else:
         command = f'pkill {process_name}'
     
-    logger.info(f"终止进程: {process_name}")
+    logger.debug(f"终止进程: {process_name}")
     return run_command(command, timeout=10)
 
 

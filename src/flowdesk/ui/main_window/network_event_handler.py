@@ -33,6 +33,127 @@ class NetworkEventHandler:
         self.main_window = main_window
         self.network_service = network_service
         self.logger = get_logger(__name__)
+        
+        # 如果网络服务已提供，立即连接信号
+        if self.network_service:
+            self._connect_signals()
+    
+    def set_network_service(self, network_service):
+        """
+        设置网络服务并连接信号
+        
+        Args:
+            network_service: 网络服务实例
+        """
+        self.network_service = network_service
+        if self.network_service:
+            self._connect_signals()
+    
+    def _connect_signals(self):
+        """
+        连接网络服务的信号到事件处理方法
+        """
+        if not self.network_service:
+            return
+            
+        # 连接网络服务的信号到事件处理方法
+        self.network_service.adapters_updated.connect(self._on_adapters_updated)
+        self.network_service.adapter_selected.connect(self._on_adapter_selected)
+        self.network_service.ip_info_updated.connect(self._on_ip_info_updated)
+        self.network_service.extra_ips_updated.connect(self._on_extra_ips_updated)
+        self.network_service.adapter_refreshed.connect(self._on_adapter_refreshed)
+        self.network_service.network_info_copied.connect(self._on_network_info_copied)
+        self.network_service.error_occurred.connect(self._on_network_error)
+        
+        # 连接adapter_info_updated信号，用于网卡切换后的状态栏最终更新
+        self.network_service.adapter_info_updated.connect(self._on_adapter_info_updated_for_status_bar)
+        
+        self.logger.debug("NetworkEventHandler信号连接完成，包括adapter_info_updated信号")
+    
+    def _on_adapters_updated(self, adapters):
+        """
+        处理网卡列表更新事件
+        
+        Args:
+            adapters: 更新后的网卡列表
+        """
+        try:
+            self.logger.debug(f"网卡列表已更新，共 {len(adapters)} 个网卡")
+        except Exception as e:
+            self.logger.error(f"处理网卡列表更新事件时发生异常: {str(e)}")
+    
+    def _on_adapter_selected(self, adapter_info):
+        """
+        处理网卡选择事件
+        
+        Args:
+            adapter_info: 选中的网卡信息
+        """
+        try:
+            self.logger.debug(f"网卡已选择: {adapter_info}")
+        except Exception as e:
+            self.logger.error(f"处理网卡选择事件时发生异常: {str(e)}")
+    
+    def _on_ip_info_updated(self, ip_info):
+        """
+        处理IP信息更新事件
+        
+        Args:
+            ip_info: 更新后的IP信息
+        """
+        try:
+            self.logger.debug(f"IP信息已更新: {ip_info}")
+        except Exception as e:
+            self.logger.error(f"处理IP信息更新事件时发生异常: {str(e)}")
+    
+    def _on_extra_ips_updated(self, extra_ips):
+        """
+        处理额外IP列表更新事件
+        
+        Args:
+            extra_ips: 更新后的额外IP列表
+        """
+        try:
+            self.logger.debug(f"额外IP列表已更新，共 {len(extra_ips)} 个IP")
+        except Exception as e:
+            self.logger.error(f"处理额外IP列表更新事件时发生异常: {str(e)}")
+    
+    def _on_adapter_refreshed(self, adapter_info):
+        """
+        处理网卡刷新事件
+        
+        Args:
+            adapter_info: 刷新后的网卡信息
+        """
+        try:
+            self.logger.debug(f"网卡信息已刷新: {adapter_info}")
+        except Exception as e:
+            self.logger.error(f"处理网卡刷新事件时发生异常: {str(e)}")
+    
+    def _on_network_info_copied(self, success_message):
+        """
+        处理网络信息复制事件
+        
+        Args:
+            success_message: 复制成功消息
+        """
+        try:
+            self.logger.debug(f"网络信息复制成功: {success_message}")
+        except Exception as e:
+            self.logger.error(f"处理网络信息复制事件时发生异常: {str(e)}")
+    
+    def _on_network_error(self, error_title, error_message):
+        """
+        处理网络错误事件
+        
+        Args:
+            error_title: 错误标题
+            error_message: 错误消息
+        """
+        try:
+            self.logger.error(f"网络错误 - {error_title}: {error_message}")
+        except Exception as e:
+            self.logger.error(f"处理网络错误事件时发生异常: {str(e)}")
     
     def _on_adapter_combo_changed(self, display_name):
         """
@@ -47,10 +168,12 @@ class NetworkEventHandler:
         2. 解析显示名称，提取出网卡的友好名称部分
         3. 在服务层的网卡缓存中查找匹配的网卡对象
         4. 调用服务层的选择方法，触发后续的信息更新流程
+        5. 在状态栏显示网卡切换状态
         
         Args:
             display_name (str): UI下拉框中选中的完整显示名称，格式为"描述 (友好名称)"
         """
+        self.logger.debug(f"🔄 网卡切换事件触发 - 选择的网卡: '{display_name}'")
         try:
             if not self.network_service or not display_name:
                 return
@@ -62,7 +185,7 @@ class NetworkEventHandler:
             self.logger.debug(f"当前缓存网卡数量: {len(self.network_service._adapters) if self.network_service._adapters else 0}")
             
             for adapter in self.network_service._adapters:
-                self.logger.debug(f"检查网卡: name='{adapter.name}', description='{adapter.description}', friendly_name='{adapter.friendly_name}'")
+                self.logger.debug(f"🔍 检查网卡匹配: name='{adapter.name}', description='{adapter.description}', friendly_name='{adapter.friendly_name}'")
                 # 现在匹配name字段（完整名称带序号）
                 if adapter.name == display_name or adapter.description == display_name or adapter.friendly_name == display_name:
                     # 找到匹配的网卡，立即更新状态徽章以减少卡顿感
@@ -71,6 +194,13 @@ class NetworkEventHandler:
                     
                     # 移除立即更新逻辑，避免显示过时的缓存数据
                     # 直接依赖服务层的完整刷新流程，确保显示最新的链路速度信息
+                    
+                    # 在状态栏显示网卡切换状态
+                    if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
+                        self.main_window.service_coordinator.status_bar_service.set_status(
+                            f"🔄 正在切换到网卡: {adapter.friendly_name}", 
+                            auto_clear_seconds=2
+                        )
                     
                     # 然后调用服务层的选择方法进行完整刷新
                     # 这将触发一系列的信号发射，最终更新UI显示
@@ -283,6 +413,13 @@ class NetworkEventHandler:
             adapter_display_name: 网卡显示名称（用于日志）
         """
         try:
+            # 在状态栏显示IP配置应用状态
+            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
+                self.main_window.service_coordinator.status_bar_service.set_status(
+                    f"⚙️ 正在应用IP配置到: {adapter_display_name}", 
+                    auto_clear_seconds=5
+                )
+            
             # 记录IP配置应用操作的开始
             self.logger.debug(f"用户确认后开始应用IP配置到网卡 {adapter_display_name}: "
                            f"IP={ip_address}, 掩码={subnet_mask}")
@@ -318,22 +455,29 @@ class NetworkEventHandler:
         处理服务层错误信号并显示错误弹窗
         
         作用说明：
-        当网络配置操作失败时，这个方法负责向用户显示明确的错误信息弹窗。
+        当网络配置操作发生错误时，这个方法负责向用户显示明确的错误信息弹窗。
         采用面向对象设计原则，将错误处理逻辑封装在独立方法中，
-        确保用户能够及时了解操作失败的具体原因和解决建议。
+        确保用户能够及时了解错误原因并获得解决问题的指导。
         
         面向对象设计特点：
         - 单一职责：专门负责错误信息的UI显示
-        - 封装性：将复杂的错误处理逻辑封装在方法内部
-        - 用户体验：提供直观的错误信息和操作建议
+        - 封装性：将错误处理逻辑封装在方法内部
+        - 用户体验：提供清晰的错误描述和解决建议
         
         Args:
-            error_title (str): 错误标题，用于弹窗标题栏显示
-            error_message (str): 详细的错误信息，包含原因分析和解决建议
+            error_title (str): 错误标题，简要描述错误类型
+            error_message (str): 详细错误信息，包含具体错误原因和建议
         """
         try:
-            # 记录错误日志供开发者调试使用
-            self.logger.error(f"{error_title}: {error_message}")
+            # 在状态栏显示错误状态
+            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
+                self.main_window.service_coordinator.status_bar_service.set_status(
+                    f"❌ 操作失败: {error_title}", 
+                    auto_clear_seconds=5
+                )
+            
+            # 记录错误信息供开发者调试使用
+            self.logger.error(f"服务层错误 - {error_title}: {error_message}")
             
             # 显示用户友好的错误弹窗
             
@@ -372,6 +516,13 @@ class NetworkEventHandler:
             success_message (str): 服务层传递的成功消息，包含配置详情
         """
         try:
+            # 在状态栏显示成功状态
+            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
+                self.main_window.service_coordinator.status_bar_service.set_status(
+                    "✅ IP配置应用成功", 
+                    auto_clear_seconds=3
+                )
+            
             # 记录IP配置成功的详细信息供开发者调试使用
             self.logger.debug(f"IP配置应用成功: {success_message}")
             
@@ -424,7 +575,85 @@ class NetworkEventHandler:
             # 当前版本通过日志记录，后续版本可扩展UI进度显示
             
         except Exception as e:
-            self.logger.error(f"处理操作进度信号失败: {str(e)}")
+            self.logger.error(f"网卡选择处理异常: {str(e)}")
+    
+    def _on_add_selected_extra_ips(self, adapter_id, selected_ips):
+        """
+        处理添加选中额外IP事件
+        
+        Args:
+            adapter_id (str): 网卡ID
+            selected_ips (List[str]): 选中的IP地址列表
+        """
+        try:
+            self.logger.debug(f"🔄 开始添加选中的额外IP - 网卡: {adapter_id}, IP数量: {len(selected_ips)}")
+            
+            # 在状态栏显示操作状态
+            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
+                self.main_window.service_coordinator.status_bar_service.set_status(
+                    f"🔄 正在添加 {len(selected_ips)} 个额外IP地址...", 
+                    auto_clear_seconds=0  # 不自动清除，等待操作完成
+                )
+            
+            # 调用服务层方法添加额外IP
+            self.network_service.add_selected_extra_ips(adapter_id, selected_ips)
+            
+        except Exception as e:
+            self.logger.error(f"处理添加选中额外IP事件时发生异常: {str(e)}")
+            # 在状态栏显示错误状态
+            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
+                self.main_window.service_coordinator.status_bar_service.set_status(
+                    f"❌ 添加额外IP失败: {str(e)}", 
+                    auto_clear_seconds=5
+                )
+
+    def _on_adapter_info_updated_for_status_bar(self, aggregated_info):
+        """
+        处理网卡信息更新事件，专门用于状态栏最终状态更新
+        
+        当网卡切换完成后，基于最新的网卡信息更新状态栏显示最终状态。
+        这确保了网卡切换操作的完整性和用户体验的连贯性。
+        
+        Args:
+            aggregated_info: 聚合的网卡信息对象
+        """
+        try:
+            self.logger.debug(f"🎯 收到adapter_info_updated信号，开始更新状态栏")
+            
+            if not aggregated_info or not aggregated_info.detailed_info:
+                self.logger.debug("网卡信息不完整，跳过状态栏更新")
+                return
+                
+            detailed_info = aggregated_info.detailed_info
+            
+            # 获取网卡友好名称用于显示
+            adapter_name = getattr(detailed_info, 'friendly_name', '') or getattr(detailed_info, 'name', '未知网卡')
+            
+            # 获取连接状态（使用正确的字段名）
+            connection_status = getattr(detailed_info, 'status', '未知')
+            
+            self.logger.debug(f"📊 网卡信息 - 名称: {adapter_name}, 状态: {connection_status}")
+            
+            # 根据连接状态设置状态栏消息
+            if connection_status == '已连接' or connection_status == 'Up':
+                status_message = f"✅ 已切换到 {adapter_name} (已连接)"
+            elif connection_status == '已断开' or connection_status == 'Down':
+                status_message = f"🔌 已切换到 {adapter_name} (已断开)"
+            else:
+                status_message = f"🔄 已切换到 {adapter_name}"
+            
+            # 更新状态栏显示最终状态
+            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
+                self.main_window.service_coordinator.status_bar_service.set_status(
+                    status_message, 
+                    auto_clear_seconds=0  # 不自动清除，保持显示
+                )
+                self.logger.debug(f"✅ 状态栏已更新网卡切换最终状态: {status_message}")
+            else:
+                self.logger.error("❌ 无法访问状态栏服务")
+            
+        except Exception as e:
+            self.logger.error(f"更新网卡切换状态栏时发生异常: {str(e)}")
     
     def _on_extra_ips_added(self, success_message):
         """
