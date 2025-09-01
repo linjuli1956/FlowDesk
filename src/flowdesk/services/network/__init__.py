@@ -20,6 +20,13 @@ from .ip_configuration_service import IPConfigurationService
 from .extra_ip_management_service import ExtraIPManagementService
 from .network_ui_coordinator_service import NetworkUICoordinatorService
 
+# 拆分后的专业组件
+from .adapter_info_retriever import AdapterInfoRetriever
+from .adapter_status_analyzer import AdapterStatusAnalyzer
+from .adapter_config_parser import AdapterConfigParser
+from .adapter_dns_enhancer import AdapterDnsEnhancer
+from .adapter_info_utils import get_interface_type, prefix_to_netmask
+
 # 兼容门面（主要对外接口）
 from .network_service import NetworkService
 
@@ -41,6 +48,14 @@ __all__ = [
     'IPConfigurationService',
     'ExtraIPManagementService',
     'NetworkUICoordinatorService',
+    
+    # 拆分后的专业组件
+    'AdapterInfoRetriever',
+    'AdapterStatusAnalyzer',
+    'AdapterConfigParser',
+    'AdapterDnsEnhancer',
+    'get_interface_type',
+    'prefix_to_netmask',
     
     # 主要对外接口
     'NetworkService',

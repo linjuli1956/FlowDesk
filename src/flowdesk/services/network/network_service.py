@@ -59,7 +59,7 @@ class NetworkService(NetworkServiceBase):
         
         # 创建专业服务实例
         self._discovery_service = AdapterDiscoveryService(parent=self)
-        self._info_service = AdapterInfoService(parent=self)
+        self._info_service = AdapterInfoService(discovery_service=self._discovery_service)
         self._status_service = AdapterStatusService(parent=self)
         self._performance_service = AdapterPerformanceService(parent=self)
         self._ip_config_service = IPConfigurationService(parent=self)
