@@ -69,6 +69,9 @@ class AdapterInfoPanel(QWidget):
         """
         super().__init__(parent)
         
+        # 网卡描述到友好名称的映射字典
+        self._adapter_name_mapping = {}
+        
         # 创建所有UI组件
         self._create_components()
         
@@ -225,38 +228,63 @@ class AdapterInfoPanel(QWidget):
         
         将UI事件连接到面板自身的信号，供父容器转发给服务层。
         """
-        # 网卡选择变更
-        self.adapter_combo.currentTextChanged.connect(self.adapter_selected.emit)
+        # 网卡选择变更 - 传递友好名称而不是描述
+        self.adapter_combo.currentTextChanged.connect(self._on_adapter_selection_changed)
         
         # 刷新网卡列表
         self.refresh_btn.clicked.connect(self.refresh_adapters.emit)
         
-        # 网卡操作按钮
+        # 网卡操作按钮 - 传递友好名称而不是描述
         self.enable_adapter_btn.clicked.connect(
-            lambda: self.enable_adapter.emit(self.adapter_combo.currentText())
+            lambda: self.enable_adapter.emit(self._get_current_adapter_friendly_name())
         )
         self.disable_adapter_btn.clicked.connect(
-            lambda: self.disable_adapter.emit(self.adapter_combo.currentText())
+            lambda: self.disable_adapter.emit(self._get_current_adapter_friendly_name())
         )
         self.set_static_btn.clicked.connect(
-            lambda: self.set_static_ip.emit(self.adapter_combo.currentText())
+            lambda: self.set_static_ip.emit(self._get_current_adapter_friendly_name())
         )
         self.set_dhcp_btn.clicked.connect(
-            lambda: self.set_dhcp.emit(self.adapter_combo.currentText())
+            lambda: self.set_dhcp.emit(self._get_current_adapter_friendly_name())
         )
         
         # 复制网卡信息
         self.copy_info_btn.clicked.connect(self.copy_adapter_info.emit)
     
-    def update_adapter_list(self, adapter_names):
+    def _on_adapter_selection_changed(self, description):
+        """
+        处理网卡选择变更事件
+        
+        Args:
+            description (str): 网卡描述（下拉框显示的文本）
+        """
+        friendly_name = self._get_current_adapter_friendly_name()
+        self.adapter_selected.emit(friendly_name)
+    
+    def _get_current_adapter_friendly_name(self):
+        """
+        获取当前选中网卡的友好名称
+        
+        Returns:
+            str: 网卡友好名称，如果未找到则返回描述
+        """
+        current_description = self.adapter_combo.currentText()
+        return self._adapter_name_mapping.get(current_description, current_description)
+    
+    def update_adapter_list(self, adapter_names, name_mapping=None):
         """
         更新网卡下拉框列表
         
         Args:
             adapter_names (list): 网卡名称列表
+            name_mapping (dict): 描述到友好名称的映射字典
         """
         self.adapter_combo.clear()
         self.adapter_combo.addItems(adapter_names)
+        
+        # 更新映射关系
+        if name_mapping:
+            self._adapter_name_mapping.update(name_mapping)
     
     def update_ip_info_display(self, formatted_info):
         """

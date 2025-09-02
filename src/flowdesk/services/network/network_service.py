@@ -19,6 +19,7 @@ from .adapter_performance_service import AdapterPerformanceService
 from .ip_configuration_service import IPConfigurationService
 from .extra_ip_management_service import ExtraIPManagementService
 from .network_ui_coordinator_service import NetworkUICoordinatorService
+from .adapter_operation_service import AdapterOperationService
 
 
 class NetworkService(NetworkServiceBase):
@@ -64,6 +65,7 @@ class NetworkService(NetworkServiceBase):
         self._performance_service = AdapterPerformanceService(parent=self)
         self._ip_config_service = IPConfigurationService(parent=self)
         self._extra_ip_service = ExtraIPManagementService(parent=self)
+        self._operation_service = AdapterOperationService(parent=self)
         self._ui_coordinator = NetworkUICoordinatorService(parent=self)
         
         # 建立服务间的依赖关系
@@ -130,6 +132,11 @@ class NetworkService(NetworkServiceBase):
         # 连接额外IP管理服务的信号
         self._extra_ip_service.extra_ips_added.connect(self.extra_ips_added)
         self._extra_ip_service.extra_ips_removed.connect(self.extra_ips_removed)
+        
+        # 连接网卡操作服务的信号
+        self._operation_service.operation_completed.connect(self.operation_completed)
+        self._operation_service.operation_progress.connect(self.operation_progress)
+        self._operation_service.error_occurred.connect(self.error_occurred)
         
         self.logger.debug("网络服务信号连接完成")
     
@@ -572,5 +579,50 @@ class NetworkService(NetworkServiceBase):
                 'is_valid': False,
                 'error_message': '网络配置验证过程中发生错误，请检查输入参数。'
             }
+    
+    # endregion
+    
+    # region 网卡操作方法
+    
+    def enable_adapter(self, adapter_name: str) -> bool:
+        """
+        启用指定网卡
+        
+        通过操作服务执行网卡启用操作，包含状态预检查。
+        
+        Args:
+            adapter_name: 网卡友好名称
+            
+        Returns:
+            bool: 启用成功返回True，失败返回False
+        """
+        self.logger.info(f"请求启用网卡: {adapter_name}")
+        return self._operation_service.enable_adapter(adapter_name)
+    
+    def disable_adapter(self, adapter_name: str) -> None:
+        """
+        禁用指定网卡
+        
+        通过操作服务执行网卡禁用操作，包含状态预检查。
+        操作结果通过operation_completed信号通知UI层。
+        
+        Args:
+            adapter_name: 网卡友好名称
+        """
+        self.logger.info(f"请求禁用网卡: {adapter_name}")
+        self._operation_service.disable_adapter(adapter_name)
+    
+    def set_dhcp_mode(self, adapter_name: str) -> None:
+        """
+        设置网卡为DHCP自动获取IP模式
+        
+        通过操作服务执行DHCP设置操作，包含状态预检查。
+        操作结果通过operation_completed信号通知UI层。
+        
+        Args:
+            adapter_name: 网卡友好名称
+        """
+        self.logger.info(f"请求设置DHCP模式: {adapter_name}")
+        self._operation_service.set_dhcp_mode(adapter_name)
     
     # endregion

@@ -285,8 +285,7 @@ class ValidationErrorDialog(QDialog):
             invalid_input (str): 用户输入的无效IP地址
             auto_close_seconds (int): 自动关闭倒计时秒数
         """
-        self.error_title.setText("IP地址格式错误")
-        self.error_icon.setText("🌐")
+        self.error_title.setText("🌐 IP地址格式错误")
         
         error_reason = self._analyze_ip_address_error(invalid_input)
         

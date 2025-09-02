@@ -83,18 +83,15 @@ class IPConfigurationService(NetworkServiceBase):
             # 查找目标网卡的连接名称，netsh命令需要使用连接名而非GUID
             adapter_info = self._find_adapter_basic_info(adapter_id)
             if not adapter_info:
-                error_msg = f"未找到网卡 {adapter_id}"
-                self.logger.error(error_msg)
-                self.error_occurred.emit("网卡查找失败", error_msg)
-                return False
-            
-            # 获取网卡的友好连接名称，用于netsh命令
-            connection_name = adapter_info.get('NetConnectionID', '')
-            if not connection_name:
-                error_msg = f"网卡 {adapter_id} 缺少连接名称"
-                self.logger.error(error_msg)
-                self.error_occurred.emit("网卡配置错误", error_msg)
-                return False
+                self.logger.error(f"未找到网卡 {adapter_id}，尝试直接使用adapter_id作为连接名")
+                # 如果找不到网卡信息，尝试直接使用adapter_id作为连接名
+                connection_name = adapter_id
+            else:
+                # 获取网卡的友好连接名称，用于netsh命令
+                connection_name = adapter_info.get('NetConnectionID', '')
+                if not connection_name:
+                    self.logger.warning(f"网卡 {adapter_id} 缺少连接名称，使用adapter_id")
+                    connection_name = adapter_id
             
             # 记录网卡信息用于调试
             self._log_operation_start("网卡配置准备", connection_name=connection_name)
@@ -210,8 +207,10 @@ class IPConfigurationService(NetworkServiceBase):
             
             # 记录命令执行结果
             self.logger.debug(f"netsh命令执行完成 - 返回码: {result.returncode}")
+            if result.stdout.strip():
+                self.logger.debug(f"命令标准输出: {result.stdout.strip()}")
             if result.stderr.strip():
-                self.logger.warning(f"命令错误输出: {result.stderr.strip()}")
+                self.logger.error(f"命令错误输出: {result.stderr.strip()}")
             
             # 检查命令执行结果
             if result.returncode == 0:

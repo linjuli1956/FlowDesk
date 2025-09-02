@@ -117,6 +117,28 @@ class ServiceCoordinator:
             self.network_service.remove_selected_extra_ips
         )
         
+        # === 网卡操作信号连接 ===
+        
+        # 启用网卡：UI启用按钮 -> 服务层启用网卡
+        self.main_window.network_config_tab.enable_adapter.connect(
+            self.network_service.enable_adapter
+        )
+        
+        # 禁用网卡：UI禁用按钮 -> 服务层禁用网卡
+        self.main_window.network_config_tab.disable_adapter.connect(
+            self.network_service.disable_adapter
+        )
+        
+        # 设置DHCP：UI DHCP按钮 -> 服务层设置DHCP模式
+        self.main_window.network_config_tab.set_dhcp.connect(
+            self.network_service.set_dhcp_mode
+        )
+        
+        # 设置静态IP：UI静态IP按钮 -> 事件处理器处理（复用现有逻辑）
+        self.main_window.network_config_tab.set_static_ip.connect(
+            event_handler._on_set_static_ip if event_handler else self._fallback_set_static_ip
+        )
+        
         # === 服务层信号连接到UI更新方法 ===
         
         # 网卡列表更新：服务层获取网卡完成 -> UI更新下拉框
@@ -183,6 +205,11 @@ class ServiceCoordinator:
         self.network_service.extra_ips_removed.connect(
             event_handler._on_extra_ips_removed if event_handler else self._fallback_extra_ips_removed
         )
+        
+        # 网卡操作完成：服务层网卡操作完成 -> UI显示操作结果弹窗
+        self.network_service.operation_completed.connect(
+            event_handler._on_operation_completed if event_handler else self._fallback_operation_completed
+        )
     
     def _connect_status_bar_signals(self):
         """
@@ -229,10 +256,41 @@ class ServiceCoordinator:
         # 基本的网卡选择逻辑
         pass
     
-    def _fallback_apply_ip_config(self, *args):
+    def _fallback_apply_ip_config(self, config_data):
         """事件处理器不可用时的IP配置应用回退方法"""
         self.logger.warning("事件处理器不可用，使用回退方法处理IP配置应用")
-        # 这里可以添加基本的IP配置应用逻辑
+        
+        # 直接调用UI协调器的IP配置方法
+        if self.network_service and hasattr(self.network_service, '_ui_coordinator'):
+            try:
+                # 获取当前选中的网卡ID
+                current_adapter_text = getattr(self.main_window.network_config_tab.adapter_info_panel.adapter_combo, 'currentText', lambda: '')()
+                if not current_adapter_text:
+                    self.logger.error("未选择网卡，无法应用IP配置")
+                    return
+                
+                # 从网卡映射中获取真实的网卡ID
+                adapter_name_mapping = getattr(self.main_window.network_config_tab, '_adapter_name_mapping', {})
+                adapter_id = adapter_name_mapping.get(current_adapter_text, current_adapter_text)
+                
+                # 提取配置数据
+                ip_address = config_data.get('ip_address', '')
+                subnet_mask = config_data.get('subnet_mask', '')
+                gateway = config_data.get('gateway', '')
+                primary_dns = config_data.get('primary_dns', '')
+                secondary_dns = config_data.get('secondary_dns', '')
+                
+                self.logger.info(f"回退方法应用IP配置: 网卡={adapter_id}, IP={ip_address}")
+                
+                # 调用UI协调器的IP配置应用方法
+                self.network_service._ui_coordinator.apply_ip_config(
+                    adapter_id, ip_address, subnet_mask, gateway, primary_dns, secondary_dns
+                )
+                
+            except Exception as e:
+                self.logger.error(f"回退方法应用IP配置失败: {str(e)}")
+        else:
+            self.logger.error("网络服务或UI协调器不可用，无法应用IP配置")
     
     def _fallback_add_selected_ips(self, adapter_name: str, ip_configs: list):
         """事件处理器不可用时的添加额外IP回退方法"""
@@ -307,3 +365,17 @@ class ServiceCoordinator:
         """批量额外IP删除的回退处理"""
         self.logger.warning("事件处理器未初始化，使用回退方法处理IP删除")
         self.logger.debug(f"批量删除IP成功: {success_message}")
+    
+    def _fallback_set_static_ip(self, adapter_name):
+        """设置静态IP的回退处理"""
+        self.logger.warning("事件处理器未初始化，使用回退方法处理静态IP设置")
+        self.logger.debug(f"设置静态IP请求: {adapter_name}")
+        # 这里可以添加基本的静态IP设置逻辑或显示提示
+    
+    def _fallback_operation_completed(self, success, message, operation):
+        """网卡操作完成的回退处理"""
+        self.logger.warning("事件处理器未初始化，使用回退方法处理操作完成")
+        if success:
+            self.logger.info(f"操作成功: {operation} - {message}")
+        else:
+            self.logger.error(f"操作失败: {operation} - {message}")

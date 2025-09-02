@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QMessageBox
 from ...utils.logger import get_logger
 from ...models.ip_config_confirmation import IPConfigConfirmation
 from ..dialogs.ip_config_confirm_dialog import IPConfigConfirmDialog
+from ..dialogs.operation_result_dialog import OperationResultDialog
 
 
 class NetworkEventHandler:
@@ -68,7 +69,10 @@ class NetworkEventHandler:
         # 连接adapter_info_updated信号，用于网卡切换后的状态栏最终更新
         self.network_service.adapter_info_updated.connect(self._on_adapter_info_updated_for_status_bar)
         
-        self.logger.debug("NetworkEventHandler信号连接完成，包括adapter_info_updated信号")
+        # 连接网卡操作信号
+        self.network_service.operation_completed.connect(self._on_operation_completed)
+        
+        self.logger.debug("NetworkEventHandler信号连接完成，包括adapter_info_updated和operation_completed信号")
     
     def _on_adapters_updated(self, adapters):
         """
@@ -218,33 +222,46 @@ class NetworkEventHandler:
             self.logger.error(f"网卡选择处理失败，错误详情: {str(e)}")
             # 在生产环境中，这里应该向用户显示友好的错误提示
     
-    def _on_apply_ip_config(self, config_data):
+    def _get_current_selected_adapter(self):
         """
-        处理IP配置应用请求的核心业务逻辑转换方法
+        获取当前选中的网卡信息（复用现有数据）
         
-        增强版本：集成IP配置确认弹窗，在应用配置前展示变更详情并询问用户确认。
-        这个方法是"修改IP地址"按钮功能的关键桥梁，负责将UI层收集的
-        配置数据转换为服务层能够处理的格式，并调用相应的业务方法。
+        从网络配置Tab的适配器信息面板获取当前选中的网卡对象，
+        避免重复查找网卡信息，提高代码复用性。
         
-        工作流程：
-        1. 接收UI层传递的配置数据字典
-        2. 验证必要的配置参数是否完整
-        3. 获取当前选中的网卡标识符和当前配置
-        4. 创建IP配置确认数据模型
-        5. 显示确认弹窗，等待用户确认
-        6. 用户确认后调用服务层的IP配置应用方法
-        7. 处理可能的异常情况并记录日志
-        
-        参数说明：
-            config_data (dict): UI层收集的IP配置数据，包含：
-                - ip_address: IP地址
-                - subnet_mask: 子网掩码
-                - gateway: 网关地址（可选）
-                - primary_dns: 主DNS服务器（可选）
-                - secondary_dns: 辅助DNS服务器（可选）
-                - adapter: 网卡显示名称
+        Returns:
+            AdapterInfo: 当前选中的网卡信息对象，如果未找到返回None
         """
         try:
+            current_adapter_text = self.main_window.network_config_tab.adapter_info_panel.adapter_combo.currentText()
+            if not current_adapter_text:
+                return None
+            
+            # 从服务层缓存中查找匹配的网卡对象
+            for adapter in self.network_service._adapters:
+                if (adapter.name == current_adapter_text or 
+                    adapter.description == current_adapter_text or 
+                    adapter.friendly_name == current_adapter_text):
+                    return adapter
+            return None
+        except Exception as e:
+            self.logger.error(f"获取当前选中网卡失败: {str(e)}")
+            return None
+
+    def _on_apply_ip_config(self, config_data):
+        """
+        处理IP配置应用请求的核心方法
+        
+        这个方法接收来自UI层的IP配置数据，进行验证和预处理，
+        然后调用服务层执行实际的网络配置操作。
+        
+        Args:
+            config_data (dict): IP配置数据字典，包含ip_address、subnet_mask等字段
+        """
+        try:
+            # 添加调试日志，确认方法被调用
+            self.logger.info(f"🔥 网络事件处理器收到IP配置应用请求: {config_data}")
+            self.logger.info("🔥 开始执行网卡状态检测和IP配置流程")
             # 验证服务层是否已正确初始化
             if not self.network_service:
                 self.logger.error("网络服务未初始化，无法应用IP配置")
@@ -258,24 +275,73 @@ class NetworkEventHandler:
                 self.logger.warning("IP地址或子网掩码为空，无法应用配置")
                 return
             
-            # 获取当前选中的网卡ID和网卡对象
-            adapter_display_name = config_data.get('adapter', '')
-            if not adapter_display_name:
+            # 获取当前UI中实际选择的网卡
+            current_adapter_text = self.main_window.network_config_tab.adapter_info_panel.adapter_combo.currentText()
+            if not current_adapter_text:
                 self.logger.warning("未选择网卡，无法应用IP配置")
                 return
             
-            # 在服务层的网卡缓存中查找匹配的网卡对象
-            target_adapter = None
-            for adapter in self.network_service._adapters:
-                if (adapter.name == adapter_display_name or 
-                    adapter.description == adapter_display_name or 
-                    adapter.friendly_name == adapter_display_name):
-                    target_adapter = adapter
-                    break
+            # 直接从网络配置Tab获取当前选中的网卡信息（复用现有数据）
+            target_adapter = self._get_current_selected_adapter()
             
             if not target_adapter:
-                self.logger.error(f"无法找到匹配的网卡: {adapter_display_name}")
+                self.logger.error(f"无法找到匹配的网卡: {current_adapter_text}")
                 return
+            
+            # 🔥 关键修复：在任何验证之前先检查网卡状态并自动启用
+            self.logger.info(f"🔥 检查网卡状态 - 网卡: {target_adapter.friendly_name}, 状态: '{target_adapter.status}'")
+            adapter_disabled = (target_adapter.status == "已禁用" or 
+                              target_adapter.status == "Disabled" or
+                              target_adapter.status == "未连接" or
+                              target_adapter.status == "已断开连接" or
+                              target_adapter.status == "Disconnected" or
+                              "禁用" in target_adapter.status or
+                              "断开" in target_adapter.status)
+            
+            # 如果网卡禁用，先自动启用网卡
+            if adapter_disabled:
+                self.logger.info(f"🔥 网卡 {target_adapter.friendly_name} 处于禁用/断开状态，立即启用网卡")
+                
+                # 显示启用网卡的提示对话框
+                from PyQt5.QtWidgets import QMessageBox
+                reply = QMessageBox.question(
+                    self.main_window,
+                    "网卡状态提示",
+                    f"网卡 '{target_adapter.friendly_name}' 当前处于 {target_adapter.status} 状态。\n\n"
+                    f"需要先启用网卡才能修改IP配置。\n\n"
+                    f"是否自动启用网卡？",
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.Yes
+                )
+                
+                if reply == QMessageBox.Yes:
+                    # 启用网卡
+                    enable_success = self.network_service.enable_adapter(target_adapter.friendly_name)
+                    if not enable_success:
+                        self.logger.error(f"启用网卡失败: {target_adapter.friendly_name}")
+                        QMessageBox.critical(
+                            self.main_window,
+                            "网卡启用失败",
+                            f"无法启用网卡 {target_adapter.friendly_name}，请检查网络设置。"
+                        )
+                        return
+                    else:
+                        self.logger.info(f"🔥 网卡启用成功: {target_adapter.friendly_name}")
+                        # 等待网卡启用完成
+                        import time
+                        time.sleep(3)
+                        # 重新获取网卡信息
+                        self.network_service.refresh_current_adapter()
+                        QMessageBox.information(
+                            self.main_window,
+                            "网卡启用成功",
+                            f"网卡 {target_adapter.friendly_name} 已成功启用，现在继续修改IP配置。"
+                        )
+                        # 重新获取更新后的网卡信息
+                        target_adapter = self._get_current_selected_adapter()
+                else:
+                    self.logger.info("用户取消启用网卡，IP配置操作终止")
+                    return
             
             # 提取可选配置参数
             gateway = config_data.get('gateway', '').strip()
@@ -349,6 +415,56 @@ class NetworkEventHandler:
             self.logger.debug(f"配置对比 - 当前DNS1: '{current_dns1}' vs 新DNS1: '{new_dns1}'")
             self.logger.debug(f"配置对比 - 当前DNS2: '{current_dns2}' vs 新DNS2: '{new_dns2}'")
             
+            # 检查网卡是否禁用，如果禁用则先自动启用
+            self.logger.debug(f"确认弹窗前网卡状态检查 - 网卡: {target_adapter.friendly_name}, 状态: '{target_adapter.status}'")
+            adapter_disabled = (target_adapter.status == "已禁用" or 
+                              target_adapter.status == "Disabled" or
+                              target_adapter.status == "未连接" or
+                              "禁用" in target_adapter.status)
+            
+            # 如果网卡禁用，先自动启用网卡
+            if adapter_disabled:
+                self.logger.info(f"网卡 {target_adapter.friendly_name} 处于禁用状态，先启用网卡")
+                
+                # 显示启用网卡的提示对话框
+                from PyQt5.QtWidgets import QMessageBox
+                reply = QMessageBox.question(
+                    self.main_window,
+                    "网卡状态提示",
+                    f"网卡 '{target_adapter.friendly_name}' 当前处于禁用状态。\n\n"
+                    f"需要先启用网卡才能修改IP配置。\n\n"
+                    f"是否自动启用网卡？",
+                    QMessageBox.Yes | QMessageBox.No,
+                    QMessageBox.Yes
+                )
+                
+                if reply == QMessageBox.Yes:
+                    # 启用网卡
+                    enable_success = self.network_service.enable_adapter(target_adapter.friendly_name)
+                    if not enable_success:
+                        self.logger.error(f"启用网卡失败: {target_adapter.friendly_name}")
+                        QMessageBox.critical(
+                            self.main_window,
+                            "网卡启用失败",
+                            f"无法启用网卡 {target_adapter.friendly_name}，请检查网络设置。"
+                        )
+                        return
+                    else:
+                        self.logger.info(f"网卡启用成功: {target_adapter.friendly_name}")
+                        # 等待网卡启用完成
+                        import time
+                        time.sleep(2)
+                        # 重新获取网卡信息
+                        self.network_service.refresh_current_adapter()
+                        QMessageBox.information(
+                            self.main_window,
+                            "网卡启用成功",
+                            f"网卡 {target_adapter.friendly_name} 已成功启用，现在可以修改IP配置。"
+                        )
+                else:
+                    self.logger.info("用户取消启用网卡，IP配置操作终止")
+                    return
+            
             # 创建IP配置确认数据模型
             confirmation_data = IPConfigConfirmation(
                 adapter_name=target_adapter.friendly_name or target_adapter.name,
@@ -372,21 +488,34 @@ class NetworkEventHandler:
             # 显示IP配置确认弹窗
             confirm_dialog = IPConfigConfirmDialog(confirmation_data, self.main_window)
             
-            # 连接确认信号到实际应用方法
+            # 如果网卡禁用，在弹窗中添加额外提示
+            if adapter_disabled:
+                # 在变更详情中添加网卡启用提示
+                original_html = confirm_dialog.changes_text.toHtml()
+                additional_info = """
+                <div style='background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 8px; margin: 8px 0; border-radius: 4px;'>
+                    <span style='color: #856404; font-weight: bold;'>⚠️ 重要提示：</span><br>
+                    <span style='color: #856404;'>检测到网卡处于禁用状态，系统将先自动启用网卡，然后应用IP配置。</span>
+                </div>
+                """
+                confirm_dialog.changes_text.setHtml(original_html + additional_info)
+            
+            # 连接确认信号到实际的IP配置应用方法
             confirm_dialog.confirmed.connect(
                 lambda: self._apply_confirmed_ip_config(
                     target_adapter.id, ip_address, subnet_mask, 
-                    gateway, primary_dns, secondary_dns, adapter_display_name
+                    gateway, primary_dns, secondary_dns, current_adapter_text,
+                    target_adapter  # 传递完整的adapter对象用于状态检查
                 )
             )
             
             # 连接取消信号到日志记录
             confirm_dialog.cancelled.connect(
-                lambda: self.logger.debug(f"用户取消IP配置修改: {adapter_display_name}")
+                lambda: self.logger.debug(f"用户取消IP配置修改: {current_adapter_text}")
             )
             
             # 显示弹窗（模态）
-            self.logger.debug(f"显示IP配置确认弹窗: {adapter_display_name}")
+            self.logger.debug(f"显示IP配置确认弹窗: {current_adapter_text}")
             confirm_dialog.exec_()
                 
         except Exception as e:
@@ -396,7 +525,7 @@ class NetworkEventHandler:
             # 在生产环境中，这里应该向用户显示友好的错误提示
     
     def _apply_confirmed_ip_config(self, adapter_id, ip_address, subnet_mask, 
-                                 gateway, primary_dns, secondary_dns, adapter_display_name):
+                                 gateway, primary_dns, secondary_dns, adapter_display_name, adapter_info=None):
         """
         应用用户确认的IP配置
         
@@ -458,6 +587,8 @@ class NetworkEventHandler:
                     f"⚙️ 正在应用IP配置到: {adapter_display_name}", 
                     auto_clear_seconds=5
                 )
+            
+            # 网卡状态检测已在确认弹窗前完成，此处直接执行IP配置
             
             # 记录IP配置应用操作的开始
             self.logger.debug(f"用户确认后开始应用IP配置到网卡 {adapter_display_name}: "
@@ -771,3 +902,88 @@ class NetworkEventHandler:
             # 详细记录错误信息，便于开发人员快速定位问题
             self.logger.error(f"处理批量删除IP成功信号失败: {str(e)}")
             # 如果弹窗显示失败，至少记录日志保证成功信息不丢失
+    
+    def _on_operation_completed(self, success: bool, message: str, operation: str):
+        """
+        处理网卡操作完成信号
+        
+        显示统一的操作结果弹窗，提供用户友好的操作反馈。
+        操作成功后自动刷新网卡信息以更新状态显示。
+        异常时使用备用QMessageBox确保用户获得操作反馈。
+        
+        Args:
+            success: 操作是否成功
+            message: 操作结果消息
+            operation: 操作类型描述
+        """
+        try:
+            # 显示操作结果弹窗
+            if success:
+                OperationResultDialog.show_success(message, operation, self.main_window)
+                # 操作成功后自动刷新网卡信息，更新状态显示
+                if self.network_service:
+                    self.logger.debug(f"{operation}成功，自动刷新网卡信息")
+                    self.network_service.refresh_current_adapter()
+            else:
+                OperationResultDialog.show_error(message, operation, self.main_window)
+                
+        except Exception as e:
+            self.logger.error(f"显示操作结果弹窗失败: {e}")
+            # 备用弹窗处理
+            try:
+                from PyQt5.QtWidgets import QMessageBox
+                if success:
+                    QMessageBox.information(self.main_window, f"✅ {operation}成功", message)
+                    # 即使弹窗失败，也要刷新网卡信息
+                    if self.network_service:
+                        self.network_service.refresh_current_adapter()
+                else:
+                    QMessageBox.critical(self.main_window, f"❌ {operation}失败", message)
+            except Exception as fallback_error:
+                self.logger.error(f"备用弹窗也失败: {fallback_error}")
+    
+    def _on_set_static_ip(self, adapter_name: str):
+        """
+        处理设置静态IP信号
+        
+        复用现有的IP配置修改逻辑，通过触发IP配置应用来实现静态IP设置。
+        这样可以保持代码的一致性和复用性。
+        
+        Args:
+            adapter_name: 要设置静态IP的网卡名称
+        """
+        try:
+            self.logger.info(f"处理静态IP设置请求: {adapter_name}")
+            
+            # 获取当前网卡的IP配置信息
+            current_config = self.main_window.network_config_tab.ip_config_panel.get_current_ip_config()
+            
+            if current_config:
+                # 添加网卡信息到配置数据中
+                current_config['adapter'] = adapter_name
+                # 触发IP配置应用，实现静态IP设置
+                self._on_apply_ip_config(current_config)
+            else:
+                self.logger.warning(f"无法获取网卡 {adapter_name} 的当前IP配置")
+                # 显示错误提示
+                try:
+                    OperationResultDialog.show_error(
+                        "无法获取当前IP配置信息，请检查网卡状态", 
+                        "设置静态IP", 
+                        self.main_window
+                    )
+                except Exception:
+                    from PyQt5.QtWidgets import QMessageBox
+                    QMessageBox.warning(self.main_window, "设置静态IP", "无法获取当前IP配置信息")
+                    
+        except Exception as e:
+            self.logger.error(f"处理静态IP设置失败: {e}")
+            try:
+                OperationResultDialog.show_error(
+                    f"设置静态IP时发生错误: {str(e)}", 
+                    "设置静态IP", 
+                    self.main_window
+                )
+            except Exception:
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.critical(self.main_window, "设置静态IP失败", f"操作失败: {str(e)}")

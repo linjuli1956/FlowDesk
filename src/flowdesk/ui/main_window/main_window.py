@@ -78,7 +78,7 @@ class MainWindow(MainWindowBase):
             self.service_coordinator.initialize_services()
             
             # 设置network_event_handler的network_service引用并连接信号
-            self.network_event_handler.set_network_service(self.network_service)
+            self.network_event_handler.set_network_service(self.service_coordinator.network_service)
             
             self.logger.info("所有功能组件初始化完成")
             

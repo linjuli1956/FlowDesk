@@ -4,7 +4,7 @@ IP配置确认弹窗：在应用IP配置前展示变更详情并询问用户确�
 """
 
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QHBoxLayout, QLabel, QTextEdit, QPushButton, QFrame
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtCore import Qt, pyqtSignal, QPoint
 
 from ...models.ip_config_confirmation import IPConfigConfirmation
 
@@ -36,6 +36,9 @@ class IPConfigConfirmDialog(QDialog):
         super().__init__(parent)
         self.confirmation_data = confirmation_data
         
+        # 拖拽相关变量
+        self.drag_position = QPoint()
+        
         # 设置弹窗基本属性
         self.setup_dialog_properties()
         
@@ -50,11 +53,13 @@ class IPConfigConfirmDialog(QDialog):
         self.setObjectName("ip_config_confirm_dialog")
         self.setModal(True)  # 模态弹窗
         
-        # 设置窗口标志：无标题栏的固定尺寸弹窗
+        # 设置窗口标志：无标题栏但支持拖拽的弹窗
         self.setWindowFlags(Qt.Dialog | Qt.FramelessWindowHint)
         
-        # 设置固定尺寸，禁用调整大小和拖拽
-        self.setFixedSize(520, 380)
+        # 设置最小尺寸而不是固定尺寸，避免多显示器DPI问题
+        self.setMinimumSize(520, 380)
+        self.setMaximumSize(600, 450)  # 允许一定的尺寸弹性
+        self.resize(520, 380)  # 设置初始尺寸
         
         # 居中显示
         if self.parent():
@@ -180,3 +185,15 @@ class IPConfigConfirmDialog(QDialog):
         # 无标题栏时通过ESC键或代码关闭等同于取消操作
         self.cancelled.emit()
         super().closeEvent(event)
+    
+    def mousePressEvent(self, event):
+        """处理鼠标按下事件 - 开始拖拽"""
+        if event.button() == Qt.LeftButton:
+            self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
+            event.accept()
+    
+    def mouseMoveEvent(self, event):
+        """处理鼠标移动事件 - 执行拖拽"""
+        if event.buttons() == Qt.LeftButton and not self.drag_position.isNull():
+            self.move(event.globalPos() - self.drag_position)
+            event.accept()

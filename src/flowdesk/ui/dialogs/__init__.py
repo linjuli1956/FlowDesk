@@ -20,7 +20,9 @@
 """
 
 from .add_ip_dialog import AddIPDialog
+from .operation_result_dialog import OperationResultDialog
 
 __all__ = [
-    'AddIPDialog'
+    'AddIPDialog',
+    'OperationResultDialog'
 ]

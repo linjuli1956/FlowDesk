@@ -474,3 +474,18 @@ class IPConfigPanel(QWidget):
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Unchecked)
             self.extra_ip_list.addItem(item)
+    
+    def get_current_ip_config(self):
+        """
+        获取当前IP配置输入框中的配置信息
+        
+        Returns:
+            dict: 包含当前IP配置信息的字典
+        """
+        return {
+            'ip_address': self.ip_address_input.text().strip(),
+            'subnet_mask': self.subnet_mask_input.text().strip(),
+            'gateway': self.gateway_input.text().strip(),
+            'dns_primary': self.primary_dns_input.text().strip(),
+            'dns_secondary': self.secondary_dns_input.text().strip()
+        }

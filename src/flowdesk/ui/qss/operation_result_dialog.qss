@@ -1,0 +1,52 @@
+/*
+操作结果弹窗专用样式表
+遵循Claymorphism设计风格和弹窗专项UI注意事项
+*/
+
+/* 弹窗容器 */
+#operation_result_dialog {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.95), stop:1 rgba(245,247,250,0.95));
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.6);
+}
+
+/* 结果图标 */
+#operation_result_dialog #result_icon {
+    background: transparent;
+    border: none;
+    color: #2c3e50;
+    margin: 10px 0;
+}
+
+/* 消息文本 */
+#operation_result_dialog #result_message {
+    background: transparent;
+    border: none;
+    color: #1f2937;
+    margin: 5px 15px;
+}
+
+/* 确定按钮 - 蓝色渐变 */
+#operation_result_dialog QPushButton#dialog_ok_button {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #3b82f6, stop:1 #2563eb);
+    border: 2px solid #1d4ed8;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    min-width: 80px;
+    padding: 8px 16px;
+}
+
+#operation_result_dialog QPushButton#dialog_ok_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #60a5fa, stop:1 #3b82f6);
+    border-color: #1e40af;
+}
+
+#operation_result_dialog QPushButton#dialog_ok_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #2563eb, stop:1 #1d4ed8);
+    border-color: #1e3a8a;
+}

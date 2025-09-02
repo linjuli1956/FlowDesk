@@ -54,6 +54,7 @@ class NetworkServiceBase(QObject):
     status_badges_updated = pyqtSignal(str, str, str, str, str)  # 状态徽章更新信号，参数：连接显示文本, 连接属性, IP模式显示文本, IP模式属性, 链路速度显示文本
     operation_status = pyqtSignal(str, bool)     # 操作状态反馈信号，参数：操作描述, 成功标识
     operation_progress = pyqtSignal(str)         # 操作进度更新信号，参数：进度描述
+    operation_completed = pyqtSignal(bool, str, str)  # 网卡操作完成信号，参数：成功标识, 消息, 操作类型
     error_occurred = pyqtSignal(str, str)        # 错误发生信号，参数：错误类型, 错误描述
     
     # endregion

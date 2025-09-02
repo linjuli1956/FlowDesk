@@ -293,8 +293,8 @@ class NetworkConfigTab(QWidget):
             # 建立映射：完整描述 -> 友好名称
             self._adapter_name_mapping[display_name] = adapter.friendly_name or adapter.name or "未知"
         
-        # 更新下拉框
-        self.adapter_info_panel.update_adapter_list(adapter_display_names)
+        # 更新下拉框并传递映射关系
+        self.adapter_info_panel.update_adapter_list(adapter_display_names, self._adapter_name_mapping)
 
     def eventFilter(self, obj, event):
         """

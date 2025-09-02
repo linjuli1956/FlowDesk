@@ -19,6 +19,7 @@ from .adapter_performance_service import AdapterPerformanceService
 from .ip_configuration_service import IPConfigurationService
 from .extra_ip_management_service import ExtraIPManagementService
 from .network_ui_coordinator_service import NetworkUICoordinatorService
+from .adapter_operation_service import AdapterOperationService
 
 # 拆分后的专业组件
 from .adapter_info_retriever import AdapterInfoRetriever
@@ -48,6 +49,7 @@ __all__ = [
     'IPConfigurationService',
     'ExtraIPManagementService',
     'NetworkUICoordinatorService',
+    'AdapterOperationService',
     
     # 拆分后的专业组件
     'AdapterInfoRetriever',
