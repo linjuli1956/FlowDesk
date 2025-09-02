@@ -33,14 +33,15 @@ class TestNetworkUICoordinatorService(unittest.TestCase):
         self.mock_ip_config_service = Mock()
         self.mock_extra_ip_service = Mock()
         
-        self.coordinator = NetworkUICoordinatorService(
-            discovery_service=self.mock_discovery_service,
-            info_service=self.mock_info_service,
-            status_service=self.mock_status_service,
-            performance_service=self.mock_performance_service,
-            ip_config_service=self.mock_ip_config_service,
-            extra_ip_service=self.mock_extra_ip_service
-        )
+        self.coordinator = NetworkUICoordinatorService()
+        
+        # 手动设置mock服务实例
+        self.coordinator._discovery_service = self.mock_discovery_service
+        self.coordinator._info_service = self.mock_info_service
+        self.coordinator._status_service = self.mock_status_service
+        self.coordinator._performance_service = self.mock_performance_service
+        self.coordinator._ip_config_service = self.mock_ip_config_service
+        self.coordinator._extra_ip_service = self.mock_extra_ip_service
     
     def tearDown(self):
         """测试后清理"""

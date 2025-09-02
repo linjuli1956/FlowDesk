@@ -44,7 +44,7 @@ class AdapterInfoPanel(QWidget):
     - refresh_adapters: 刷新网卡列表信号
     - enable_adapter: 启用网卡信号
     - disable_adapter: 禁用网卡信号
-    - set_static_ip: 设置静态IP信号
+    - modify_mac_address: 修改MAC地址信号
     - set_dhcp: 设置DHCP信号
     - copy_adapter_info: 复制网卡信息信号
     """
@@ -54,7 +54,7 @@ class AdapterInfoPanel(QWidget):
     refresh_adapters = pyqtSignal()     # 刷新网卡列表
     enable_adapter = pyqtSignal(str)    # 启用网卡
     disable_adapter = pyqtSignal(str)   # 禁用网卡
-    set_static_ip = pyqtSignal(str)     # 设置静态IP
+    modify_mac_address = pyqtSignal(str)     # 修改MAC地址
     set_dhcp = pyqtSignal(str)          # 设置DHCP
     copy_adapter_info = pyqtSignal()    # 复制网卡信息
     
@@ -140,9 +140,9 @@ class AdapterInfoPanel(QWidget):
         self.disable_adapter_btn.setObjectName("disable_adapter_btn")
         self.disable_adapter_btn.setFixedSize(90, 30)
         
-        self.set_static_btn = QPushButton("🔧 静态IP")
+        self.set_static_btn = QPushButton("🔧 修改MAC")
         self.set_static_btn.setObjectName("set_static_btn")
-        self.set_static_btn.setFixedSize(80, 30)
+        self.set_static_btn.setFixedSize(90, 30)
         
         self.set_dhcp_btn = QPushButton("🔄 DHCP")
         self.set_dhcp_btn.setObjectName("set_dhcp_btn")
@@ -242,7 +242,7 @@ class AdapterInfoPanel(QWidget):
             lambda: self.disable_adapter.emit(self._get_current_adapter_friendly_name())
         )
         self.set_static_btn.clicked.connect(
-            lambda: self.set_static_ip.emit(self._get_current_adapter_friendly_name())
+            lambda: self.modify_mac_address.emit(self._get_current_adapter_friendly_name())
         )
         self.set_dhcp_btn.clicked.connect(
             lambda: self.set_dhcp.emit(self._get_current_adapter_friendly_name())
@@ -279,8 +279,23 @@ class AdapterInfoPanel(QWidget):
             adapter_names (list): 网卡名称列表
             name_mapping (dict): 描述到友好名称的映射字典
         """
-        self.adapter_combo.clear()
-        self.adapter_combo.addItems(adapter_names)
+        # 记住当前选中的网卡
+        current_selection = self.adapter_combo.currentText()
+        
+        # 临时阻塞信号，避免UI更新时触发adapter_selected信号导致无限循环
+        self.adapter_combo.blockSignals(True)
+        try:
+            self.adapter_combo.clear()
+            self.adapter_combo.addItems(adapter_names)
+            
+            # 恢复之前的选择（如果该网卡仍在列表中）
+            if current_selection and current_selection in adapter_names:
+                index = adapter_names.index(current_selection)
+                self.adapter_combo.setCurrentIndex(index)
+                
+        finally:
+            # 恢复信号，确保用户后续操作能正常触发事件
+            self.adapter_combo.blockSignals(False)
         
         # 更新映射关系
         if name_mapping:

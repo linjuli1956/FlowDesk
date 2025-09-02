@@ -78,11 +78,11 @@ logger.debug(f"可用服务类数量: {len(__all__)}")
 对于现有代码，推荐的导入方式：
 ```python
 # 推荐：使用兼容门面（完全向后兼容）
-from flowdesk.services.network import NetworkService
+# from flowdesk.services.network import NetworkService
 network_service = NetworkService()
 
 # 高级：直接使用专业服务（需要手动协调）
-from flowdesk.services.network import (
+# from flowdesk.services.network import (
     AdapterDiscoveryService,
     AdapterInfoService,
     NetworkUICoordinatorService

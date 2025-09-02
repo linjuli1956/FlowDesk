@@ -116,10 +116,11 @@ class StatusBarService(QObject):
             if auto_clear:
                 QTimer.singleShot(clear_delay, lambda: self._clear_user_action())
                 
-            self.logger.debug(f"用户操作状态已更新: {action}")
+            # 临时禁用日志避免递归错误
+            # self.logger.debug(f"用户操作状态已更新: {action}")
             
         except Exception as e:
-            self.logger.error(f"更新用户操作状态失败: {str(e)}")
+            print(f"更新用户操作状态失败: {str(e)}")
     
     def set_ready_status(self):
         """设置就绪状态"""
@@ -186,10 +187,11 @@ class StatusBarService(QObject):
                 clear_delay=clear_delay
             )
             
-            self.logger.debug(f"状态已设置: {status_text}")
+            # 临时禁用日志避免递归错误
+            # self.logger.debug(f"状态已设置: {status_text}")
             
         except Exception as e:
-            self.logger.error(f"设置状态失败: {str(e)}")
+            print(f"设置状态失败: {str(e)}")
             # 回退到基本状态显示
             self.update_user_action("⚠️ 状态更新失败")
     
@@ -201,7 +203,8 @@ class StatusBarService(QObject):
             new_status: 新的状态信息
         """
         self._current_status = new_status
-        self.logger.debug(f"🚀 StatusBarService发射status_updated信号: {new_status.user_action}")
+        # 临时禁用日志避免递归错误
+        # self.logger.debug(f"StatusBarService发射status_updated信号: {new_status.user_action}")
         self.status_updated.emit(new_status)
     
     def _restore_ready_status(self):

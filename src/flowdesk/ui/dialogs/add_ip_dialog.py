@@ -28,7 +28,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtGui import QFont
-from flowdesk.utils.logger import get_logger
+from ...utils.logger import get_logger
 
 from ..widgets.validators import IPAddressValidator, SubnetMaskValidator
 from .validation_error_dialog import ValidationErrorDialog

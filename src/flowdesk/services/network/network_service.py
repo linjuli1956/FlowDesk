@@ -225,6 +225,9 @@ class NetworkService(NetworkServiceBase):
         
         这是MainWindow初始化时调用的关键方法，负责启动网卡发现流程。
         委托给UI协调器执行完整的网卡获取和信号发射逻辑。
+        
+        Returns:
+            List[AdapterInfo]: 网卡信息列表，如果获取失败返回空列表
         """
         try:
             self._log_operation_start("获取所有网卡信息")
@@ -232,8 +235,12 @@ class NetworkService(NetworkServiceBase):
             # 委托给UI协调器执行完整的网卡列表刷新流程
             self._ui_coordinator.refresh_adapters_list()
             
+            # 返回当前缓存的网卡列表，确保不返回None
+            return self._adapters.copy() if self._adapters else []
+            
         except Exception as e:
             self._log_operation_error("获取所有网卡信息", e)
+            return []  # 异常时返回空列表而不是None
     
     def copy_adapter_info(self):
         """
@@ -467,9 +474,27 @@ class NetworkService(NetworkServiceBase):
         获取当前选中的网卡ID
         
         Returns:
-            Optional[str]: 当前网卡ID，未选择时返回None
+            Optional[str]: 当前选中的网卡GUID，未选中时返回None
         """
         return self._current_adapter_id
+    
+    def get_current_adapter(self) -> Optional[Dict[str, Any]]:
+        """
+        获取当前选中网卡的详细信息
+        
+        Returns:
+            Optional[Dict[str, Any]]: 当前选中网卡的信息字典，未选中时返回None
+        """
+        try:
+            if not self._current_adapter_id:
+                return None
+                
+            # 委托给UI协调器获取当前网卡信息
+            return self._ui_coordinator.get_current_adapter_info()
+            
+        except Exception as e:
+            self._log_operation_error("获取当前网卡信息", e)
+            return None
     
     # endregion
     

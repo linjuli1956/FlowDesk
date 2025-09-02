@@ -357,8 +357,8 @@ class IPConfigPanel(QWidget):
             'ip_address': ip_address,
             'subnet_mask': subnet_mask,
             'gateway': gateway,
-            'primary_dns': primary_dns,
-            'secondary_dns': secondary_dns,
+            'dns_primary': primary_dns,
+            'dns_secondary': secondary_dns,
             'adapter': current_adapter  # 添加网卡信息
         }
         self.ip_config_applied.emit(config)
@@ -419,6 +419,19 @@ class IPConfigPanel(QWidget):
         
         获取额外IP列表中勾选的项目并发射信号。
         """
+        # 获取勾选的IP列表
+        checked_ips = []
+        for i in range(self.extra_ip_list.count()):
+            item = self.extra_ip_list.item(i)
+            if item.checkState() == Qt.Checked:
+                checked_ips.append(item.text())
+        
+        # 如果没有勾选任何IP，提示用户
+        if not checked_ips:
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.information(self, "提示", "请先勾选要删除的IP地址")
+            return
+            
         # 获取父容器的网卡选择信息
         parent_tab = self.parent()
         if hasattr(parent_tab, 'adapter_info_panel') and hasattr(parent_tab.adapter_info_panel, 'adapter_combo'):
@@ -426,11 +439,6 @@ class IPConfigPanel(QWidget):
         else:
             current_adapter = ''
             
-        checked_ips = []
-        for i in range(self.extra_ip_list.count()):
-            item = self.extra_ip_list.item(i)
-            if item.checkState() == Qt.Checked:
-                checked_ips.append(item.text())
         self.remove_selected_ips.emit(current_adapter, checked_ips)
     
     def update_ip_config_inputs(self, ip_config_info):

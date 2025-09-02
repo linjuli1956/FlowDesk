@@ -461,20 +461,26 @@ QPushButton:disabled {
         stop:0 #dc2626, stop:1 #b91c1c);
 }
 
-/* === 设置静态IP按钮 - 橙色渐变 === */
+/* === 修改MAC按钮 - 青色渐变，体现网络硬件配置的专业属性 === */
+/*
+ * 功能说明：专门用于修改网卡MAC地址的操作按钮
+ * 设计理念：使用青色渐变体现网络硬件层面的技术操作特性
+ * 色彩语义：青色代表技术、精确、硬件配置等专业属性
+ * 架构原则：遵循Claymorphism设计风格，提供现代化的视觉体验
+ */
 #set_static_btn {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #fbbf24, stop:1 #f59e0b);
+        stop:0 #22d3ee, stop:1 #06b6d4);  /* 青色渐变：浅青→深青 */
 }
 
 #set_static_btn:hover {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #f59e0b, stop:1 #d97706);
+        stop:0 #06b6d4, stop:1 #0891b2);  /* 悬停时加深：深青→更深青 */
 }
 
 #set_static_btn:pressed {
     background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-        stop:0 #d97706, stop:1 #b45309);
+        stop:0 #0891b2, stop:1 #0e7490);  /* 按下时最深：更深青→最深青 */
 }
 
 /* === 设置DHCP按钮 - 橙色渐变 === */

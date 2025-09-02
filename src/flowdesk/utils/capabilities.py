@@ -33,8 +33,8 @@ from typing import Dict, Any, Optional
 import logging
 
 # 获取日志记录器
-from flowdesk.utils.logger import get_logger
-from flowdesk.models import (
+from .logger import get_logger
+from ..models import (
     SystemCapabilities, PlatformInfo, PythonVersionInfo, 
     WindowsVersionInfo, NetworkCapabilities, HardwareMonitorCapabilities
 )

@@ -40,7 +40,7 @@ class NetworkConfigTab(QWidget):
     apply_ip_config = pyqtSignal(dict)  # 应用IP配置信号
     enable_adapter = pyqtSignal(str)    # 启用网卡信号
     disable_adapter = pyqtSignal(str)   # 禁用网卡信号
-    set_static_ip = pyqtSignal(str)     # 设置静态IP信号
+    modify_mac_address = pyqtSignal(str)     # 修改MAC地址信号
     set_dhcp = pyqtSignal(str)          # 设置DHCP信号
     copy_adapter_info = pyqtSignal()    # 复制网卡信息信号
     add_extra_ip = pyqtSignal(str, str) # 添加额外IP信号
@@ -159,7 +159,7 @@ class NetworkConfigTab(QWidget):
         self.adapter_info_panel.refresh_adapters.connect(self.refresh_adapters.emit)
         self.adapter_info_panel.enable_adapter.connect(self.enable_adapter.emit)
         self.adapter_info_panel.disable_adapter.connect(self.disable_adapter.emit)
-        self.adapter_info_panel.set_static_ip.connect(self.set_static_ip.emit)
+        self.adapter_info_panel.modify_mac_address.connect(self.modify_mac_address.emit)
         self.adapter_info_panel.set_dhcp.connect(self.set_dhcp.emit)
         self.adapter_info_panel.copy_adapter_info.connect(self.copy_adapter_info.emit)
         

@@ -11,7 +11,7 @@ from .adapter_status_analyzer import AdapterStatusAnalyzer
 from .adapter_config_parser import AdapterConfigParser
 from .adapter_dns_enhancer import AdapterDnsEnhancer
 from .adapter_info_utils import get_interface_type
-from flowdesk.models import AdapterInfo
+from ...models import AdapterInfo
 
 
 class AdapterInfoRetriever(NetworkServiceBase):

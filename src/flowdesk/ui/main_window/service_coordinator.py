@@ -36,10 +36,28 @@ class ServiceCoordinator:
     
     def initialize_services(self):
         """
-        初始化服务层组件并连接信号槽
+        初始化所有服务层组件（仅创建服务实例，不连接信号）
         
-        创建NetworkService实例，连接UI层与服务层的信号槽通信，
-        实现网络配置Tab的核心功能逻辑。
+        拆包后需要延迟注入：先创建服务实例，等network_event_handler设置完成后
+        再通过inject_and_connect()方法连接信号并启动服务功能。
+        """
+        self._initialize_services_only()
+    
+    def inject_and_connect(self):
+        """
+        延迟注入接口：在network_event_handler设置network_service后调用
+        
+        连接所有信号槽并启动服务功能，确保事件处理器已准备就绪。
+        """
+        self._connect_all_signals()
+        self._start_services()
+    
+    def _initialize_services_only(self):
+        """
+        仅初始化服务实例，不连接信号不启动功能
+        
+        创建NetworkService实例等服务组件，但不触发任何可能发射信号的操作。
+        这样可以确保在network_event_handler设置network_service前不会触发事件。
         """
         try:
             # 创建网络服务实例
@@ -58,24 +76,44 @@ class ServiceCoordinator:
             self.main_window.network_service = self.network_service
             self.main_window.status_bar_service = self.status_bar_service
             
+        except Exception as e:
+            error_msg = f"服务层初始化失败: {str(e)}"
+            self.logger.error(error_msg)
+            # 服务初始化失败不影响UI显示，但功能会受限
+    
+    def _connect_all_signals(self):
+        """
+        连接所有信号槽，在network_service设置完成后安全执行
+        """
+        try:
             # 连接网络配置Tab的信号槽
             self._connect_network_config_signals()
             
             # 连接状态栏的信号槽
             self._connect_status_bar_signals()
             
-            # 启动初始化：自动获取网卡信息
+            self.logger.info("所有信号连接完成")
+            
+        except Exception as e:
+            error_msg = f"信号连接失败: {str(e)}"
+            self.logger.error(error_msg)
+    
+    def _start_services(self):
+        """
+        启动服务功能，在信号连接完成后安全触发初始数据加载
+        """
+        try:
+            # 现在可以安全地触发网卡数据加载，因为事件处理器已准备就绪
             self.network_service.get_all_adapters()
             
             # 启动状态栏初始化：显示应用启动状态
             self.status_bar_service.set_status("🚀 应用启动完成", auto_clear_seconds=3)
             
-            self.logger.info("所有服务核心功能连接完成")
+            self.logger.info("所有服务核心功能启动完成")
             
         except Exception as e:
-            error_msg = f"服务层初始化失败: {str(e)}"
+            error_msg = f"服务启动失败: {str(e)}"
             self.logger.error(error_msg)
-            # 服务初始化失败不影响UI显示，但功能会受限
     
     def _connect_network_config_signals(self):
         """
@@ -140,9 +178,9 @@ class ServiceCoordinator:
             self.network_service.set_dhcp_mode
         )
         
-        # 设置静态IP：UI静态IP按钮 -> 事件处理器处理（复用现有逻辑）
-        self.main_window.network_config_tab.set_static_ip.connect(
-            event_handler._on_set_static_ip if event_handler else self._fallback_set_static_ip
+        # 修改MAC地址：UI修改MAC按钮 -> 事件处理器处理
+        self.main_window.network_config_tab.modify_mac_address.connect(
+            self._fallback_modify_mac_address
         )
         
         # === 服务层信号连接到UI更新方法 ===
@@ -372,10 +410,10 @@ class ServiceCoordinator:
         self.logger.warning("事件处理器未初始化，使用回退方法处理IP删除")
         self.logger.debug(f"批量删除IP成功: {success_message}")
     
-    def _fallback_set_static_ip(self, adapter_name):
-        """设置静态IP的回退处理"""
-        self.logger.warning("事件处理器未初始化，使用回退方法处理静态IP设置")
-        self.logger.debug(f"设置静态IP请求: {adapter_name}")
+    def _fallback_modify_mac_address(self, adapter_name):
+        """修改MAC地址的回退处理"""
+        self.logger.warning("事件处理器未初始化，使用回退方法处理MAC地址修改")
+        self.logger.debug(f"修改MAC地址请求: {adapter_name}")
         # 这里可以添加基本的静态IP设置逻辑或显示提示
     
     def _fallback_operation_completed(self, success, message, operation):

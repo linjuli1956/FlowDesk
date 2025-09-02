@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional
 
 from .network_service_base import NetworkServiceBase
 from .adapter_info_retriever import AdapterInfoRetriever
-from flowdesk.models import AdapterInfo
+from ...models import AdapterInfo
 
 
 class AdapterInfoService(NetworkServiceBase):

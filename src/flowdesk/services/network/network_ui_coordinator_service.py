@@ -165,8 +165,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
                 # 发射网卡列表更新信号
                 self.adapters_updated.emit(adapters)
                 
-                # 自动选中第一个网卡（参照源文件逻辑）
-                # 由于列表已经按优先级排序，第一个网卡就是最佳选择
+                # 自动选择第一个网卡（已修复UI更新时的信号循环问题）
                 if adapters and not self._current_adapter_id:
                     self.logger.debug(f"自动选择第一个网卡: {adapters[0].friendly_name}")
                     self.set_current_adapter(adapters[0].id)
@@ -252,7 +251,7 @@ class NetworkUICoordinatorService(NetworkServiceBase):
             # 如果有详细信息，处理IP配置和额外IP信息
             if detailed_info:
                 # 创建IP配置数据
-                from flowdesk.models import IPConfigInfo
+                from ...models import IPConfigInfo
                 ip_config_data = IPConfigInfo(
                     adapter_id=self._current_adapter_id,
                     ip_address=detailed_info.get_primary_ip() or '',

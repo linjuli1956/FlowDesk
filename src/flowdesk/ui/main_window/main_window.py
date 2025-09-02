@@ -73,12 +73,14 @@ class MainWindow(MainWindowBase):
             # 初始化UI状态管理器：负责界面状态的统一管理
             self.ui_state_manager = UIStateManager(self)
             
-            # 执行服务初始化：启动所有服务并建立信号连接
-            # 这必须在所有UI组件初始化完成后执行，避免信号发射时组件未就绪
+            # 执行服务初始化：仅创建服务实例，不连接信号
             self.service_coordinator.initialize_services()
             
             # 设置network_event_handler的network_service引用并连接信号
             self.network_event_handler.set_network_service(self.service_coordinator.network_service)
+            
+            # 延迟注入：连接信号并启动服务功能
+            self.service_coordinator.inject_and_connect()
             
             self.logger.info("所有功能组件初始化完成")
             
