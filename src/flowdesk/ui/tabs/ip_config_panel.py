@@ -289,22 +289,76 @@ class IPConfigPanel(QWidget):
         """
         收集IP配置信息并发射信号
         
+        增强版本：在发射信号前进行输入验证，如果发现无效输入则显示用户友好的错误提示。
         从输入框收集所有IP配置信息，组装成字典格式发射给服务层。
         需要通过父容器获取当前选中的网卡信息。
         """
-        # 获取父容器的网卡选择信息
+        # 导入验证工具和错误对话框
+        from ...utils.ip_validation_utils import validate_ip_address, validate_subnet_mask
+        from ..dialogs.validation_error_dialog import ValidationErrorDialog
+        
+        # 获取输入值
+        ip_address = self.ip_address_input.text().strip()
+        subnet_mask = self.subnet_mask_input.text().strip()
+        gateway = self.gateway_input.text().strip()
+        primary_dns = self.primary_dns_input.text().strip()
+        secondary_dns = self.secondary_dns_input.text().strip()
+        
+        # 验证必填字段：IP地址和子网掩码
+        if not ip_address:
+            error_dialog = ValidationErrorDialog(self)
+            error_dialog.show_ip_address_error("", 10)
+            return
+            
+        if not subnet_mask:
+            error_dialog = ValidationErrorDialog(self)
+            error_dialog.show_subnet_mask_error("", 10)
+            return
+        
+        # 验证IP地址格式
+        if not validate_ip_address(ip_address):
+            error_dialog = ValidationErrorDialog(self)
+            error_dialog.show_ip_address_error(ip_address, 10)
+            return
+        
+        # 验证子网掩码格式 - 使用智能验证支持22、24等简写格式
+        from ...utils.ip_validation_utils import smart_validate_subnet_mask
+        if not smart_validate_subnet_mask(subnet_mask):
+            error_dialog = ValidationErrorDialog(self)
+            error_dialog.show_subnet_mask_error(subnet_mask, 0)
+            return
+        
+        # 验证网关地址（如果提供）
+        if gateway and not validate_ip_address(gateway):
+            error_dialog = ValidationErrorDialog(self)
+            error_dialog.show_ip_address_error(gateway, 10)
+            return
+        
+        # 验证DNS服务器地址（如果提供）
+        if primary_dns and not validate_ip_address(primary_dns):
+            error_dialog = ValidationErrorDialog(self)
+            error_dialog.show_ip_address_error(primary_dns, 10)
+            return
+            
+        if secondary_dns and not validate_ip_address(secondary_dns):
+            error_dialog = ValidationErrorDialog(self)
+            error_dialog.show_ip_address_error(secondary_dns, 10)
+            return
+        
+        # 所有验证通过，获取父容器的网卡选择信息
         parent_tab = self.parent()
         if hasattr(parent_tab, 'adapter_info_panel') and hasattr(parent_tab.adapter_info_panel, 'adapter_combo'):
             current_adapter = parent_tab.adapter_info_panel.adapter_combo.currentText()
         else:
             current_adapter = ''
         
+        # 组装配置信息并发射信号
         config = {
-            'ip_address': self.ip_address_input.text().strip(),
-            'subnet_mask': self.subnet_mask_input.text().strip(),
-            'gateway': self.gateway_input.text().strip(),
-            'primary_dns': self.primary_dns_input.text().strip(),
-            'secondary_dns': self.secondary_dns_input.text().strip(),
+            'ip_address': ip_address,
+            'subnet_mask': subnet_mask,
+            'gateway': gateway,
+            'primary_dns': primary_dns,
+            'secondary_dns': secondary_dns,
             'adapter': current_adapter  # 添加网卡信息
         }
         self.ip_config_applied.emit(config)

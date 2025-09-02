@@ -31,6 +31,7 @@ from PyQt5.QtGui import QFont
 from flowdesk.utils.logger import get_logger
 
 from ..widgets.validators import IPAddressValidator, SubnetMaskValidator
+from .validation_error_dialog import ValidationErrorDialog
 
 
 class AddIPDialog(QDialog):
@@ -78,6 +79,8 @@ class AddIPDialog(QDialog):
         # 初始化日志记录器
         self.logger = get_logger(self.__class__.__name__)
         
+        # 初始化验证错误提示对话框
+        self.validation_error_dialog = None
         
         # 设置对话框基本属性
         self._setup_dialog_properties()
@@ -232,12 +235,17 @@ class AddIPDialog(QDialog):
         - 子网掩码输入框：使用SubnetMaskValidator支持多种格式验证
         """
         # 创建验证器实例
-        ip_validator = IPAddressValidator()
-        mask_validator = SubnetMaskValidator()
+        self.ip_validator = IPAddressValidator()
+        self.mask_validator = SubnetMaskValidator()
         
         # 为输入框设置验证器，启用实时验证
-        self.ip_input.setValidator(ip_validator)
-        self.mask_input.setValidator(mask_validator)
+        self.ip_input.setValidator(self.ip_validator)
+        self.mask_input.setValidator(self.mask_validator)
+        
+        # 注释：移除实时验证错误信号连接，改为仅在最终验证时触发错误提示
+        # 这样用户可以自由输入中间状态的内容（如255.255.251.），不会被实时阻止
+        # self.ip_validator.validation_error.connect(self._show_ip_validation_error)
+        # self.mask_validator.validation_error.connect(self._show_mask_validation_error)
 
     def _connect_signals(self):
         """
@@ -317,15 +325,12 @@ class AddIPDialog(QDialog):
         
         # 通过验证器检查格式正确性
         # 验证器已经在输入过程中进行了实时验证，这里主要确保最终状态
-        ip_validator = IPAddressValidator()
-        mask_validator = SubnetMaskValidator()
-        
-        ip_state, _, _ = ip_validator.validate(ip_address, 0)
-        mask_state, _, _ = mask_validator.validate(subnet_mask, 0)
+        ip_state, _, _ = self.ip_validator.validate(ip_address, 0)
+        mask_state, _, _ = self.mask_validator.validate(subnet_mask, 0)
         
         # 只有当两个字段都处于Acceptable状态时才继续
-        if (ip_state == ip_validator.Acceptable and 
-            mask_state == mask_validator.Acceptable):
+        if (ip_state == self.ip_validator.Acceptable and 
+            mask_state == self.mask_validator.Acceptable):
             
             # 发射信号，携带用户输入的IP配置数据
             self.ip_added.emit(ip_address, subnet_mask)
@@ -333,11 +338,14 @@ class AddIPDialog(QDialog):
             # 接受对话框并关闭
             self.accept()
         else:
-            # 如果验证失败，设置焦点到有问题的字段
-            if ip_state != ip_validator.Acceptable:
+            # 如果验证失败，设置焦点到有问题的字段并显示错误提示
+            if ip_state != self.ip_validator.Acceptable:
                 self.ip_input.setFocus()
-            else:
+                self._show_ip_validation_error(ip_address)
+            elif mask_state != self.mask_validator.Acceptable:
+                # 子网掩码验证失败（包括Intermediate状态的无效子网掩码）
                 self.mask_input.setFocus()
+                self._show_mask_validation_error(subnet_mask)
 
     def get_ip_config(self):
         """
@@ -354,3 +362,49 @@ class AddIPDialog(QDialog):
             self.ip_input.text().strip(),
             self.mask_input.text().strip()
         )
+    
+    def _show_ip_validation_error(self, invalid_input: str):
+        """
+        显示IP地址验证错误提示
+        
+        作用说明：
+        当用户输入无效的IP地址格式时，显示用户友好的错误提示对话框。
+        采用非阻塞式设计，不影响用户继续操作。
+        
+        参数说明：
+            invalid_input (str): 用户输入的无效IP地址
+        """
+        # 如果已有错误对话框在显示，先关闭它
+        if self.validation_error_dialog:
+            self.validation_error_dialog.close()
+        
+        # 创建新的验证错误提示对话框
+        self.validation_error_dialog = ValidationErrorDialog(self)
+        
+        # 显示IP地址格式错误提示
+        self.validation_error_dialog.show_ip_address_error(invalid_input, auto_close_seconds=8)
+        
+        self.logger.info(f"显示IP地址验证错误提示: {invalid_input}")
+    
+    def _show_mask_validation_error(self, invalid_input: str):
+        """
+        显示子网掩码验证错误提示
+        
+        作用说明：
+        当用户输入无效的子网掩码格式时，显示用户友好的错误提示对话框。
+        提供详细的格式说明和正确示例，帮助用户快速纠正输入错误。
+        
+        参数说明：
+            invalid_input (str): 用户输入的无效子网掩码
+        """
+        # 如果已有错误对话框在显示，先关闭它
+        if self.validation_error_dialog:
+            self.validation_error_dialog.close()
+        
+        # 创建新的验证错误提示对话框
+        self.validation_error_dialog = ValidationErrorDialog(self)
+        
+        # 显示子网掩码格式错误提示
+        self.validation_error_dialog.show_subnet_mask_error(invalid_input, auto_close_seconds=10)
+        
+        self.logger.info(f"显示子网掩码验证错误提示: {invalid_input}")

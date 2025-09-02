@@ -1,0 +1,94 @@
+/* ValidationErrorDialog Claymorphism 样式 */
+
+/* 主对话框容器 */
+QDialog#validation_error_dialog {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1, 
+                stop:0 #f8f9fa, stop:1 #e9ecef);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* 错误图标样式 */
+QLabel#error_icon {
+    font-size: 24px;
+    color: #e74c3c;
+    background: transparent;
+    border: none;
+    padding: 8px;
+}
+
+/* 错误标题样式 */
+QLabel#error_title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c3e50;
+    background: transparent;
+    border: none;
+    padding: 4px 8px;
+}
+
+/* 错误描述文本区域 */
+QTextEdit#error_description {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(52, 152, 219, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 13px;
+    color: #2c3e50;
+    selection-background-color: rgba(52, 152, 219, 0.3);
+}
+
+/* 格式示例文本区域 */
+QTextEdit#format_examples {
+    background: rgba(46, 204, 113, 0.1);
+    border: 1px solid rgba(46, 204, 113, 0.3);
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 13px;
+    color: #27ae60;
+    selection-background-color: rgba(46, 204, 113, 0.2);
+}
+
+/* 关闭按钮样式 */
+QPushButton#close_error_dialog_btn {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #3498db, stop:1 #2980b9);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    min-width: 80px;
+    min-height: 32px;
+}
+
+QPushButton#close_error_dialog_btn:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #5dade2, stop:1 #3498db);
+    transform: translateY(-1px);
+}
+
+QPushButton#close_error_dialog_btn:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #2980b9, stop:1 #21618c);
+    transform: translateY(1px);
+}
+
+/* 倒计时标签样式 */
+QLabel#close_timer_label {
+    color: #7f8c8d;
+    font-size: 12px;
+    background: transparent;
+    border: none;
+    padding: 4px;
+}
+
+/* 分隔线样式 */
+QFrame[frameShape="4"] {
+    background: rgba(189, 195, 199, 0.5);
+    border: none;
+    max-height: 1px;
+    margin: 8px 0px;
+}

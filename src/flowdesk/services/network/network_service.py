@@ -503,7 +503,7 @@ class NetworkService(NetworkServiceBase):
             dict: 验证结果字典，包含is_valid(bool)和error_message(str)字段
         """
         try:
-            from ...utils.network_utils import validate_ip_address, validate_subnet_mask, calculate_network_info
+            from ...utils.network_utils import validate_ip_address, smart_validate_subnet_mask, calculate_network_info
             
             # 第一层验证：必填字段检查
             if not ip_address or not subnet_mask:
@@ -519,8 +519,8 @@ class NetworkService(NetworkServiceBase):
                     'error_message': f'IP地址格式无效：{ip_address}\n请输入有效的IPv4地址，如：192.168.1.100'
                 }
             
-            # 第三层验证：子网掩码格式检查
-            if not validate_subnet_mask(subnet_mask):
+            # 第三层验证：子网掩码格式检查 - 使用智能验证支持简写格式
+            if not smart_validate_subnet_mask(subnet_mask):
                 return {
                     'is_valid': False,
                     'error_message': f'子网掩码格式无效：{subnet_mask}\n请输入有效的子网掩码，如：255.255.255.0 或 /24'

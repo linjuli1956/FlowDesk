@@ -403,6 +403,8 @@ class NetworkEventHandler:
         这个方法在用户通过确认弹窗确认修改后被调用，执行实际的IP配置应用操作。
         将确认逻辑与实际应用逻辑分离，符合单一职责原则。
         
+        增强版本：在实际应用前进行最终验证，如果发现无效输入则显示用户友好的错误提示。
+        
         Args:
             adapter_id: 网卡标识符
             ip_address: IP地址
@@ -413,6 +415,43 @@ class NetworkEventHandler:
             adapter_display_name: 网卡显示名称（用于日志）
         """
         try:
+            # 最终验证：在应用配置前验证所有输入的有效性
+            from ...utils.ip_validation_utils import validate_ip_address, smart_validate_subnet_mask
+            from ..dialogs.validation_error_dialog import ValidationErrorDialog
+            
+            # 验证IP地址
+            if not validate_ip_address(ip_address):
+                self.logger.warning(f"最终验证发现无效IP地址: {ip_address}")
+                error_dialog = ValidationErrorDialog("ip_address", ip_address, self.main_window)
+                error_dialog.show()
+                return
+            
+            # 验证子网掩码 - 使用智能验证支持简写格式
+            if not smart_validate_subnet_mask(subnet_mask):
+                self.logger.warning(f"最终验证发现无效子网掩码: {subnet_mask}")
+                error_dialog = ValidationErrorDialog("subnet_mask", subnet_mask, self.main_window)
+                error_dialog.show()
+                return
+            
+            # 验证网关地址（如果提供）
+            if gateway and not validate_ip_address(gateway):
+                self.logger.warning(f"最终验证发现无效网关地址: {gateway}")
+                error_dialog = ValidationErrorDialog("ip_address", gateway, self.main_window)
+                error_dialog.show()
+                return
+            
+            # 验证DNS服务器地址（如果提供）
+            if primary_dns and not validate_ip_address(primary_dns):
+                self.logger.warning(f"最终验证发现无效主DNS地址: {primary_dns}")
+                error_dialog = ValidationErrorDialog("ip_address", primary_dns, self.main_window)
+                error_dialog.show()
+                return
+                
+            if secondary_dns and not validate_ip_address(secondary_dns):
+                self.logger.warning(f"最终验证发现无效辅助DNS地址: {secondary_dns}")
+                error_dialog = ValidationErrorDialog("ip_address", secondary_dns, self.main_window)
+                error_dialog.show()
+                return
             # 在状态栏显示IP配置应用状态
             if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
                 self.main_window.service_coordinator.status_bar_service.set_status(

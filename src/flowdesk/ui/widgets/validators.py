@@ -16,17 +16,18 @@ FlowDesk 自定义验证器模块
 """
 
 from PyQt5.QtGui import QValidator
+from PyQt5.QtCore import pyqtSignal, QObject
 from ...utils.network_utils import validate_subnet_mask
 
 
 class IPAddressValidator(QValidator):
     """
-    IP地址实时输入验证器
+    IP地址实时输入验证器（增强版）
 
     作用说明：
     这是一个高度智能的IP地址验证器，它能够在用户输入的每一个瞬间，实时判断
-    输入内容是否符合IPv4地址的格式规范。其核心目标是“实时禁止”而非“事后提醒”，
-    从根本上杜绝无效输入的可能性，提供流畅的用户体验。
+    输入内容是否符合IPv4地址的格式规范。其核心目标是"实时禁止"而非"事后提醒"，
+    从根本上杜绝无效输入的可能性，提供流畅的用户体验。增强版本添加了错误提示信号机制。
 
     实现原理：
     继承QValidator并重写其validate方法。此方法会在输入框内容每次发生变化时
@@ -36,11 +37,18 @@ class IPAddressValidator(QValidator):
     - Intermediate: 输入内容是合法的中间状态（例如 "192.168."），允许用户继续输入。
     - Acceptable: 输入内容是一个完整且合法的IP地址（例如 "192.168.1.1"）。
 
+    信号接口：
+    - validation_error: 当输入验证失败时发射，携带错误输入内容
+
     使用示例：
         ip_input = QLineEdit()
         ip_validator = IPAddressValidator()
         ip_input.setValidator(ip_validator)
+        ip_validator.validation_error.connect(show_error_dialog)
     """
+    
+    # 验证错误信号
+    validation_error = pyqtSignal(str)  # 携带无效输入内容
 
     def validate(self, input_text: str, pos: int) -> tuple:
         """
@@ -62,6 +70,8 @@ class IPAddressValidator(QValidator):
 
         # 检查段数是否超过4个，超过则无效
         if len(octets) > 4:
+            # 发射验证错误信号用于UI提示
+            self.validation_error.emit(input_text)
             return (QValidator.Invalid, input_text, pos)
 
         # 逐个检查每个段的有效性
@@ -70,18 +80,24 @@ class IPAddressValidator(QValidator):
             if not octet:
                 # 如果空段不是最后一段（例如 "192..1.1"），则无效
                 if i < len(octets) - 1:
+                    # 发射验证错误信号用于UI提示
+                    self.validation_error.emit(input_text)
                     return (QValidator.Invalid, input_text, pos)
                 # 如果是最后一段为空（例如 "192.168.1."），是合法的中间状态
                 continue
 
             # 检查段内是否只包含数字
             if not octet.isdigit():
+                # 发射验证错误信号用于UI提示
+                self.validation_error.emit(input_text)
                 return (QValidator.Invalid, input_text, pos)
 
             # 检查段的数值是否在0-255之间
             # 这是实现“实时禁止”的核心，例如输入“257”时，
             # 当输入'7'后，int(octet)会变成257，判断>255，返回Invalid
             if int(octet) > 255:
+                # 发射验证错误信号用于UI提示
+                self.validation_error.emit(input_text)
                 return (QValidator.Invalid, input_text, pos)
 
         # 检查IP地址是否是一个完整且合法的格式
@@ -95,23 +111,32 @@ class IPAddressValidator(QValidator):
 
 class SubnetMaskValidator(QValidator):
     """
-    子网掩码实时输入验证器
+    子网掩码实时输入验证器（增强版）
 
     作用说明：
     专门用于验证子网掩码输入的验证器，支持点分十进制格式（如255.255.255.0）
     和CIDR格式（如/24）两种输入方式。实现实时输入阻止，确保用户只能输入
-    符合子网掩码规范的内容。
+    符合子网掩码规范的内容。增强版本添加了错误提示信号机制。
 
     验证规则：
     1. 点分十进制格式：每段数值0-255，且必须是有效的子网掩码（连续的1后跟连续的0）
     2. CIDR格式：/0 到 /32 的有效前缀长度
-    3. 实时阻止无效字符和超出范围的数值
+    3. 纯数字CIDR：0 到 32 的有效前缀长度
+    4. 实时阻止无效字符和超出范围的数值
+    5. 当输入无效时发射错误信号用于UI提示
+
+    信号接口：
+    - validation_error: 当输入验证失败时发射，携带错误输入内容
 
     使用示例：
         mask_input = QLineEdit()
         mask_validator = SubnetMaskValidator()
         mask_input.setValidator(mask_validator)
+        mask_validator.validation_error.connect(show_error_dialog)
     """
+    
+    # 验证错误信号
+    validation_error = pyqtSignal(str)  # 携带无效输入内容
 
     def validate(self, input_text: str, pos: int) -> tuple:
         """
@@ -179,7 +204,9 @@ class SubnetMaskValidator(QValidator):
             if validate_subnet_mask(input_text):
                 return (QValidator.Acceptable, input_text, pos)
             else:
-                return (QValidator.Invalid, input_text, pos)
+                # 对于完整但无效的子网掩码，允许输入但标记为中间状态
+                # 错误提示将在最终验证时触发，而不是实时阻止输入
+                return (QValidator.Intermediate, input_text, pos)
 
         # 其他情况为中间状态
         return (QValidator.Intermediate, input_text, pos)

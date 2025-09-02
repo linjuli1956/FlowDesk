@@ -29,8 +29,14 @@ from .logger import get_logger, setup_logging, log_exception
 # 版本信息工具 - 状态栏必需
 from .version_utils import get_app_version, get_build_date, get_version_info, format_version_display
 
+# 网络工具模块 - 拆分后的专业模块
+from . import ip_validation_utils
+from . import dns_utils
+from . import network_calculation_utils
+
 __all__ = [
     'get_logger', 'setup_logging', 'log_exception',
     'resource_path', 'get_app_data_dir', 'get_logs_dir',
-    'get_app_version', 'get_build_date', 'get_version_info', 'format_version_display'
+    'get_app_version', 'get_build_date', 'get_version_info', 'format_version_display',
+    'ip_validation_utils', 'dns_utils', 'network_calculation_utils'
 ]

@@ -184,10 +184,14 @@ class IPConfigurationService(NetworkServiceBase):
             bool: 配置操作的执行结果，True表示成功，False表示失败
         """
         try:
+            # 智能处理子网掩码格式，转换为netsh命令要求的点分十进制格式
+            from ...utils.ip_validation_utils import normalize_subnet_mask_for_netsh
+            normalized_mask = normalize_subnet_mask_for_netsh(subnet_mask)
+            
             # 构建Windows netsh命令的参数列表
             cmd = [
                 'netsh', 'interface', 'ipv4', 'set', 'address',
-                connection_name, 'static', ip_address, subnet_mask
+                connection_name, 'static', ip_address, normalized_mask
             ]
             
             # 条件性添加网关参数

@@ -42,6 +42,58 @@ class IPConfigConfirmation:
     new_dns_secondary: Optional[str]  # 允许为空
     dhcp_enabled: bool
     
+    def _get_smart_subnet_mask_display(self, original_mask: str, user_input: str) -> str:
+        """
+        生成智能子网掩码三段式转换显示
+        
+        Args:
+            original_mask: 原始子网掩码
+            user_input: 用户输入的子网掩码
+            
+        Returns:
+            str: 三段式转换显示文本
+        """
+        from ..utils.ip_validation_utils import (
+            subnet_mask_to_cidr, 
+            cidr_to_subnet_mask,
+            normalize_subnet_mask_for_netsh
+        )
+        
+        try:
+            # 获取原始掩码的CIDR值
+            original_cidr = ""
+            if original_mask and original_mask != "未设置":
+                cidr_val = subnet_mask_to_cidr(original_mask)
+                if cidr_val != -1:
+                    original_cidr = f"/{cidr_val}"
+            
+            # 判断用户输入的格式类型
+            user_input_clean = user_input.strip()
+            
+            if user_input_clean.isdigit():
+                # 用户输入纯数字格式 (如: 16)
+                cidr_val = int(user_input_clean)
+                converted_mask = cidr_to_subnet_mask(cidr_val)
+                return f"{original_mask} → <span style='color: #e67e22; font-weight: bold;'>{user_input_clean}</span> → <span style='color: #10b981; font-weight: bold;'>{converted_mask}</span>"
+                
+            elif user_input_clean.startswith('/'):
+                # 用户输入CIDR格式 (如: /16)
+                cidr_val = int(user_input_clean[1:])
+                converted_mask = cidr_to_subnet_mask(cidr_val)
+                return f"{original_mask} → <span style='color: #e67e22; font-weight: bold;'>{user_input_clean}</span> → <span style='color: #10b981; font-weight: bold;'>{converted_mask}</span>"
+                
+            else:
+                # 用户输入点分十进制格式 (如: 255.255.0.0)
+                cidr_val = subnet_mask_to_cidr(user_input_clean)
+                if cidr_val != -1:
+                    return f"{original_mask} → <span style='color: #e67e22; font-weight: bold;'>{user_input_clean}</span> → <span style='color: #10b981; font-weight: bold;'>/{cidr_val}</span>"
+                else:
+                    return f"{original_mask} → <span style='color: #10b981; font-weight: bold;'>{user_input_clean}</span>"
+                    
+        except (ValueError, TypeError):
+            # 转换失败，使用简单显示
+            return f"{original_mask} → <span style='color: #10b981; font-weight: bold;'>{user_input}</span>"
+
     def get_changes_summary(self) -> str:
         """
         生成配置变更摘要文本 - 显示所有配置项对比，带HTML格式和颜色
@@ -56,9 +108,11 @@ class IPConfigConfirmation:
         current_ip_display = self.current_ip or "未设置"
         changes.append(f'<span style="color: #2c3e50; font-size: 13px;">IP地址: {current_ip_display} </span><span style="color: #3b82f6; font-size: 15px; font-weight: bold;">→ {self.new_ip}</span>')
         
+        # 智能子网掩码显示 - 三段式转换
         subnet_changed = self.current_subnet_mask != self.new_subnet_mask
         current_subnet_display = self.current_subnet_mask or "未设置"
-        changes.append(f'<span style="color: #2c3e50; font-size: 13px;">子网掩码: {current_subnet_display} </span><span style="color: #10b981; font-size: 15px; font-weight: bold;">→ {self.new_subnet_mask}</span>')
+        smart_subnet_display = self._get_smart_subnet_mask_display(current_subnet_display, self.new_subnet_mask)
+        changes.append(f'<span style="color: #2c3e50; font-size: 13px;">子网掩码: {smart_subnet_display}</span>')
         
         current_gw = self.current_gateway or "未设置"
         new_gw = self.new_gateway or "未设置"
