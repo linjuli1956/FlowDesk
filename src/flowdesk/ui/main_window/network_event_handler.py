@@ -289,18 +289,21 @@ class NetworkEventHandler:
                 return
             
             # 🔥 关键修复：在任何验证之前先检查网卡状态并自动启用
-            self.logger.info(f"🔥 检查网卡状态 - 网卡: {target_adapter.friendly_name}, 状态: '{target_adapter.status}'")
-            adapter_disabled = (target_adapter.status == "已禁用" or 
-                              target_adapter.status == "Disabled" or
-                              target_adapter.status == "未连接" or
-                              target_adapter.status == "已断开连接" or
-                              target_adapter.status == "Disconnected" or
-                              "禁用" in target_adapter.status or
-                              "断开" in target_adapter.status)
+            # 获取最新的网卡状态，而不是使用缓存中的旧状态
+            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.adapter_status_service:
+                current_status, is_enabled, is_connected = self.main_window.service_coordinator.adapter_status_service.get_adapter_status(target_adapter.friendly_name)
+                self.logger.info(f"🔥 检查网卡状态 - 网卡: {target_adapter.friendly_name}, 最新状态: '{current_status}', 启用: {is_enabled}")
+                adapter_disabled = not is_enabled
+            else:
+                # 备用方案：使用缓存状态
+                self.logger.info(f"🔥 检查网卡状态 - 网卡: {target_adapter.friendly_name}, 缓存状态: '{target_adapter.status}'")
+                adapter_disabled = (target_adapter.status == "已禁用" or 
+                                  target_adapter.status == "Disabled" or
+                                  "禁用" in target_adapter.status)
             
             # 如果网卡禁用，先自动启用网卡
             if adapter_disabled:
-                self.logger.info(f"🔥 网卡 {target_adapter.friendly_name} 处于禁用/断开状态，立即启用网卡")
+                self.logger.info(f"🔥 网卡 {target_adapter.friendly_name} 处于禁用状态，需要先启用网卡")
                 
                 # 显示启用网卡的提示对话框
                 from PyQt5.QtWidgets import QMessageBox
@@ -419,7 +422,6 @@ class NetworkEventHandler:
             self.logger.debug(f"确认弹窗前网卡状态检查 - 网卡: {target_adapter.friendly_name}, 状态: '{target_adapter.status}'")
             adapter_disabled = (target_adapter.status == "已禁用" or 
                               target_adapter.status == "Disabled" or
-                              target_adapter.status == "未连接" or
                               "禁用" in target_adapter.status)
             
             # 如果网卡禁用，先自动启用网卡

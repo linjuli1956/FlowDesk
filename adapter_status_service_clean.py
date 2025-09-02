@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-网卡状态判断专用服务模块。这个文件在FlowDesk网络管理架构中扮演"状态检测器"角色，专门负责精确判断网络适配器的连接和管理状态。
-它解决了网卡状态信息不准确的问题，通过双重状态判断机制（netsh命令获取管理状态和连接状态，wmic状态码作为备用）确保状态判断的准确性。
-UI层依赖此服务提供的状态信息来正确显示网卡状态徽章和连接指示，其他网络服务通过此模块获得可靠的网卡可用性判断。该服务严格遵循单一职责原则，将复杂的状态判断逻辑完全封装。
+网卡状态判断专用服务模块 - 清理版本
 """
 from typing import Dict, Tuple
 
@@ -12,15 +10,6 @@ from .network_service_base import NetworkServiceBase
 class AdapterStatusService(NetworkServiceBase):
     """
     网络适配器状态判断服务 - 委托给AdapterStatusAnalyzer
-    
-    专门负责网络适配器状态精确判断的核心服务。
-    此服务实现了双重状态判断机制，确保状态信息的准确性。
-    
-    主要功能：
-    - 通过netsh命令获取网卡管理状态和连接状态
-    - 实现双重状态判断逻辑，区分启用状态和连接状态
-    - 提供wmic状态码作为备用状态判断方案
-    - 支持中英文Windows系统的状态解析
     """
     
     def __init__(self, parent=None):

@@ -5,6 +5,7 @@
 
 from ...utils.logger import get_logger
 from ...services import NetworkService, StatusBarService
+from ...services.network.adapter_status_service import AdapterStatusService
 
 
 class ServiceCoordinator:
@@ -31,6 +32,7 @@ class ServiceCoordinator:
         # 初始化服务层组件
         self.network_service = None
         self.status_bar_service = None
+        self.adapter_status_service = None
     
     def initialize_services(self):
         """
@@ -47,6 +49,10 @@ class ServiceCoordinator:
             # 创建状态栏服务实例
             self.status_bar_service = StatusBarService()
             self.logger.info("状态栏服务初始化完成")
+            
+            # 创建网卡状态服务实例
+            self.adapter_status_service = AdapterStatusService()
+            self.logger.info("网卡状态服务初始化完成")
             
             # 将服务实例设置到主窗口，供其他组件使用
             self.main_window.network_service = self.network_service

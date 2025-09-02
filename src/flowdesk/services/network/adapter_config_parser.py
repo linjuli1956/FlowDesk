@@ -7,6 +7,7 @@ import re
 import logging
 from typing import Dict, Any, List
 from .adapter_info_utils import prefix_to_netmask
+from .adapter_psutil_config_retriever import AdapterPsutilConfigRetriever
 
 
 class AdapterConfigParser:
@@ -26,16 +27,68 @@ class AdapterConfigParser:
     def __init__(self):
         """初始化配置解析器"""
         self.logger = logging.getLogger(self.__class__.__name__)
+        # 初始化psutil配置获取器，用于获取未连接网卡的静态配置
+        self.psutil_retriever = AdapterPsutilConfigRetriever()
     
-    def get_adapter_ip_config(self, adapter_name: str) -> Dict[str, Any]:
+    def get_adapter_ip_config(self, adapter_name: str, adapter_id: str = None) -> Dict[str, Any]:
         """
-        获取指定网卡IP配置信息的核心实现方法
+        获取指定网卡IP配置信息的增强版核心方法
+        
+        实现双重IP配置获取策略：
+        1. 优先使用netsh + ipconfig获取（适用于已连接状态）
+        2. 如果获取不到IP信息，使用psutil方式获取（适用于未连接状态，过滤APIPA地址）
+        3. 智能合并两种方式的配置信息，确保数据完整性
         
         Args:
             adapter_name (str): 网卡连接名称，如"vEthernet (泰兴)"
+            adapter_id (str, optional): 网卡GUID，用于WMI查询未连接状态的配置
             
         Returns:
             Dict[str, Any]: 包含完整IP配置信息的字典，包括IP地址、子网掩码、网关、DNS等
+        """
+        # 初始化配置字典，提供默认值确保数据结构完整性
+        config = {
+            'ip_addresses': [],
+            'ipv6_addresses': [],
+            'subnet_masks': [],
+            'gateway': '',
+            'dns_servers': [],
+            'dhcp_enabled': True,
+            'link_speed': ''
+        }
+        
+        try:
+            # 方式1：使用原有netsh + ipconfig方式获取配置（适用于已连接状态）
+            config = self._get_config_via_netsh_ipconfig(adapter_name)
+            
+            # 第二步：如果获取不到IP信息，尝试使用psutil获取未连接网卡的静态配置
+            if not config.get('ip_addresses'):
+                psutil_config = self.psutil_retriever.get_config_via_psutil(adapter_name)
+                if psutil_config:
+                    # 合并psutil获取的配置信息
+                    config = self._merge_psutil_config(config, psutil_config)
+                    
+                    if psutil_config.get('ip_addresses'):
+                        self.logger.info(f"通过psutil成功获取网卡 {adapter_name} 的静态IP配置")
+            
+            
+        except Exception as e:
+            self.logger.error(f"获取网卡 {adapter_name} IP配置失败: {str(e)}")
+        
+        return config
+    
+    def _get_config_via_netsh_ipconfig(self, adapter_name: str) -> Dict[str, Any]:
+        """
+        使用原有netsh + ipconfig方式获取网卡配置
+        
+        这是原有的配置获取方式，适用于网卡已连接的状态。
+        保持原有逻辑不变，确保向后兼容性。
+        
+        Args:
+            adapter_name (str): 网卡连接名称
+            
+        Returns:
+            Dict[str, Any]: 网卡配置信息字典
         """
         # 初始化配置字典，提供默认值确保数据结构完整性
         config = {
@@ -155,6 +208,7 @@ class AdapterConfigParser:
             self.logger.debug(f"成功使用ipconfig补充网卡 {adapter_name} 的完整配置信息")
         
         return config
+    
     
     def _supplement_config_with_ipconfig(self, adapter_name: str, config: Dict[str, Any]) -> None:
         """
@@ -390,3 +444,53 @@ class AdapterConfigParser:
             Dict[str, Any]: 完整的网络配置信息
         """
         return self.get_adapter_ip_config(adapter_name)
+    
+    def _merge_psutil_config(self, base_config: Dict[str, Any], psutil_config: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        合并psutil获取的配置信息到基础配置中
+        
+        这个方法将psutil获取的网卡配置信息智能合并到基础配置中，
+        确保未连接网卡的静态IP配置能够正确显示。
+        
+        Args:
+            base_config (Dict[str, Any]): 基础配置字典（来自netsh/ipconfig）
+            psutil_config (Dict[str, Any]): psutil获取的配置信息
+            
+        Returns:
+            Dict[str, Any]: 合并后的完整配置信息
+        """
+        try:
+            # 合并IPv4地址信息
+            if psutil_config.get('ip_addresses'):
+                base_config['ip_addresses'] = psutil_config['ip_addresses']
+                self.logger.debug(f"从psutil合并IPv4地址: {psutil_config['ip_addresses']}")
+            
+            # 合并IPv6地址信息
+            if psutil_config.get('ipv6_addresses'):
+                base_config['ipv6_addresses'] = psutil_config['ipv6_addresses']
+                self.logger.debug(f"从psutil合并IPv6地址: {psutil_config['ipv6_addresses']}")
+            
+            # 合并子网掩码信息
+            if psutil_config.get('subnet_masks'):
+                base_config['subnet_masks'] = psutil_config['subnet_masks']
+                self.logger.debug(f"从psutil合并子网掩码: {psutil_config['subnet_masks']}")
+            
+            # 从psutil的网卡状态推断DHCP状态
+            # 如果psutil显示网卡有静态IP但状态为未连接，通常表示静态配置
+            if psutil_config.get('ip_addresses') and not psutil_config.get('is_up', True):
+                base_config['dhcp_enabled'] = False
+                self.logger.debug("根据psutil状态推断为静态IP配置")
+            
+            # 合并网卡速度信息（如果可用）
+            if psutil_config.get('speed', 0) > 0:
+                speed_mbps = psutil_config['speed']
+                base_config['link_speed'] = f"{speed_mbps} Mbps"
+                self.logger.debug(f"从psutil合并链路速度: {speed_mbps} Mbps")
+            
+            # 记录合并操作
+            self.logger.debug("psutil配置信息合并完成")
+            
+        except Exception as e:
+            self.logger.error(f"合并psutil配置信息失败: {str(e)}")
+        
+        return base_config

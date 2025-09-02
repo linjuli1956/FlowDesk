@@ -26,6 +26,7 @@ from .adapter_info_retriever import AdapterInfoRetriever
 from .adapter_status_analyzer import AdapterStatusAnalyzer
 from .adapter_config_parser import AdapterConfigParser
 from .adapter_dns_enhancer import AdapterDnsEnhancer
+from .adapter_psutil_config_retriever import AdapterPsutilConfigRetriever
 from .adapter_info_utils import get_interface_type, prefix_to_netmask
 
 # 兼容门面（主要对外接口）
@@ -56,6 +57,7 @@ __all__ = [
     'AdapterStatusAnalyzer',
     'AdapterConfigParser',
     'AdapterDnsEnhancer',
+    'AdapterPsutilConfigRetriever',
     'get_interface_type',
     'prefix_to_netmask',
     

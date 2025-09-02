@@ -25,22 +25,27 @@ class AdapterStatusAnalyzer:
         """初始化状态分析器"""
         self.logger = logging.getLogger(self.__class__.__name__)
     
-    def get_interface_status_info(self, adapter_name: str) -> Dict[str, str]:
+    def _get_interface_status_info(self, adapter_name: str) -> Dict[str, str]:
         """
-        获取网卡精确的启用和连接状态信息
+        使用netsh interface show interface命令获取网卡的精确状态信息
+        
+        这个方法通过Windows的netsh命令获取网卡的管理状态和连接状态，
+        提供比WMI更准确的状态判断能力。
         
         Args:
             adapter_name (str): 网卡连接名称
             
         Returns:
-            Dict[str, str]: 包含管理状态、连接状态和接口名称的字典
+            Dict[str, str]: 包含admin_status（管理状态）和connect_status（连接状态）的字典
         """
-        # 初始化状态字典，提供默认值确保数据结构完整性
         status_info = {
-            'admin_status': '未知',      # 管理状态：网卡是否被启用
-            'connect_status': '未知',    # 连接状态：网卡是否已连接到网络
-            'interface_name': ''         # 接口名称：用于验证匹配结果
+            'admin_status': '未知',
+            'connect_status': '未知',
+            'interface_name': adapter_name
         }
+        
+        # 调试日志：开始状态获取
+        self.logger.info(f"开始获取网卡 '{adapter_name}' 的状态信息")
         
         try:
             # 执行netsh interface show interface命令获取所有网卡的状态表格
@@ -115,8 +120,10 @@ class AdapterStatusAnalyzer:
                             admin_state = line_parts[0]  # 管理状态
                             operational_state = line_parts[1]  # 连接状态
                             
-                            self.logger.debug(f"✅ 匹配成功: 网卡 '{adapter_name}' -> 接口 '{interface_name}': "
-                                            f"管理状态={admin_state}, 连接状态={operational_state}")
+                            # 🔥 调试日志：详细状态信息
+                            self.logger.info(f"🔥 匹配成功: 网卡 '{adapter_name}' -> 接口 '{interface_name}'")
+                            self.logger.info(f"🔥 原始行内容: '{line}'")
+                            self.logger.info(f"🔥 解析结果: 管理状态='{admin_state}', 连接状态='{operational_state}'")
                             
                             # 映射管理状态
                             if admin_state == '已启用':
@@ -136,7 +143,17 @@ class AdapterStatusAnalyzer:
                             
                             status_info['interface_name'] = interface_name
                             
-                            self.logger.debug(f"网卡 {adapter_name} 状态解析成功: 管理状态={status_info['admin_status']}, 连接状态={status_info['connect_status']}")
+                            # 🔥 调试日志：状态映射结果
+                            self.logger.info(f"🔥 网卡 {adapter_name} 状态映射完成:")
+                            self.logger.info(f"🔥   管理状态: '{admin_state}' -> '{status_info['admin_status']}'")
+                            self.logger.info(f"🔥   连接状态: '{operational_state}' -> '{status_info['connect_status']}'")
+                            
+                            # 调用最终状态判断
+                            final_status, is_enabled, is_connected = self.determine_final_status(
+                                status_info['admin_status'], 
+                                status_info['connect_status']
+                            )
+                            self.logger.info(f"🔥 最终状态判断: '{final_status}', 启用={is_enabled}, 连接={is_connected}")
                             break
                 else:
                     # 如果没有找到匹配的网卡，记录警告信息
@@ -216,7 +233,7 @@ class AdapterStatusAnalyzer:
         """
         # 获取精确的网卡状态信息 - 使用netsh interface show interface命令
         # 这是新增的双重状态判断机制，提供比wmic状态码更准确的状态信息
-        interface_status = self.get_interface_status_info(adapter_name)
+        interface_status = self._get_interface_status_info(adapter_name)
         
         # 应用双重状态判断逻辑 - 结合管理状态和连接状态
         # 这个逻辑遵循面向对象架构的单一职责原则，专门处理状态判断

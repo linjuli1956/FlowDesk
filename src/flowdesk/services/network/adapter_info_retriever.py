@@ -87,8 +87,8 @@ class AdapterInfoRetriever(NetworkServiceBase):
             
             self._log_operation_start("获取网卡详细信息", adapter_name=adapter_name)
             
-            # 使用配置解析器获取IP配置信息
-            ip_config = self.config_parser.get_adapter_ip_config(adapter_name)
+            # 使用配置解析器获取IP配置信息（传递adapter_id支持WMI获取）
+            ip_config = self.config_parser.get_adapter_ip_config(adapter_name, adapter_id)
             
             # 确保链路速度信息在创建AdapterInfo对象前已获取
             if not ip_config.get('link_speed'):
@@ -141,16 +141,18 @@ class AdapterInfoRetriever(NetworkServiceBase):
             self._log_operation_error("获取网卡详细信息", e)
             return None
     
-    def get_adapter_ip_config(self, adapter_name: str) -> dict:
+    def get_adapter_ip_config(self, adapter_name: str, adapter_id: str = None) -> dict:
         """
         获取指定网卡IP配置信息的公共接口
         
         这个方法提供向后兼容的接口，委托给配置解析器处理。
+        支持传递adapter_id以启用WMI配置获取功能。
         
         Args:
             adapter_name (str): 网卡连接名称，如"vEthernet (泰兴)"
+            adapter_id (str, optional): 网卡GUID，用于WMI查询未连接状态的配置
             
         Returns:
             dict: 包含完整IP配置信息的字典
         """
-        return self.config_parser.get_adapter_ip_config(adapter_name)
+        return self.config_parser.get_adapter_ip_config(adapter_name, adapter_id)
