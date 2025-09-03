@@ -66,6 +66,8 @@ class StylesheetService:
             "tray_exit_dialog.qss",     # 托盘退出对话框样式
             "add_ip_dialog.qss",        # 添加IP对话框专用样式
             "ip_config_confirm_dialog.qss",  # IP配置确认弹窗专用样式
+            "modify_mac_dialog.qss",    # MAC地址修改弹窗专用样式
+            "network_progress_dialog.qss",   # 网络进度对话框专用样式
             "operation_result_dialog.qss",   # 操作结果弹窗专用样式
             "status_bar.qss",           # 状态栏专用样式
             "main_window.qss",          # 主窗口特定样式

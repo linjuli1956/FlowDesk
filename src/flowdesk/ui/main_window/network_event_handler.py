@@ -16,6 +16,7 @@ from ...utils.logger import get_logger
 from ...models.ip_config_confirmation import IPConfigConfirmation
 from ..dialogs.ip_config_confirm_dialog import IPConfigConfirmDialog
 from ..dialogs.operation_result_dialog import OperationResultDialog
+from ..dialogs.network_progress_dialog import show_network_progress
 
 # 导入拆分后的专业事件处理器
 from .network_events.network_adapter_events import NetworkAdapterEvents
@@ -162,6 +163,215 @@ class NetworkEventHandler:
     def _on_apply_ip_config(self, config_data):
         """委托给IP配置事件处理器"""
         return self.ip_config_events._on_apply_ip_config(config_data)
+    
+    def _on_modify_mac_address(self, adapter_name):
+        """处理修改MAC地址请求"""
+        self.logger.info(f"收到修改MAC地址请求: {adapter_name}")
+        
+        # 导入弹窗类
+        from ..dialogs.modify_mac_dialog import ModifyMacDialog
+        from ...services.network.mac_address_service import MacAddressService
+        
+        try:
+            # 创建MAC地址服务
+            mac_service = MacAddressService()
+            
+            # 获取当前和初始MAC地址
+            import asyncio
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            current_mac = loop.run_until_complete(mac_service.get_current_mac_address(adapter_name))
+            original_mac = loop.run_until_complete(mac_service.get_original_mac_address(adapter_name))
+            
+            loop.close()
+            
+            if not current_mac:
+                self._show_error_message("错误", f"无法获取网卡 {adapter_name} 的MAC地址")
+                return
+            
+            # 创建并显示MAC修改弹窗
+            dialog = ModifyMacDialog(adapter_name, current_mac, original_mac, self.main_window)
+            
+            # 连接弹窗信号
+            dialog.mac_modify_requested.connect(self._execute_mac_modify)
+            dialog.mac_restore_requested.connect(self._execute_mac_restore)
+            
+            # 显示弹窗
+            dialog.exec_()
+            
+        except Exception as e:
+            self.logger.error(f"打开MAC修改弹窗失败: {e}")
+            self._show_error_message("错误", f"打开MAC修改弹窗失败: {str(e)}")
+    
+    def _execute_mac_modify(self, adapter_name, new_mac):
+        """执行MAC地址修改（使用进度对话框）"""
+        self.logger.info(f"开始执行MAC地址修改: {adapter_name} -> {new_mac}")
+        
+        def modify_mac_operation(progress_callback=None):
+            """MAC修改操作函数（支持进度回调）"""
+            try:
+                from ...services.network.mac_address_service import MacAddressService
+                import asyncio
+                import time
+                
+                # 创建MAC地址服务
+                mac_service = MacAddressService()
+                
+                # 执行MAC修改
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                
+                # 步骤1: 准备修改MAC地址 (20%)
+                if progress_callback:
+                    progress_callback(20, "正在准备修改MAC地址...")
+                time.sleep(0.5)  # 模拟操作时间
+                
+                modify_result = loop.run_until_complete(mac_service.modify_mac_address(adapter_name, new_mac))
+                
+                if modify_result.success:
+                    # 步骤2: MAC修改成功，准备重启网卡 (50%)
+                    if progress_callback:
+                        progress_callback(50, "MAC地址修改成功，正在重启网卡...")
+                    time.sleep(1.0)  # 模拟重启准备时间
+                    
+                    # MAC修改成功，重启网卡
+                    restart_result = loop.run_until_complete(mac_service.restart_adapter(adapter_name))
+                    
+                    if restart_result.success:
+                        # 步骤3: 网卡重启成功，等待网卡稳定 (75%)
+                        if progress_callback:
+                            progress_callback(75, "网卡重启成功，正在等待网卡稳定...")
+                        time.sleep(2.0)  # 等待网卡稳定
+                        
+                        # 步骤4: 验证MAC是否生效 (90%)
+                        if progress_callback:
+                            progress_callback(90, "正在验证MAC地址修改结果...")
+                        time.sleep(0.5)
+                        
+                        # 验证MAC是否生效
+                        final_mac = loop.run_until_complete(mac_service.get_current_mac_address(adapter_name))
+                        
+                        if final_mac and final_mac.upper() == new_mac.upper():
+                            # 步骤5: 刷新网卡信息 (100%)
+                            if progress_callback:
+                                progress_callback(95, "正在刷新网卡信息...")
+                            
+                            # 刷新网卡信息
+                            if self.network_service:
+                                self.network_service.refresh_current_adapter()
+                            return True
+                        else:
+                            return False
+                    else:
+                        return False
+                else:
+                    return False
+                    
+            except Exception as e:
+                self.logger.error(f"MAC地址修改异常: {e}")
+                return False
+            finally:
+                if 'loop' in locals():
+                    loop.close()
+        
+        # 使用进度对话框执行操作
+        success = show_network_progress(
+            operation_name="修改MAC地址",
+            operation_func=modify_mac_operation,
+            adapter_name=adapter_name,
+            parent=self.main_window
+        )
+        
+        if success:
+            self._show_success_message("成功", f"MAC地址修改成功！\n\n网卡: {adapter_name}\n新MAC: {new_mac}")
+        else:
+            self._show_error_message("失败", f"MAC地址修改失败，请检查网卡状态和权限设置")
+    
+    def _execute_mac_restore(self, adapter_name):
+        """执行MAC地址恢复（使用进度对话框）"""
+        self.logger.info(f"开始恢复初始MAC地址: {adapter_name}")
+        
+        def restore_mac_operation(progress_callback=None):
+            """MAC恢复操作函数（支持进度回调）"""
+            try:
+                from ...services.network.mac_address_service import MacAddressService
+                import asyncio
+                import time
+                
+                # 创建MAC地址服务
+                mac_service = MacAddressService()
+                
+                # 执行MAC恢复
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                
+                # 步骤1: 准备恢复MAC地址 (25%)
+                if progress_callback:
+                    progress_callback(25, "正在准备恢复初始MAC地址...")
+                time.sleep(0.5)
+                
+                restore_result = loop.run_until_complete(mac_service.restore_original_mac(adapter_name))
+                
+                if restore_result.success:
+                    # 步骤2: MAC恢复成功，准备重启网卡 (60%)
+                    if progress_callback:
+                        progress_callback(60, "MAC地址恢复成功，正在重启网卡...")
+                    time.sleep(1.0)
+                    
+                    # MAC恢复成功，重启网卡
+                    restart_result = loop.run_until_complete(mac_service.restart_adapter(adapter_name))
+                    
+                    if restart_result.success:
+                        # 步骤3: 网卡重启成功，等待稳定 (85%)
+                        if progress_callback:
+                            progress_callback(85, "网卡重启成功，正在等待网卡稳定...")
+                        time.sleep(2.0)
+                        
+                        # 步骤4: 刷新网卡信息 (95%)
+                        if progress_callback:
+                            progress_callback(95, "正在刷新网卡信息...")
+                        
+                        # 刷新网卡信息
+                        if self.network_service:
+                            self.network_service.refresh_current_adapter()
+                        return True
+                    else:
+                        return False
+                else:
+                    return False
+                    
+            except Exception as e:
+                self.logger.error(f"MAC地址恢复异常: {e}")
+                return False
+            finally:
+                if 'loop' in locals():
+                    loop.close()
+        
+        # 使用进度对话框执行操作
+        success = show_network_progress(
+            operation_name="恢复初始MAC地址",
+            operation_func=restore_mac_operation,
+            adapter_name=adapter_name,
+            parent=self.main_window
+        )
+        
+        if success:
+            self._show_success_message("成功", f"已恢复初始MAC地址！\n\n网卡: {adapter_name}")
+        else:
+            self._show_error_message("失败", f"MAC地址恢复失败，请检查网卡状态和权限设置")
+    
+    def _show_success_message(self, title, message):
+        """显示成功消息"""
+        QMessageBox.information(self.main_window, title, message)
+    
+    def _show_warning_message(self, title, message):
+        """显示警告消息"""
+        QMessageBox.warning(self.main_window, title, message)
+    
+    def _show_error_message(self, title, message):
+        """显示错误消息"""
+        QMessageBox.critical(self.main_window, title, message)
     
     def _apply_confirmed_ip_config(self, adapter_id, ip_address, subnet_mask, 
                                  gateway, primary_dns, secondary_dns, adapter_display_name, adapter_info=None):

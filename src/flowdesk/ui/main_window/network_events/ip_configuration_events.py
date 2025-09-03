@@ -9,6 +9,7 @@ from ....utils.logger import get_logger
 from ...dialogs.operation_result_dialog import OperationResultDialog
 from ....models.ip_config_confirmation import IPConfigConfirmation
 from ...dialogs.ip_config_confirm_dialog import IPConfigConfirmDialog
+from ...dialogs.network_progress_dialog import show_network_progress
 
 
 class IPConfigurationEvents:
@@ -134,64 +135,92 @@ class IPConfigurationEvents:
     
     def _apply_confirmed_ip_config(self, config_data, adapter_name):
         """
-        应用用户确认的IP配置
+        应用用户确认的IP配置（使用进度对话框）
         
         这个方法在用户确认IP配置后被调用，负责实际执行配置应用操作。
-        它会调用服务层的配置应用方法，并在状态栏显示操作进度。
-        
-        设计原则：
-        - 委托模式：将实际的配置应用逻辑委托给服务层
-        - 进度反馈：通过状态栏提供实时的操作进度反馈
-        - 异常处理：确保配置失败时用户获得明确的错误信息
+        使用NetworkProgressDialog提供用户友好的进度反馈。
         
         Args:
             config_data (dict): 用户确认的IP配置数据
             adapter_name (str): 目标网卡名称
         """
-        try:
-            self.logger.debug(f"🚀 开始应用IP配置到网卡: {adapter_name}")
-            
-            # 在状态栏显示正在应用配置的状态
-            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
-                self.main_window.service_coordinator.status_bar_service.set_status(
-                    f"⚙️ 正在应用IP配置到 {adapter_name}...", 
-                    auto_clear_seconds=0  # 不自动清除，等待操作完成
-                )
-            
-            # 委托给服务层执行实际的IP配置应用
-            if self.network_service:
-                # 通过网卡名称获取网卡ID
-                adapter_id = self.network_service.get_adapter_id_by_name(adapter_name)
+        def apply_ip_config_operation(progress_callback=None):
+            """IP配置应用操作函数（支持进度回调）"""
+            try:
+                import time
                 
-                if not adapter_id:
-                    error_msg = f"无法获取网卡 '{adapter_name}' 的ID，无法应用IP配置"
-                    self.logger.error(error_msg)
-                    QMessageBox.critical(self.main_window, "系统错误", error_msg)
-                    return
+                self.logger.debug(f"🚀 开始应用IP配置到网卡: {adapter_name}")
                 
-                # 调用正确的参数格式
-                self.network_service.apply_ip_config(
-                    adapter_id=adapter_id,
-                    ip_address=config_data.get('ip_address', ''),
-                    subnet_mask=config_data.get('subnet_mask', ''),
-                    gateway=config_data.get('gateway', ''),
-                    primary_dns=config_data.get('dns_primary', ''),
-                    secondary_dns=config_data.get('dns_secondary', '')
-                )
-            else:
-                error_msg = "网络服务未初始化，无法应用IP配置"
-                self.logger.error(error_msg)
-                QMessageBox.critical(self.main_window, "系统错误", error_msg)
+                # 步骤1: 验证网络服务 (10%)
+                if progress_callback:
+                    progress_callback(10, "正在验证网络服务...")
+                time.sleep(0.3)
                 
-        except Exception as e:
-            self.logger.error(f"应用IP配置异常: {str(e)}")
-            # 在状态栏显示错误状态
-            if hasattr(self.main_window, 'service_coordinator') and self.main_window.service_coordinator.status_bar_service:
-                self.main_window.service_coordinator.status_bar_service.set_status(
-                    f"❌ IP配置应用失败: {str(e)}", 
-                    auto_clear_seconds=5
-                )
-            QMessageBox.critical(self.main_window, "配置失败", f"应用IP配置时发生错误：{str(e)}")
+                # 委托给服务层执行实际的IP配置应用
+                if self.network_service:
+                    # 步骤2: 获取网卡ID (25%)
+                    if progress_callback:
+                        progress_callback(25, "正在获取网卡标识...")
+                    time.sleep(0.3)
+                    
+                    # 通过网卡名称获取网卡ID
+                    adapter_id = self.network_service.get_adapter_id_by_name(adapter_name)
+                    
+                    if not adapter_id:
+                        self.logger.error(f"无法获取网卡 '{adapter_name}' 的ID")
+                        return False
+                    
+                    # 步骤3: 准备IP配置参数 (40%)
+                    if progress_callback:
+                        progress_callback(40, "正在准备IP配置参数...")
+                    time.sleep(0.5)
+                    
+                    # 步骤4: 应用IP配置 (70%)
+                    if progress_callback:
+                        progress_callback(70, "正在应用IP配置...")
+                    time.sleep(1.0)
+                    
+                    # 调用正确的参数格式
+                    result = self.network_service.apply_ip_config(
+                        adapter_id=adapter_id,
+                        ip_address=config_data.get('ip_address', ''),
+                        subnet_mask=config_data.get('subnet_mask', ''),
+                        gateway=config_data.get('gateway', ''),
+                        primary_dns=config_data.get('dns_primary', ''),
+                        secondary_dns=config_data.get('dns_secondary', '')
+                    )
+                    
+                    # 步骤5: 等待配置生效 (90%)
+                    if progress_callback:
+                        progress_callback(90, "正在等待配置生效...")
+                    time.sleep(1.5)
+                    
+                    # 步骤6: 刷新网卡信息 (95%)
+                    if progress_callback:
+                        progress_callback(95, "正在刷新网卡信息...")
+                    time.sleep(0.5)
+                    
+                    return result if result is not None else True
+                else:
+                    self.logger.error("网络服务未初始化")
+                    return False
+                    
+            except Exception as e:
+                self.logger.error(f"应用IP配置异常: {str(e)}")
+                return False
+        
+        # 使用进度对话框执行操作
+        success = show_network_progress(
+            operation_name="修改IP配置",
+            operation_func=apply_ip_config_operation,
+            adapter_name=adapter_name,
+            parent=self.main_window
+        )
+        
+        if success:
+            QMessageBox.information(self.main_window, "成功", f"IP配置应用成功！\n\n网卡: {adapter_name}")
+        else:
+            QMessageBox.critical(self.main_window, "失败", f"IP配置应用失败，请检查网络设置和权限")
     
     def _get_current_selected_adapter(self):
         """

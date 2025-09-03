@@ -1,0 +1,137 @@
+/*
+网络进度对话框专用样式表
+遵循Claymorphism设计风格
+*/
+
+/* 对话框容器 */
+QDialog#network_progress_dialog {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(255,255,255,0.95), stop:1 rgba(245,247,250,0.95));
+    border-radius: 16px;
+    border: 2px solid rgba(255,255,255,0.6);
+}
+
+/* 内容区域框架 */
+QFrame#content_section_frame {
+    background: transparent;
+    border: none;
+}
+
+/* 操作标题标签 */
+QLabel#operation_title_label {
+    color: #1f2937;
+    font-size: 16px;
+    font-weight: 600;
+    background: transparent;
+    border: none;
+    padding: 4px 0px;
+}
+
+/* 操作状态标签 */
+QLabel#operation_status_label {
+    color: #4b5563;
+    font-size: 14px;
+    font-weight: 400;
+    background: transparent;
+    border: none;
+    padding: 2px 0px;
+}
+
+/* 耗时标签 */
+QLabel#operation_time_label {
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 400;
+    background: transparent;
+    border: none;
+    padding: 2px 0px;
+}
+
+/* 进度区域框架 */
+QFrame#progress_section_frame {
+    background: transparent;
+    border: none;
+}
+
+/* 网络进度条 */
+QProgressBar#network_progress_bar {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 rgba(229,231,235,0.8), stop:1 rgba(209,213,219,0.8));
+    border: 2px solid rgba(156,163,175,0.3);
+    border-radius: 8px;
+    text-align: center;
+    color: #374151;
+    font-weight: 500;
+    min-height: 20px;
+    max-height: 20px;
+}
+
+QProgressBar#network_progress_bar::chunk {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1, 
+                stop:0 #3b82f6, stop:1 #2563eb);
+    border-radius: 6px;
+    margin: 2px;
+}
+
+/* 按钮区域框架 */
+QFrame#button_section_frame {
+    background: transparent;
+    border: none;
+}
+
+/* 取消按钮 - 红色渐变 */
+QDialog#network_progress_dialog QPushButton#dialog_cancel_button {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #ef4444, stop:1 #dc2626);
+    border: 2px solid rgba(185,28,28,0.4);
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    min-width: 100px;
+    min-height: 36px;
+    padding: 8px 16px;
+}
+
+QDialog#network_progress_dialog QPushButton#dialog_cancel_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #f87171, stop:1 #ef4444);
+    border-color: rgba(153,27,27,0.6);
+}
+
+QDialog#network_progress_dialog QPushButton#dialog_cancel_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #dc2626, stop:1 #b91c1c);
+    border-color: rgba(127,29,29,0.8);
+}
+
+QDialog#network_progress_dialog QPushButton#dialog_cancel_button:disabled {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #9ca3af, stop:1 #6b7280);
+    border-color: rgba(107,114,128,0.3);
+    color: rgba(255,255,255,0.7);
+}
+
+/* 确定按钮 - 绿色渐变（操作完成时使用） */
+QDialog#network_progress_dialog QPushButton#dialog_ok_button {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #10b981, stop:1 #059669);
+    border: 2px solid rgba(5,150,105,0.4);
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    min-width: 100px;
+    min-height: 36px;
+    padding: 8px 16px;
+}
+
+QDialog#network_progress_dialog QPushButton#dialog_ok_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #34d399, stop:1 #10b981);
+    border-color: rgba(4,120,87,0.6);
+}
+
+QDialog#network_progress_dialog QPushButton#dialog_ok_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                stop:0 #059669, stop:1 #047857);
+    border-color: rgba(6,95,70,0.8);
+}

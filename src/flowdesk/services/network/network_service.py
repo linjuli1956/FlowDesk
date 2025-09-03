@@ -478,6 +478,39 @@ class NetworkService(NetworkServiceBase):
         """
         return self._current_adapter_id
     
+    def get_adapter_id_by_name(self, adapter_name: str) -> Optional[str]:
+        """
+        根据网卡友好名称获取网卡ID
+        
+        Args:
+            adapter_name: 网卡友好名称（如"以太网"）
+            
+        Returns:
+            Optional[str]: 网卡GUID，未找到时返回None
+        """
+        try:
+            self._log_operation_start("根据名称获取网卡ID", adapter_name=adapter_name)
+            
+            # 遍历缓存的网卡列表查找匹配的网卡
+            for adapter in self._adapters:
+                if adapter.friendly_name == adapter_name or adapter.name == adapter_name:
+                    self._log_operation_success("根据名称获取网卡ID", f"找到网卡ID: {adapter.id}")
+                    return adapter.id
+            
+            # 如果缓存中没有找到，尝试刷新缓存后再查找
+            self._update_adapters_cache()
+            for adapter in self._adapters:
+                if adapter.friendly_name == adapter_name or adapter.name == adapter_name:
+                    self._log_operation_success("根据名称获取网卡ID", f"刷新后找到网卡ID: {adapter.id}")
+                    return adapter.id
+            
+            self.logger.warning(f"未找到名称为 '{adapter_name}' 的网卡")
+            return None
+            
+        except Exception as e:
+            self._log_operation_error("根据名称获取网卡ID", e)
+            return None
+    
     def get_current_adapter(self) -> Optional[Dict[str, Any]]:
         """
         获取当前选中网卡的详细信息

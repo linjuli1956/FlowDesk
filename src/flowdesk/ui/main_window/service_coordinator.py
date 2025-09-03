@@ -180,7 +180,7 @@ class ServiceCoordinator:
         
         # 修改MAC地址：UI修改MAC按钮 -> 事件处理器处理
         self.main_window.network_config_tab.modify_mac_address.connect(
-            self._fallback_modify_mac_address
+            event_handler._on_modify_mac_address if event_handler else self._fallback_modify_mac_address
         )
         
         # === 服务层信号连接到UI更新方法 ===

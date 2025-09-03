@@ -1,269 +1,598 @@
-2025-09-03 00:44:40 - flowdesk.utils.logger - INFO - logger.py:93 - 日志系统初始化完成 - 标准模式
-2025-09-03 00:44:40 - flowdesk.services.network - DEBUG - __init__.py:71 - FlowDesk网络服务模块已加载 - 版本 2.0.0
-2025-09-03 00:44:40 - flowdesk.services.network - DEBUG - __init__.py:72 - 可用服务类数量: 17
-2025-09-03 00:44:40 - __main__ - INFO - app.py:75 - FlowDesk应用程序启动
-2025-09-03 00:44:40 - __main__ - INFO - app.py:106 - 正在检查管理员权限...
-2025-09-03 00:44:40 - __main__ - INFO - app.py:112 - 已获得管理员权限，网络配置功能可正常使用
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:74 - 样式表管理服务初始化完成 - 标准模式
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: main_pyqt5.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: network_config_tab.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: network_tools_tab.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: rdp_tab.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: hardware_tab.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: system_tray_menu.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: tray_exit_dialog.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: add_ip_dialog.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: ip_config_confirm_dialog.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: operation_result_dialog.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: status_bar.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:118 - 样式文件加载成功: main_window.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:126 - 样式表合并完成，已加载文件: main_pyqt5.qss, network_config_tab.qss, network_tools_tab.qss, rdp_tab.qss, hardware_tab.qss, system_tray_menu.qss, tray_exit_dialog.qss, add_ip_dialog.qss, ip_config_confirm_dialog.qss, operation_result_dialog.qss, status_bar.qss, main_window.qss
-2025-09-03 00:44:40 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:153 - 样式表应用成功
-2025-09-03 00:44:40 - __main__ - INFO - app.py:92 - 样式表加载完成
-2025-09-03 00:44:40 - flowdesk.ui.main_window.main_window - INFO - main_window.py:45 - 开始初始化主窗口拼装类
-2025-09-03 00:44:40 - flowdesk.ui.tabs.network_config_tab - DEBUG - network_config_tab.py:76 - NetworkConfigTab重构版初始化完成
-2025-09-03 00:44:41 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:88 - 状态栏UI布局设置完成
-2025-09-03 00:44:41 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:50 - 状态栏UI组件初始化完成
-2025-09-03 00:44:41 - flowdesk.ui.main_window.main_window_base - INFO - main_window_base.py:56 - 主窗口基础组件初始化完成
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:95 - [NetworkService] 开始执行操作: NetworkService门面初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: AdapterDiscoveryService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: AdapterDiscoveryService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:95 - [AdapterInfoRetriever] 开始执行操作: AdapterInfoRetriever初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_info_service - INFO - adapter_info_service.py:40 - 网卡详细信息服务已初始化（轻量级协调器模式）
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: AdapterDiscoveryService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_status_service - DEBUG - network_service_base.py:95 - [AdapterStatusService] 开始执行操作: AdapterStatusService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: AdapterPerformanceService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.ip_configuration_service - DEBUG - network_service_base.py:95 - [IPConfigurationService] 开始执行操作: IPConfigurationService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.extra_ip_management_service - DEBUG - network_service_base.py:95 - [ExtraIPManagementService] 开始执行操作: ExtraIPManagementService初始化 (无参数)
-2025-09-03 00:44:41 - AdapterOperationService - DEBUG - adapter_operation_service.py:52 - 网卡操作服务初始化完成
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: NetworkUICoordinatorService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:72 - 已注入网卡发现服务
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:82 - 已注入网卡信息服务
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:92 - 已注入网卡状态服务
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:102 - 已注入网卡性能服务
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:112 - 已注入IP配置服务
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:122 - 已注入额外IP管理服务
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:100 - 服务依赖关系建立完成
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:141 - 网络服务信号连接完成
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:81 - 网络服务门面初始化完成，所有专业服务已就绪
-2025-09-03 00:44:41 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:65 - 网络服务初始化完成
-2025-09-03 00:44:41 - flowdesk.services.status_bar_service - DEBUG - status_bar_service.py:67 - 状态栏管理服务初始化完成
-2025-09-03 00:44:41 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:69 - 状态栏服务初始化完成
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: AdapterDiscoveryService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_status_service - DEBUG - network_service_base.py:95 - [AdapterStatusService] 开始执行操作: AdapterStatusService初始化 (无参数)
-2025-09-03 00:44:41 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:73 - 网卡状态服务初始化完成
-2025-09-03 00:44:41 - flowdesk.ui.main_window.network_events.network_adapter_events - DEBUG - network_adapter_events.py:66 - NetworkAdapterEvents信号连接完成
-2025-09-03 00:44:41 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:66 - IPConfigurationEvents信号连接完成
-2025-09-03 00:44:41 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:64 - NetworkStatusEvents信号连接完成
-2025-09-03 00:44:41 - flowdesk.ui.main_window.network_event_handler - DEBUG - network_event_handler.py:93 - NetworkEventHandler协调器信号连接完成，委托给专业处理器
-2025-09-03 00:44:41 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:95 - 所有信号连接完成
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:95 - [NetworkService] 开始执行操作: 获取所有网卡信息 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 刷新网卡列表 (无参数)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: 发现网络适配器 (cache_valid=False)
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '10:63:4B:00:5F:00', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:295 - 网卡排序完成：已连接 4 个，未连接 3 个
-2025-09-03 00:44:41 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:106 - [AdapterDiscoveryService] 操作成功完成: 发现网络适配器 - 共找到 7 个网卡
-2025-09-03 00:44:41 - flowdesk.services.network.extra_ip_management_service - DEBUG - extra_ip_management_service.py:231 - 更新网卡信息缓存，共 7 个网卡
-2025-09-03 00:44:41 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Hyper-V Virtual Ethernet Adapter #3', name: 'Hyper-V Virtual Ethernet Adapter #3', description: 'Hyper-V Virtual Ethernet Adapter', friendly_name: 'vEthernet (泰兴)'
-2025-09-03 00:44:41 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', name: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', description: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', friendly_name: 'WLAN'
-2025-09-03 00:44:41 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Realtek Gaming GbE Family Controller', name: 'Realtek Gaming GbE Family Controller', description: 'Realtek Gaming GbE Family Controller', friendly_name: '以太网'
-2025-09-03 00:44:41 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'ASIX USB to Gigabit Ethernet Family Adapter', name: 'ASIX USB to Gigabit Ethernet Family Adapter', description: 'ASIX USB to Gigabit Ethernet Family Adapter', friendly_name: '以太网 2'
-2025-09-03 00:44:41 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Hyper-V Virtual Ethernet Adapter #2', name: 'Hyper-V Virtual Ethernet Adapter #2', description: 'Hyper-V Virtual Ethernet Adapter', friendly_name: 'vEthernet (USB)'
-2025-09-03 00:44:41 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'TAP-Windows Adapter V9', name: 'TAP-Windows Adapter V9', description: 'TAP-Windows Adapter V9', friendly_name: '本地连接'
-2025-09-03 00:44:41 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Bluetooth Device (Personal Area Network)', name: 'Bluetooth Device (Personal Area Network)', description: 'Bluetooth Device (Personal Area Network)', friendly_name: '蓝牙网络连接'
-2025-09-03 00:44:41 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:67 - 网卡列表更新完成：成功加载 7 个网络适配器到下拉框
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:165 - 网卡缓存已更新，当前缓存网卡数量: 7
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Hyper-V Virtual Ethernet Adapter #3', friendly_name='vEthernet (泰兴)', description='Hyper-V Virtual Ethernet Adapter'
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Realtek 8188GU Wireless LAN 802.11n USB NIC', friendly_name='WLAN', description='Realtek 8188GU Wireless LAN 802.11n USB NIC'
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Realtek Gaming GbE Family Controller', friendly_name='以太网', description='Realtek Gaming GbE Family Controller'
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='ASIX USB to Gigabit Ethernet Family Adapter', friendly_name='以太网 2', description='ASIX USB to Gigabit Ethernet Family Adapter'
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Hyper-V Virtual Ethernet Adapter #2', friendly_name='vEthernet (USB)', description='Hyper-V Virtual Ethernet Adapter'
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='TAP-Windows Adapter V9', friendly_name='本地连接', description='TAP-Windows Adapter V9'
-2025-09-03 00:44:41 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Bluetooth Device (Personal Area Network)', friendly_name='蓝牙网络连接', description='Bluetooth Device (Personal Area Network)'
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:170 - 自动选择第一个网卡: vEthernet (泰兴)
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 设置当前网卡 (adapter_id={083E8011-1034-4CB5-8071-D1A4ED8B96E9})
-2025-09-03 00:44:41 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 刷新当前网卡 (adapter_id={083E8011-1034-4CB5-8071-D1A4ED8B96E9})
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '10:63:4B:00:5F:00', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:328 - 成功找到网卡基本信息: vEthernet (泰兴)
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '10:63:4B:00:5F:00', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '2'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:328 - 成功找到网卡基本信息: vEthernet (泰兴)
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:95 - [AdapterInfoRetriever] 开始执行操作: 获取网卡详细信息 (adapter_name=vEthernet (泰兴))
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:114 - netsh命令执行成功，输出长度: 676 字符
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:240 - ipconfig输出长度: 5315 字符
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:259 - 找到网卡 vEthernet (泰兴) 的配置段落，长度: 1620 字符
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:289 - 解析到IPv4地址: ['172.2.208.10', '172.16.3.10', '192.168.20.10']
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:312 - 解析到IPv6地址: ['2408:825c:a620:6634:54f:1f3f:b77e:ee53', '2408:825c:a620:5289:5b64:9830:10da:f3bf', '2408:825c:a620:5289::d19', '2408:825c:a620:5289:54f:1f3f:b77e:ee53', 'fe80::86e2:74c0:2b1a:54b0%4']
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:347 - 解析到子网掩码: ['255.255.0.0', '255.255.0.0', '255.255.255.0']
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:360 - 解析到默认网关: 172.2.0.1
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:398 - 解析到DNS服务器: ['114.114.114.114']
-2025-09-03 00:44:42 - AdapterConfigParser - DEBUG - adapter_config_parser.py:418 - 解析到DHCP状态: 已禁用
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: AdapterPerformanceService初始化 (无参数)
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: 获取链路速度 (adapter_name=vEthernet (泰兴))
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: 查询网卡描述 (adapter_name=vEthernet (泰兴))
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:222 - 执行wmic查询命令: wmic path win32_networkadapter where "NetConnectionID='vEthernet (泰兴)'" get Description /format:csv
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:230 - wmic查询返回码: 0
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:237 - 解析到 1 行有效数据
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:241 - 处理第 1 行数据
-2025-09-03 00:44:42 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:106 - [AdapterPerformanceService] 操作成功完成: 查询网卡描述 - 找到描述: Hyper-V Virtual Ethernet Adapter
-2025-09-03 00:44:43 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:94 - wmic nic输出行数: 4
-2025-09-03 00:44:43 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:95 - 目标网卡描述: 'Hyper-V Virtual Ethernet Adapter'
-2025-09-03 00:44:43 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:99 - 第1行解析: parts数量=3
-2025-09-03 00:44:43 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:105 - 网卡名称: 'Hyper-V Virtual Ethernet Adapter #3', 速度: '1000000000'
-2025-09-03 00:44:43 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:117 - 描述包含匹配成功
-2025-09-03 00:44:43 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:126 - 网卡匹配成功! 名称: Hyper-V Virtual Ethernet Adapter #3
-2025-09-03 00:44:43 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:106 - [AdapterPerformanceService] 操作成功完成: 获取链路速度 - wmic解析: 1.0 Gbps
-2025-09-03 00:44:43 - AdapterConfigParser - DEBUG - adapter_config_parser.py:426 - 成功获取网卡 vEthernet (泰兴) 链路速度: 1.0 Gbps
-2025-09-03 00:44:43 - AdapterConfigParser - DEBUG - adapter_config_parser.py:208 - 成功使用ipconfig补充网卡 vEthernet (泰兴) 的完整配置信息
-2025-09-03 00:44:43 - AdapterDnsEnhancer - DEBUG - adapter_dns_enhancer.py:56 - netsh获取到网卡 vEthernet (泰兴) 的DNS服务器: ['114.114.114.114']
-2025-09-03 00:44:43 - AdapterDnsEnhancer - DEBUG - adapter_dns_enhancer.py:93 - 网卡 vEthernet (泰兴) DNS配置已增强: ['114.114.114.114']
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:48 - 开始获取网卡 'vEthernet (泰兴)' 的状态信息
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:64 - 成功使用编码 utf-8 解析netsh输出
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:79 - netsh interface show interface 完整输出:
+2025-09-03 15:34:47 - flowdesk.utils.logger - INFO - logger.py:93 - 日志系统初始化完成 - 标准模式
+2025-09-03 15:34:47 - flowdesk.services.network - DEBUG - __init__.py:71 - FlowDesk网络服务模块已加载 - 版本 2.0.0
+2025-09-03 15:34:47 - flowdesk.services.network - DEBUG - __init__.py:72 - 可用服务类数量: 17
+2025-09-03 15:34:47 - __main__ - INFO - app.py:75 - FlowDesk应用程序启动
+2025-09-03 15:34:47 - __main__ - INFO - app.py:106 - 正在检查管理员权限...
+2025-09-03 15:34:47 - __main__ - INFO - app.py:112 - 已获得管理员权限，网络配置功能可正常使用
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:76 - 样式表管理服务初始化完成 - 标准模式
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: main_pyqt5.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: network_config_tab.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: network_tools_tab.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: rdp_tab.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: hardware_tab.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: system_tray_menu.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: tray_exit_dialog.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: add_ip_dialog.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: ip_config_confirm_dialog.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: modify_mac_dialog.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: network_progress_dialog.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: operation_result_dialog.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: status_bar.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:120 - 样式文件加载成功: main_window.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:128 - 样式表合并完成，已加载文件: main_pyqt5.qss, network_config_tab.qss, network_tools_tab.qss, rdp_tab.qss, hardware_tab.qss, system_tray_menu.qss, tray_exit_dialog.qss, add_ip_dialog.qss, ip_config_confirm_dialog.qss, modify_mac_dialog.qss, network_progress_dialog.qss, operation_result_dialog.qss, status_bar.qss, main_window.qss
+2025-09-03 15:34:47 - flowdesk.services.stylesheet_service - DEBUG - stylesheet_service.py:155 - 样式表应用成功
+2025-09-03 15:34:47 - __main__ - INFO - app.py:92 - 样式表加载完成
+2025-09-03 15:34:47 - flowdesk.ui.main_window.main_window - INFO - main_window.py:45 - 开始初始化主窗口拼装类
+2025-09-03 15:34:47 - flowdesk.ui.tabs.network_config_tab - DEBUG - network_config_tab.py:76 - NetworkConfigTab重构版初始化完成
+2025-09-03 15:34:48 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:88 - 状态栏UI布局设置完成
+2025-09-03 15:34:48 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:50 - 状态栏UI组件初始化完成
+2025-09-03 15:34:48 - flowdesk.ui.main_window.main_window_base - INFO - main_window_base.py:56 - 主窗口基础组件初始化完成
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:95 - [NetworkService] 开始执行操作: NetworkService门面初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: AdapterDiscoveryService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: AdapterDiscoveryService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:95 - [AdapterInfoRetriever] 开始执行操作: AdapterInfoRetriever初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_info_service - INFO - adapter_info_service.py:40 - 网卡详细信息服务已初始化（轻量级协调器模式）
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: AdapterDiscoveryService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_status_service - DEBUG - network_service_base.py:95 - [AdapterStatusService] 开始执行操作: AdapterStatusService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: AdapterPerformanceService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.ip_configuration_service - DEBUG - network_service_base.py:95 - [IPConfigurationService] 开始执行操作: IPConfigurationService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.extra_ip_management_service - DEBUG - network_service_base.py:95 - [ExtraIPManagementService] 开始执行操作: ExtraIPManagementService初始化 (无参数)
+2025-09-03 15:34:48 - AdapterOperationService - DEBUG - adapter_operation_service.py:52 - 网卡操作服务初始化完成
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: NetworkUICoordinatorService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:72 - 已注入网卡发现服务
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:82 - 已注入网卡信息服务
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:92 - 已注入网卡状态服务
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:102 - 已注入网卡性能服务
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:112 - 已注入IP配置服务
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:122 - 已注入额外IP管理服务
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:100 - 服务依赖关系建立完成
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:141 - 网络服务信号连接完成
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:81 - 网络服务门面初始化完成，所有专业服务已就绪
+2025-09-03 15:34:48 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:65 - 网络服务初始化完成
+2025-09-03 15:34:48 - flowdesk.services.status_bar_service - DEBUG - status_bar_service.py:67 - 状态栏管理服务初始化完成
+2025-09-03 15:34:48 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:69 - 状态栏服务初始化完成
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: AdapterDiscoveryService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_status_service - DEBUG - network_service_base.py:95 - [AdapterStatusService] 开始执行操作: AdapterStatusService初始化 (无参数)
+2025-09-03 15:34:48 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:73 - 网卡状态服务初始化完成
+2025-09-03 15:34:48 - flowdesk.ui.main_window.network_events.network_adapter_events - DEBUG - network_adapter_events.py:66 - NetworkAdapterEvents信号连接完成
+2025-09-03 15:34:48 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:67 - IPConfigurationEvents信号连接完成
+2025-09-03 15:34:48 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:64 - NetworkStatusEvents信号连接完成
+2025-09-03 15:34:48 - flowdesk.ui.main_window.network_event_handler - DEBUG - network_event_handler.py:94 - NetworkEventHandler协调器信号连接完成，委托给专业处理器
+2025-09-03 15:34:48 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:95 - 所有信号连接完成
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:95 - [NetworkService] 开始执行操作: 获取所有网卡信息 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 刷新网卡列表 (无参数)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: 发现网络适配器 (cache_valid=False)
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:295 - 网卡排序完成：已连接 3 个，未连接 4 个
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:106 - [AdapterDiscoveryService] 操作成功完成: 发现网络适配器 - 共找到 7 个网卡
+2025-09-03 15:34:48 - flowdesk.services.network.extra_ip_management_service - DEBUG - extra_ip_management_service.py:231 - 更新网卡信息缓存，共 7 个网卡
+2025-09-03 15:34:48 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Hyper-V Virtual Ethernet Adapter #3', name: 'Hyper-V Virtual Ethernet Adapter #3', description: 'Hyper-V Virtual Ethernet Adapter', friendly_name: 'vEthernet (泰兴)'
+2025-09-03 15:34:48 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Realtek Gaming GbE Family Controller', name: 'Realtek Gaming GbE Family Controller', description: 'Realtek Gaming GbE Family Controller', friendly_name: '以太网'
+2025-09-03 15:34:48 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'ASIX USB to Gigabit Ethernet Family Adapter', name: 'ASIX USB to Gigabit Ethernet Family Adapter', description: 'ASIX USB to Gigabit Ethernet Family Adapter', friendly_name: '以太网 2'
+2025-09-03 15:34:48 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Hyper-V Virtual Ethernet Adapter #2', name: 'Hyper-V Virtual Ethernet Adapter #2', description: 'Hyper-V Virtual Ethernet Adapter', friendly_name: 'vEthernet (USB)'
+2025-09-03 15:34:48 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', name: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', description: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', friendly_name: 'WLAN'
+2025-09-03 15:34:48 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'TAP-Windows Adapter V9', name: 'TAP-Windows Adapter V9', description: 'TAP-Windows Adapter V9', friendly_name: '本地连接'
+2025-09-03 15:34:48 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Bluetooth Device (Personal Area Network)', name: 'Bluetooth Device (Personal Area Network)', description: 'Bluetooth Device (Personal Area Network)', friendly_name: '蓝牙网络连接'
+2025-09-03 15:34:48 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:67 - 网卡列表更新完成：成功加载 7 个网络适配器到下拉框
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:165 - 网卡缓存已更新，当前缓存网卡数量: 7
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Hyper-V Virtual Ethernet Adapter #3', friendly_name='vEthernet (泰兴)', description='Hyper-V Virtual Ethernet Adapter'
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Realtek Gaming GbE Family Controller', friendly_name='以太网', description='Realtek Gaming GbE Family Controller'
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='ASIX USB to Gigabit Ethernet Family Adapter', friendly_name='以太网 2', description='ASIX USB to Gigabit Ethernet Family Adapter'
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Hyper-V Virtual Ethernet Adapter #2', friendly_name='vEthernet (USB)', description='Hyper-V Virtual Ethernet Adapter'
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Realtek 8188GU Wireless LAN 802.11n USB NIC', friendly_name='WLAN', description='Realtek 8188GU Wireless LAN 802.11n USB NIC'
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='TAP-Windows Adapter V9', friendly_name='本地连接', description='TAP-Windows Adapter V9'
+2025-09-03 15:34:48 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Bluetooth Device (Personal Area Network)', friendly_name='蓝牙网络连接', description='Bluetooth Device (Personal Area Network)'
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:170 - 自动选择第一个网卡: vEthernet (泰兴)
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 设置当前网卡 (adapter_id={083E8011-1034-4CB5-8071-D1A4ED8B96E9})
+2025-09-03 15:34:48 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 刷新当前网卡 (adapter_id={083E8011-1034-4CB5-8071-D1A4ED8B96E9})
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:48 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:328 - 成功找到网卡基本信息: vEthernet (泰兴)
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:328 - 成功找到网卡基本信息: vEthernet (泰兴)
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:95 - [AdapterInfoRetriever] 开始执行操作: 获取网卡详细信息 (adapter_name=vEthernet (泰兴))
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:114 - netsh命令执行成功，输出长度: 676 字符
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:240 - ipconfig输出长度: 3749 字符
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:259 - 找到网卡 vEthernet (泰兴) 的配置段落，长度: 1543 字符
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:289 - 解析到IPv4地址: ['172.2.208.10', '172.16.3.10', '192.168.20.10']
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:312 - 解析到IPv6地址: ['fe80::86e2:74c0:2b1a:54b0%4', '2408:825c:a620:5289::d19', '2408:825c:a620:5289:11b2:b01f:71a:dcdb', '2408:825c:a620:5289:5b64:9830:10da:f3bf']
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:347 - 解析到子网掩码: ['255.255.0.0', '255.255.0.0', '255.255.255.0']
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:360 - 解析到默认网关: 172.2.0.1
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:398 - 解析到DNS服务器: ['114.114.114.114']
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:418 - 解析到DHCP状态: 已禁用
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: AdapterPerformanceService初始化 (无参数)
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: 获取链路速度 (adapter_name=vEthernet (泰兴))
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: 查询网卡描述 (adapter_name=vEthernet (泰兴))
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:222 - 执行wmic查询命令: wmic path win32_networkadapter where "NetConnectionID='vEthernet (泰兴)'" get Description /format:csv
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:230 - wmic查询返回码: 0
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:237 - 解析到 1 行有效数据
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:241 - 处理第 1 行数据
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:106 - [AdapterPerformanceService] 操作成功完成: 查询网卡描述 - 找到描述: Hyper-V Virtual Ethernet Adapter
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:94 - wmic nic输出行数: 3
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:95 - 目标网卡描述: 'Hyper-V Virtual Ethernet Adapter'
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:99 - 第1行解析: parts数量=3
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:105 - 网卡名称: 'Hyper-V Virtual Ethernet Adapter #3', 速度: '1000000000'
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:117 - 描述包含匹配成功
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:126 - 网卡匹配成功! 名称: Hyper-V Virtual Ethernet Adapter #3
+2025-09-03 15:34:49 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:106 - [AdapterPerformanceService] 操作成功完成: 获取链路速度 - wmic解析: 1.0 Gbps
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:426 - 成功获取网卡 vEthernet (泰兴) 链路速度: 1.0 Gbps
+2025-09-03 15:34:49 - AdapterConfigParser - DEBUG - adapter_config_parser.py:208 - 成功使用ipconfig补充网卡 vEthernet (泰兴) 的完整配置信息
+2025-09-03 15:34:50 - AdapterDnsEnhancer - DEBUG - adapter_dns_enhancer.py:56 - netsh获取到网卡 vEthernet (泰兴) 的DNS服务器: ['114.114.114.114']
+2025-09-03 15:34:50 - AdapterDnsEnhancer - DEBUG - adapter_dns_enhancer.py:93 - 网卡 vEthernet (泰兴) DNS配置已增强: ['114.114.114.114']
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:48 - 开始获取网卡 'vEthernet (泰兴)' 的状态信息
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:64 - 成功使用编码 utf-8 解析netsh输出
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:79 - netsh interface show interface 完整输出:
 
 管理员状态     状态           类型             接口名称
 -------------------------------------------------------------------------
 已启用            已断开连接          专用               本地连接
 已启用            已连接            专用               以太网 2
-已启用            已连接            专用               WLAN
+已禁用            已断开连接          专用               WLAN
 已启用            已断开连接          专用               vEthernet (USB)
 已启用            已连接            专用               vEthernet (泰兴)
 已启用            已连接            专用               以太网
 
 
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:85 - 解析到 8 行输出，目标网卡: 'vEthernet (泰兴)'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:98 - 🔍 可用接口列表: ['本地连接', '以太网 2', 'WLAN', 'vEthernet (USB)', 'vEthernet (泰兴)', '以太网']
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第0行解析: 接口名称='接口名称', 完整行='管理员状态     状态           类型             接口名称'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第2行解析: 接口名称='本地连接', 完整行='已启用            已断开连接          专用               本地连接'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第3行解析: 接口名称='以太网 2', 完整行='已启用            已连接            专用               以太网 2'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第4行解析: 接口名称='WLAN', 完整行='已启用            已连接            专用               WLAN'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第5行解析: 接口名称='vEthernet (USB)', 完整行='已启用            已断开连接          专用               vEthernet (USB)'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第6行解析: 接口名称='vEthernet (泰兴)', 完整行='已启用            已连接            专用               vEthernet (泰兴)'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:124 - 🔥 匹配成功: 网卡 'vEthernet (泰兴)' -> 接口 'vEthernet (泰兴)'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:125 - 🔥 原始行内容: '已启用            已连接            专用               vEthernet (泰兴)'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:126 - 🔥 解析结果: 管理状态='已启用', 连接状态='已连接'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:147 - 🔥 网卡 vEthernet (泰兴) 状态映射完成:
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:148 - 🔥   管理状态: '已启用' -> '已启用'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:149 - 🔥   连接状态: '已连接' -> '已连接'
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:199 - 状态判断结果: 网卡已启用且已连接
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:156 - 🔥 最终状态判断: '已连接', 启用=True, 连接=True
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:199 - 状态判断结果: 网卡已启用且已连接
-2025-09-03 00:44:43 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:282 - 网卡 vEthernet (泰兴) 精确状态分析: 管理状态=已启用, 连接状态=已连接, 最终状态=已连接
-2025-09-03 00:44:43 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:106 - [AdapterInfoRetriever] 操作成功完成: 获取网卡详细信息 - 网卡: vEthernet (泰兴)
-2025-09-03 00:44:43 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:226 - 从详细信息中提取链路速度: 1.0 Gbps
-2025-09-03 00:44:43 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:243 - 发射adapter_info_updated信号 - 网卡ID: {083E8011-1034-4CB5-8071-D1A4ED8B96E9}
-2025-09-03 00:44:43 - flowdesk.services.network.network_service - DEBUG - network_service.py:146 - NetworkService收到adapter_info_updated信号 - 网卡ID: {083E8011-1034-4CB5-8071-D1A4ED8B96E9}
-2025-09-03 00:44:43 - flowdesk.services.network.network_service - DEBUG - network_service.py:147 - NetworkService即将转发adapter_info_updated信号给UI层
-2025-09-03 00:44:43 - flowdesk.services.network.network_service - DEBUG - network_service.py:149 - 手动发射adapter_info_updated信号
-2025-09-03 00:44:43 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:102 - 🎯 收到adapter_info_updated信号，开始更新状态栏
-2025-09-03 00:44:43 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:116 - 📊 网卡信息 - 名称: vEthernet (泰兴), 状态: 已连接
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ 已切换到 vEthernet (泰兴) (已连接)
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ 已切换到 vEthernet (泰兴) (已连接)
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ 已切换到 vEthernet (泰兴) (已连接)
-2025-09-03 00:44:43 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:132 - 状态栏已更新网卡切换最终状态: ✅ 已切换到 vEthernet (泰兴) (已连接)
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:134 - [调试] _on_adapter_info_updated被调用，aggregated_info类型: <class 'flowdesk.models.common.AggregatedAdapterInfo'>
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:142 - [调试] 提取到detailed_info，类型: <class 'flowdesk.models.adapter_info.AdapterInfo'>
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:143 - [调试] detailed_info属性: status=已连接, link_speed=1.0 Gbps, dhcp_enabled=False
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:146 - [调试] 即将调用_update_status_badges_from_info
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:172 - 状态徽章更新已由Service层直接处理，跳过UI层处理
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:150 - [调试] 即将调用_update_ip_info_display_from_info
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:192 - IP信息展示区域已更新
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:153 - 网卡信息UI更新完成: Hyper-V Virtual Ethernet Adapter #3
-2025-09-03 00:44:43 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:102 - 🎯 收到adapter_info_updated信号，开始更新状态栏
-2025-09-03 00:44:43 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:116 - 📊 网卡信息 - 名称: vEthernet (泰兴), 状态: 已连接
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ 已切换到 vEthernet (泰兴) (已连接)
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ 已切换到 vEthernet (泰兴) (已连接)
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ 已切换到 vEthernet (泰兴) (已连接)
-2025-09-03 00:44:43 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:132 - 状态栏已更新网卡切换最终状态: ✅ 已切换到 vEthernet (泰兴) (已连接)
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:134 - [调试] _on_adapter_info_updated被调用，aggregated_info类型: <class 'flowdesk.models.common.AggregatedAdapterInfo'>
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:142 - [调试] 提取到detailed_info，类型: <class 'flowdesk.models.adapter_info.AdapterInfo'>
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:143 - [调试] detailed_info属性: status=已连接, link_speed=1.0 Gbps, dhcp_enabled=False
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:146 - [调试] 即将调用_update_status_badges_from_info
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:172 - 状态徽章更新已由Service层直接处理，跳过UI层处理
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:150 - [调试] 即将调用_update_ip_info_display_from_info
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:192 - IP信息展示区域已更新
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:153 - 网卡信息UI更新完成: Hyper-V Virtual Ethernet Adapter #3
-2025-09-03 00:44:43 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:266 - 发射ip_info_updated信号，用于更新右侧输入框
-2025-09-03 00:44:43 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:262 - 📡 IP信息已更新: 172.2.208.10
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:224 - [调试] 准备更新IP配置输入框，IPConfigInfo对象: IPConfigInfo(adapter_id='{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', ip_address='172.2.208.10', subnet_mask='255.255.0.0', gateway='172.2.0.1', dns_primary='114.114.114.114', dns_secondary='', dhcp_enabled=False)
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:226 - [调试] IP配置输入框更新完成
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:229 - IP配置界面更新完成: 172.2.208.10
-2025-09-03 00:44:43 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:279 - 发射extra_ips_updated信号，共2个额外IP: ['172.16.3.10/255.255.0.0', '192.168.20.10/255.255.255.0']
-2025-09-03 00:44:43 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:418 - 📋 额外IP列表已更新，共 2 个
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:251 - 接收到字符串格式的额外IP列表: ['172.16.3.10/255.255.0.0', '192.168.20.10/255.255.255.0']
-2025-09-03 00:44:43 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:264 - 额外IP列表已更新，共 2 个
-2025-09-03 00:44:43 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 刷新当前网卡 - 信息更新完成
-2025-09-03 00:44:43 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 设置当前网卡 - 已切换到网卡: {083E8011-1034-4CB5-8071-D1A4ED8B96E9}
-2025-09-03 00:44:43 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 刷新网卡列表 - 成功获取7个网卡
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: 🚀 应用启动完成
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: 🚀 应用启动完成
-2025-09-03 00:44:43 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | 🚀 应用启动完成
-2025-09-03 00:44:43 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:112 - 所有服务核心功能启动完成
-2025-09-03 00:44:43 - flowdesk.ui.main_window.main_window_base - INFO - main_window.py:85 - 所有功能组件初始化完成
-2025-09-03 00:44:43 - flowdesk.ui.main_window.main_window_base - INFO - main_window.py:53 - 主窗口拼装类初始化完成
-2025-09-03 00:44:43 - flowdesk.utils.capabilities - INFO - capabilities.py:155 - 系统能力检测完成
-2025-09-03 00:44:43 - flowdesk.services.system_tray_service - DEBUG - system_tray_service.py:68 - 系统托盘服务初始化成功
-2025-09-03 00:44:43 - flowdesk.services.tray_ui_service - DEBUG - tray_ui_service.py:177 - 系统托盘设置成功
-2025-09-03 00:44:44 - __main__ - INFO - app.py:149 - 应用程序启动完成 - ✅ 管理员权限 - 可以修改网络配置
-2025-09-03 00:44:49 - flowdesk.ui.main_window.service_coordinator - WARNING - service_coordinator.py:415 - 事件处理器未初始化，使用回退方法处理MAC地址修改
-2025-09-03 00:44:49 - flowdesk.ui.main_window.service_coordinator - DEBUG - service_coordinator.py:416 - 修改MAC地址请求: vEthernet (泰兴)
-2025-09-03 00:47:31 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:86 - 🔧 收到IP配置应用请求
-2025-09-03 00:47:31 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:301 - 从左侧面板获取的IP信息文本: 网卡描述: Hyper-V Virtual Ethernet Adapter
-友好名称: vEthernet (泰兴)
-物理地址: D8:5E:D3:5E:8B:59
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:85 - 解析到 8 行输出，目标网卡: 'vEthernet (泰兴)'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:98 - 🔍 可用接口列表: ['本地连接', '以太网 2', 'WLAN', 'vEthernet (USB)', 'vEthernet (泰兴)', '以太网']
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第0行解析: 接口名称='接口名称', 完整行='管理员状态     状态           类型             接口名称'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第2行解析: 接口名称='本地连接', 完整行='已启用            已断开连接          专用               本地连接'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第3行解析: 接口名称='以太网 2', 完整行='已启用            已连接            专用               以太网 2'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第4行解析: 接口名称='WLAN', 完整行='已禁用            已断开连接          专用               WLAN'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第5行解析: 接口名称='vEthernet (USB)', 完整行='已启用            已断开连接          专用               vEthernet (USB)'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第6行解析: 接口名称='vEthernet (泰兴)', 完整行='已启用            已连接            专用               vEthernet (泰兴)'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:124 - 🔥 匹配成功: 网卡 'vEthernet (泰兴)' -> 接口 'vEthernet (泰兴)'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:125 - 🔥 原始行内容: '已启用            已连接            专用               vEthernet (泰兴)'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:126 - 🔥 解析结果: 管理状态='已启用', 连接状态='已连接'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:147 - 🔥 网卡 vEthernet (泰兴) 状态映射完成:
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:148 - 🔥   管理状态: '已启用' -> '已启用'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:149 - 🔥   连接状态: '已连接' -> '已连接'
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:199 - 状态判断结果: 网卡已启用且已连接
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:156 - 🔥 最终状态判断: '已连接', 启用=True, 连接=True
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:199 - 状态判断结果: 网卡已启用且已连接
+2025-09-03 15:34:50 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:282 - 网卡 vEthernet (泰兴) 精确状态分析: 管理状态=已启用, 连接状态=已连接, 最终状态=已连接
+2025-09-03 15:34:50 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:106 - [AdapterInfoRetriever] 操作成功完成: 获取网卡详细信息 - 网卡: vEthernet (泰兴)
+2025-09-03 15:34:50 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:226 - 从详细信息中提取链路速度: 1.0 Gbps
+2025-09-03 15:34:50 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:243 - 发射adapter_info_updated信号 - 网卡ID: {083E8011-1034-4CB5-8071-D1A4ED8B96E9}
+2025-09-03 15:34:50 - flowdesk.services.network.network_service - DEBUG - network_service.py:146 - NetworkService收到adapter_info_updated信号 - 网卡ID: {083E8011-1034-4CB5-8071-D1A4ED8B96E9}
+2025-09-03 15:34:50 - flowdesk.services.network.network_service - DEBUG - network_service.py:147 - NetworkService即将转发adapter_info_updated信号给UI层
+2025-09-03 15:34:50 - flowdesk.services.network.network_service - DEBUG - network_service.py:149 - 手动发射adapter_info_updated信号
+2025-09-03 15:34:50 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:102 - 🎯 收到adapter_info_updated信号，开始更新状态栏
+2025-09-03 15:34:50 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:116 - 📊 网卡信息 - 名称: vEthernet (泰兴), 状态: 已连接
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ 已切换到 vEthernet (泰兴) (已连接)
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ 已切换到 vEthernet (泰兴) (已连接)
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ 已切换到 vEthernet (泰兴) (已连接)
+2025-09-03 15:34:50 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:132 - 状态栏已更新网卡切换最终状态: ✅ 已切换到 vEthernet (泰兴) (已连接)
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:134 - [调试] _on_adapter_info_updated被调用，aggregated_info类型: <class 'flowdesk.models.common.AggregatedAdapterInfo'>
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:142 - [调试] 提取到detailed_info，类型: <class 'flowdesk.models.adapter_info.AdapterInfo'>
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:143 - [调试] detailed_info属性: status=已连接, link_speed=1.0 Gbps, dhcp_enabled=False
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:146 - [调试] 即将调用_update_status_badges_from_info
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:172 - 状态徽章更新已由Service层直接处理，跳过UI层处理
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:150 - [调试] 即将调用_update_ip_info_display_from_info
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:192 - IP信息展示区域已更新
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:153 - 网卡信息UI更新完成: Hyper-V Virtual Ethernet Adapter #3
+2025-09-03 15:34:50 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:102 - 🎯 收到adapter_info_updated信号，开始更新状态栏
+2025-09-03 15:34:50 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:116 - 📊 网卡信息 - 名称: vEthernet (泰兴), 状态: 已连接
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ 已切换到 vEthernet (泰兴) (已连接)
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ 已切换到 vEthernet (泰兴) (已连接)
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ 已切换到 vEthernet (泰兴) (已连接)
+2025-09-03 15:34:50 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:132 - 状态栏已更新网卡切换最终状态: ✅ 已切换到 vEthernet (泰兴) (已连接)
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:134 - [调试] _on_adapter_info_updated被调用，aggregated_info类型: <class 'flowdesk.models.common.AggregatedAdapterInfo'>
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:142 - [调试] 提取到detailed_info，类型: <class 'flowdesk.models.adapter_info.AdapterInfo'>
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:143 - [调试] detailed_info属性: status=已连接, link_speed=1.0 Gbps, dhcp_enabled=False
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:146 - [调试] 即将调用_update_status_badges_from_info
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:172 - 状态徽章更新已由Service层直接处理，跳过UI层处理
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:150 - [调试] 即将调用_update_ip_info_display_from_info
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:192 - IP信息展示区域已更新
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:153 - 网卡信息UI更新完成: Hyper-V Virtual Ethernet Adapter #3
+2025-09-03 15:34:50 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:266 - 发射ip_info_updated信号，用于更新右侧输入框
+2025-09-03 15:34:50 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:291 - 📡 IP信息已更新: 172.2.208.10
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:224 - [调试] 准备更新IP配置输入框，IPConfigInfo对象: IPConfigInfo(adapter_id='{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', ip_address='172.2.208.10', subnet_mask='255.255.0.0', gateway='172.2.0.1', dns_primary='114.114.114.114', dns_secondary='', dhcp_enabled=False)
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:226 - [调试] IP配置输入框更新完成
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:229 - IP配置界面更新完成: 172.2.208.10
+2025-09-03 15:34:50 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:279 - 发射extra_ips_updated信号，共2个额外IP: ['172.16.3.10/255.255.0.0', '192.168.20.10/255.255.255.0']
+2025-09-03 15:34:50 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:447 - 📋 额外IP列表已更新，共 2 个
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:251 - 接收到字符串格式的额外IP列表: ['172.16.3.10/255.255.0.0', '192.168.20.10/255.255.255.0']
+2025-09-03 15:34:50 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:264 - 额外IP列表已更新，共 2 个
+2025-09-03 15:34:50 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 刷新当前网卡 - 信息更新完成
+2025-09-03 15:34:50 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 设置当前网卡 - 已切换到网卡: {083E8011-1034-4CB5-8071-D1A4ED8B96E9}
+2025-09-03 15:34:50 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 刷新网卡列表 - 成功获取7个网卡
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: 🚀 应用启动完成
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: 🚀 应用启动完成
+2025-09-03 15:34:50 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | 🚀 应用启动完成
+2025-09-03 15:34:50 - flowdesk.ui.main_window.service_coordinator - INFO - service_coordinator.py:112 - 所有服务核心功能启动完成
+2025-09-03 15:34:50 - flowdesk.ui.main_window.main_window_base - INFO - main_window.py:85 - 所有功能组件初始化完成
+2025-09-03 15:34:50 - flowdesk.ui.main_window.main_window_base - INFO - main_window.py:53 - 主窗口拼装类初始化完成
+2025-09-03 15:34:50 - flowdesk.utils.capabilities - INFO - capabilities.py:155 - 系统能力检测完成
+2025-09-03 15:34:50 - flowdesk.services.system_tray_service - DEBUG - system_tray_service.py:68 - 系统托盘服务初始化成功
+2025-09-03 15:34:50 - flowdesk.services.tray_ui_service - DEBUG - tray_ui_service.py:177 - 系统托盘设置成功
+2025-09-03 15:34:50 - __main__ - INFO - app.py:149 - 应用程序启动完成 - ✅ 管理员权限 - 可以修改网络配置
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:95 - [NetworkService] 开始执行操作: 获取所有网卡信息 (无参数)
+2025-09-03 15:34:59 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 刷新网卡列表 (无参数)
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:95 - [AdapterDiscoveryService] 开始执行操作: 发现网络适配器 (cache_valid=True)
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:295 - 网卡排序完成：已连接 3 个，未连接 4 个
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - network_service_base.py:106 - [AdapterDiscoveryService] 操作成功完成: 发现网络适配器 - 共找到 7 个网卡
+2025-09-03 15:34:59 - flowdesk.services.network.extra_ip_management_service - DEBUG - extra_ip_management_service.py:231 - 更新网卡信息缓存，共 7 个网卡
+2025-09-03 15:34:59 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Hyper-V Virtual Ethernet Adapter #3', name: 'Hyper-V Virtual Ethernet Adapter #3', description: 'Hyper-V Virtual Ethernet Adapter', friendly_name: 'vEthernet (泰兴)'
+2025-09-03 15:34:59 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Realtek Gaming GbE Family Controller', name: 'Realtek Gaming GbE Family Controller', description: 'Realtek Gaming GbE Family Controller', friendly_name: '以太网'
+2025-09-03 15:34:59 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'ASIX USB to Gigabit Ethernet Family Adapter', name: 'ASIX USB to Gigabit Ethernet Family Adapter', description: 'ASIX USB to Gigabit Ethernet Family Adapter', friendly_name: '以太网 2'
+2025-09-03 15:34:59 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Hyper-V Virtual Ethernet Adapter #2', name: 'Hyper-V Virtual Ethernet Adapter #2', description: 'Hyper-V Virtual Ethernet Adapter', friendly_name: 'vEthernet (USB)'
+2025-09-03 15:34:59 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', name: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', description: 'Realtek 8188GU Wireless LAN 802.11n USB NIC', friendly_name: 'WLAN'
+2025-09-03 15:34:59 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'TAP-Windows Adapter V9', name: 'TAP-Windows Adapter V9', description: 'TAP-Windows Adapter V9', friendly_name: '本地连接'
+2025-09-03 15:34:59 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:60 - 网卡显示名称: 'Bluetooth Device (Personal Area Network)', name: 'Bluetooth Device (Personal Area Network)', description: 'Bluetooth Device (Personal Area Network)', friendly_name: '蓝牙网络连接'
+2025-09-03 15:34:59 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:67 - 网卡列表更新完成：成功加载 7 个网络适配器到下拉框
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service.py:165 - 网卡缓存已更新，当前缓存网卡数量: 7
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Hyper-V Virtual Ethernet Adapter #3', friendly_name='vEthernet (泰兴)', description='Hyper-V Virtual Ethernet Adapter'
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Realtek Gaming GbE Family Controller', friendly_name='以太网', description='Realtek Gaming GbE Family Controller'
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='ASIX USB to Gigabit Ethernet Family Adapter', friendly_name='以太网 2', description='ASIX USB to Gigabit Ethernet Family Adapter'
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Hyper-V Virtual Ethernet Adapter #2', friendly_name='vEthernet (USB)', description='Hyper-V Virtual Ethernet Adapter'
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Realtek 8188GU Wireless LAN 802.11n USB NIC', friendly_name='WLAN', description='Realtek 8188GU Wireless LAN 802.11n USB NIC'
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='TAP-Windows Adapter V9', friendly_name='本地连接', description='TAP-Windows Adapter V9'
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service.py:169 - 缓存网卡: name='Bluetooth Device (Personal Area Network)', friendly_name='蓝牙网络连接', description='Bluetooth Device (Personal Area Network)'
+2025-09-03 15:34:59 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 刷新网卡列表 - 成功获取7个网卡
+2025-09-03 15:34:59 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:95 - [NetworkService] 开始执行操作: 选择网卡 (adapter_id={D64BED12-85F2-467D-9D3B-01C11038CACE})
+2025-09-03 15:34:59 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 设置当前网卡 (adapter_id={D64BED12-85F2-467D-9D3B-01C11038CACE})
+2025-09-03 15:34:59 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 刷新当前网卡 (adapter_id={D64BED12-85F2-467D-9D3B-01C11038CACE})
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:34:59 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:328 - 成功找到网卡基本信息: 以太网 2
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:328 - 成功找到网卡基本信息: 以太网 2
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:95 - [AdapterInfoRetriever] 开始执行操作: 获取网卡详细信息 (adapter_name=以太网 2)
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:114 - netsh命令执行成功，输出长度: 430 字符
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:240 - ipconfig输出长度: 3749 字符
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:259 - 找到网卡 以太网 2 的配置段落，长度: 726 字符
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:289 - 解析到IPv4地址: ['192.168.1.222']
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:312 - 解析到IPv6地址: ['fe80::ee03:aeb5:2b2e:c79b%23']
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:347 - 解析到子网掩码: ['255.255.255.0']
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:360 - 解析到默认网关: 192.168.1.1
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:398 - 解析到DNS服务器: ['192.168.1.1']
+2025-09-03 15:35:00 - AdapterConfigParser - DEBUG - adapter_config_parser.py:418 - 解析到DHCP状态: 已禁用
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: AdapterPerformanceService初始化 (无参数)
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: 获取链路速度 (adapter_name=以太网 2)
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: 查询网卡描述 (adapter_name=以太网 2)
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:222 - 执行wmic查询命令: wmic path win32_networkadapter where "NetConnectionID='以太网 2'" get Description /format:csv
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:230 - wmic查询返回码: 0
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:237 - 解析到 1 行有效数据
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:241 - 处理第 1 行数据
+2025-09-03 15:35:00 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:106 - [AdapterPerformanceService] 操作成功完成: 查询网卡描述 - 找到描述: ASIX USB to Gigabit Ethernet Family Adapter
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:94 - wmic nic输出行数: 3
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:95 - 目标网卡描述: 'ASIX USB to Gigabit Ethernet Family Adapter'
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:99 - 第1行解析: parts数量=3
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:105 - 网卡名称: 'Hyper-V Virtual Ethernet Adapter #3', 速度: '1000000000'
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:99 - 第2行解析: parts数量=3
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:105 - 网卡名称: 'Realtek Gaming GbE Family Controller', 速度: ''
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:99 - 第3行解析: parts数量=3
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:105 - 网卡名称: 'ASIX USB to Gigabit Ethernet Family Adapter', 速度: '1000000000'
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:113 - 完整描述匹配成功
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:126 - 网卡匹配成功! 名称: ASIX USB to Gigabit Ethernet Family Adapter
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:106 - [AdapterPerformanceService] 操作成功完成: 获取链路速度 - wmic解析: 1.0 Gbps
+2025-09-03 15:35:01 - AdapterConfigParser - DEBUG - adapter_config_parser.py:426 - 成功获取网卡 以太网 2 链路速度: 1.0 Gbps
+2025-09-03 15:35:01 - AdapterConfigParser - DEBUG - adapter_config_parser.py:208 - 成功使用ipconfig补充网卡 以太网 2 的完整配置信息
+2025-09-03 15:35:01 - AdapterDnsEnhancer - DEBUG - adapter_dns_enhancer.py:56 - netsh获取到网卡 以太网 2 的DNS服务器: ['192.168.1.1']
+2025-09-03 15:35:01 - AdapterDnsEnhancer - DEBUG - adapter_dns_enhancer.py:93 - 网卡 以太网 2 DNS配置已增强: ['192.168.1.1']
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:48 - 开始获取网卡 '以太网 2' 的状态信息
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:64 - 成功使用编码 utf-8 解析netsh输出
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:79 - netsh interface show interface 完整输出:
+
+管理员状态     状态           类型             接口名称
+-------------------------------------------------------------------------
+已启用            已断开连接          专用               本地连接
+已启用            已连接            专用               以太网 2
+已禁用            已断开连接          专用               WLAN
+已启用            已断开连接          专用               vEthernet (USB)
+已启用            已连接            专用               vEthernet (泰兴)
+已启用            已连接            专用               以太网
+
+
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:85 - 解析到 8 行输出，目标网卡: '以太网 2'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:98 - 🔍 可用接口列表: ['本地连接', '以太网 2', 'WLAN', 'vEthernet (USB)', 'vEthernet (泰兴)', '以太网']
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第0行解析: 接口名称='接口名称', 完整行='管理员状态     状态           类型             接口名称'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第2行解析: 接口名称='本地连接', 完整行='已启用            已断开连接          专用               本地连接'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第3行解析: 接口名称='以太网 2', 完整行='已启用            已连接            专用               以太网 2'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:124 - 🔥 匹配成功: 网卡 '以太网 2' -> 接口 '以太网 2'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:125 - 🔥 原始行内容: '已启用            已连接            专用               以太网 2'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:126 - 🔥 解析结果: 管理状态='已启用', 连接状态='已连接'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:147 - 🔥 网卡 以太网 2 状态映射完成:
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:148 - 🔥   管理状态: '已启用' -> '已启用'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:149 - 🔥   连接状态: '已连接' -> '已连接'
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:199 - 状态判断结果: 网卡已启用且已连接
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:156 - 🔥 最终状态判断: '已连接', 启用=True, 连接=True
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:199 - 状态判断结果: 网卡已启用且已连接
+2025-09-03 15:35:01 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:282 - 网卡 以太网 2 精确状态分析: 管理状态=已启用, 连接状态=已连接, 最终状态=已连接
+2025-09-03 15:35:01 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:106 - [AdapterInfoRetriever] 操作成功完成: 获取网卡详细信息 - 网卡: 以太网 2
+2025-09-03 15:35:01 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:226 - 从详细信息中提取链路速度: 1.0 Gbps
+2025-09-03 15:35:01 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:243 - 发射adapter_info_updated信号 - 网卡ID: {D64BED12-85F2-467D-9D3B-01C11038CACE}
+2025-09-03 15:35:01 - flowdesk.services.network.network_service - DEBUG - network_service.py:146 - NetworkService收到adapter_info_updated信号 - 网卡ID: {D64BED12-85F2-467D-9D3B-01C11038CACE}
+2025-09-03 15:35:01 - flowdesk.services.network.network_service - DEBUG - network_service.py:147 - NetworkService即将转发adapter_info_updated信号给UI层
+2025-09-03 15:35:01 - flowdesk.services.network.network_service - DEBUG - network_service.py:149 - 手动发射adapter_info_updated信号
+2025-09-03 15:35:01 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:102 - 🎯 收到adapter_info_updated信号，开始更新状态栏
+2025-09-03 15:35:01 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:116 - 📊 网卡信息 - 名称: 以太网 2, 状态: 已连接
+2025-09-03 15:35:01 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:01 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:35:01 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:01 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:01 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:132 - 状态栏已更新网卡切换最终状态: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:134 - [调试] _on_adapter_info_updated被调用，aggregated_info类型: <class 'flowdesk.models.common.AggregatedAdapterInfo'>
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:142 - [调试] 提取到detailed_info，类型: <class 'flowdesk.models.adapter_info.AdapterInfo'>
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:143 - [调试] detailed_info属性: status=已连接, link_speed=1.0 Gbps, dhcp_enabled=False
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:146 - [调试] 即将调用_update_status_badges_from_info
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:172 - 状态徽章更新已由Service层直接处理，跳过UI层处理
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:150 - [调试] 即将调用_update_ip_info_display_from_info
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:192 - IP信息展示区域已更新
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:153 - 网卡信息UI更新完成: ASIX USB to Gigabit Ethernet Family Adapter
+2025-09-03 15:35:01 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:102 - 🎯 收到adapter_info_updated信号，开始更新状态栏
+2025-09-03 15:35:01 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:116 - 📊 网卡信息 - 名称: 以太网 2, 状态: 已连接
+2025-09-03 15:35:01 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:01 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:35:01 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:01 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:01 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:132 - 状态栏已更新网卡切换最终状态: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:134 - [调试] _on_adapter_info_updated被调用，aggregated_info类型: <class 'flowdesk.models.common.AggregatedAdapterInfo'>
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:142 - [调试] 提取到detailed_info，类型: <class 'flowdesk.models.adapter_info.AdapterInfo'>
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:143 - [调试] detailed_info属性: status=已连接, link_speed=1.0 Gbps, dhcp_enabled=False
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:146 - [调试] 即将调用_update_status_badges_from_info
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:172 - 状态徽章更新已由Service层直接处理，跳过UI层处理
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:150 - [调试] 即将调用_update_ip_info_display_from_info
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:192 - IP信息展示区域已更新
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:153 - 网卡信息UI更新完成: ASIX USB to Gigabit Ethernet Family Adapter
+2025-09-03 15:35:01 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:266 - 发射ip_info_updated信号，用于更新右侧输入框
+2025-09-03 15:35:01 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:291 - 📡 IP信息已更新: 192.168.1.222
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:224 - [调试] 准备更新IP配置输入框，IPConfigInfo对象: IPConfigInfo(adapter_id='{D64BED12-85F2-467D-9D3B-01C11038CACE}', ip_address='192.168.1.222', subnet_mask='255.255.255.0', gateway='192.168.1.1', dns_primary='192.168.1.1', dns_secondary='', dhcp_enabled=False)
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:226 - [调试] IP配置输入框更新完成
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:229 - IP配置界面更新完成: 192.168.1.222
+2025-09-03 15:35:01 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:283 - 发射空的extra_ips_updated信号，清空额外IP显示
+2025-09-03 15:35:01 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:449 - 额外IP列表已清空
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:259 - 格式化ExtraIP对象为字符串列表: []
+2025-09-03 15:35:01 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:264 - 额外IP列表已更新，共 0 个
+2025-09-03 15:35:01 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 刷新当前网卡 - 信息更新完成
+2025-09-03 15:35:01 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 设置当前网卡 - 已切换到网卡: {D64BED12-85F2-467D-9D3B-01C11038CACE}
+2025-09-03 15:35:04 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:87 - 🔧 收到IP配置应用请求
+2025-09-03 15:35:04 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:330 - 从左侧面板获取的IP信息文本: 网卡描述: ASIX USB to Gigabit Ethernet Family Adapter
+友好名称: 以太网 2
+物理地址: 00:0E:C6:C2:C3:F9
 连接状态: 已连接
 接口类型: 以太网
 链路速度: 1.0 Gbps
 
 === IP配置信息 ===
-主IP地址: 172.2.208.10
-子网掩码: 255.255.0.0
-
-额外IPv4地址:
-  • 172.16.3.10/255.255.0.0
-  • 192.168.20.10/255.255.255.0
+主IP地址: 192.168.1.222
+子网掩码: 255.255.255.0
 
 === 网络配置 ===
-默认网关: 172.2.0.1
+默认网关: 192.168.1.1
 DHCP状态: 禁用
-主DNS服务器: 114.114.114.114
+主DNS服务器: 192.168.1.1
 备用DNS服务器: 未配置
 
 === IPv6配置信息 ===
-主IPv6地址: 2408:825c:a620:6634:54f:1f3f:b77e:ee53
-IPv6地址2: 2408:825c:a620:5289:5b64:9830:10da:f3bf
-IPv6地址3: 2408:825c:a620:5289::d19
-IPv6地址4: 2408:825c:a620:5289:54f:1f3f:b77e:ee53
-IPv6地址5: fe80::86e2:74c0:2b1a:54b0%4
+主IPv6地址: fe80::ee03:aeb5:2b2e:c79b%23
 
-最后更新: 2025-09-03 00:44:43
-2025-09-03 00:47:31 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:344 - 解析得到的IP配置 - IP: 172.2.208.10, 子网掩码: 255.255.0.0, 网关: 172.2.0.1, 主DNS: 114.114.114.114, 备用DNS: None
-2025-09-03 00:58:29 - flowdesk.services.tray_ui_service - DEBUG - tray_ui_service.py:40 - 托盘退出对话框初始化完成
-2025-09-03 00:58:30 - flowdesk.services.tray_ui_service - DEBUG - tray_ui_service.py:119 - 用户选择: exit
-2025-09-03 00:58:30 - flowdesk.ui.main_window.main_window_base - INFO - main_window.py:105 - 主窗口关闭请求已发射信号
+最后更新: 2025-09-03 15:35:01
+2025-09-03 15:35:04 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:373 - 解析得到的IP配置 - IP: 192.168.1.222, 子网掩码: 255.255.255.0, 网关: 192.168.1.1, 主DNS: 192.168.1.1, 备用DNS: None
+2025-09-03 15:35:05 - NetworkProgressDialog - INFO - network_progress_dialog.py:46 - 创建网络进度对话框: 修改IP配置 - 以太网 2
+2025-09-03 15:35:05 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:152 - 🚀 开始应用IP配置到网卡: 以太网 2
+2025-09-03 15:35:05 - NetworkProgressDialog - DEBUG - network_progress_dialog.py:207 - 进度更新: 10% - 正在验证网络服务...
+2025-09-03 15:35:05 - NetworkProgressDialog - DEBUG - network_progress_dialog.py:207 - 进度更新: 25% - 正在获取网卡标识...
+2025-09-03 15:35:06 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:95 - [NetworkService] 开始执行操作: 根据名称获取网卡ID (adapter_name=以太网 2)
+2025-09-03 15:35:06 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:106 - [NetworkService] 操作成功完成: 根据名称获取网卡ID - 找到网卡ID: {D64BED12-85F2-467D-9D3B-01C11038CACE}
+2025-09-03 15:35:06 - NetworkProgressDialog - DEBUG - network_progress_dialog.py:207 - 进度更新: 40% - 正在准备IP配置参数...
+2025-09-03 15:35:06 - NetworkProgressDialog - DEBUG - network_progress_dialog.py:207 - 进度更新: 70% - 正在应用IP配置...
+2025-09-03 15:35:07 - flowdesk.services.network.network_service - DEBUG - network_service_base.py:95 - [NetworkService] 开始执行操作: 应用IP配置 (adapter_id={D64BED12-85F2-467D-9D3B-01C11038CACE})
+2025-09-03 15:35:07 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 协调IP配置应用 (adapter_id={D64BED12-85F2-467D-9D3B-01C11038CACE})
+2025-09-03 15:35:07 - flowdesk.services.network.ip_configuration_service - DEBUG - network_service_base.py:95 - [IPConfigurationService] 开始执行操作: 应用IP配置 (adapter_id={D64BED12-85F2-467D-9D3B-01C11038CACE}, ip=192.168.1.223)
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:378 - WMIC原始输出行数: 15
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:382 - 有效行数: 7
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:419 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:419 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:419 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:419 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:419 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:419 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:419 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:343 - 成功找到网卡基本信息: 以太网 2
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - network_service_base.py:95 - [IPConfigurationService] 开始执行操作: 网卡配置准备 (connection_name=以太网 2)
+2025-09-03 15:35:08 - flowdesk.utils.ip_validation_utils - DEBUG - ip_validation_utils.py:365 - 点分十进制格式保持不变: 255.255.255.0
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:200 - 执行IP配置命令: netsh interface ipv4 set address "以太网 2" static 192.168.1.223 255.255.255.0 192.168.1.1
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:209 - netsh命令执行完成 - 返回码: 0
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:218 - ✅ IP地址配置成功应用到网卡 '以太网 2'
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:269 - 执行主DNS配置: 192.168.1.1
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:278 - ✅ 主DNS服务器配置成功: 192.168.1.1
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - ip_configuration_service.py:311 - DNS配置成功，共配置 1/1 个DNS服务器
+2025-09-03 15:35:08 - flowdesk.services.network.ip_configuration_service - DEBUG - network_service_base.py:106 - [IPConfigurationService] 操作成功完成: 应用IP配置 - 网卡 以太网 2 的IP配置已成功应用
+2025-09-03 15:35:08 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:95 - [NetworkUICoordinatorService] 开始执行操作: 刷新当前网卡 (adapter_id={D64BED12-85F2-467D-9D3B-01C11038CACE})
+2025-09-03 15:35:08 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ IP配置应用成功
+2025-09-03 15:35:08 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:35:08 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ IP配置应用成功
+2025-09-03 15:35:08 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ IP配置应用成功
+2025-09-03 15:35:08 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:480 - IP配置应用成功: 网卡 以太网 2 的IP配置已成功应用
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:08 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:328 - 成功找到网卡基本信息: 以太网 2
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:197 - WMIC原始输出行数: 15
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:201 - 有效行数: 7
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'TAP-Windows Adapter V9', 'GUID': '{3E4CE818-81D7-4B5F-8A06-6BA784C1B678}', 'MACAddress': '00:FF:3E:4C:E8:18', 'Name': 'TAP-Windows Adapter V9', 'NetConnectionID': '本地连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{13DCB236-60BD-4020-8392-F4C68DE2152A}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'Hyper-V Virtual Ethernet Adapter #2', 'NetConnectionID': 'vEthernet (USB)', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Hyper-V Virtual Ethernet Adapter', 'GUID': '{083E8011-1034-4CB5-8071-D1A4ED8B96E9}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Hyper-V Virtual Ethernet Adapter #3', 'NetConnectionID': 'vEthernet (泰兴)', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'Realtek Gaming GbE Family Controller', 'GUID': '{D50341AC-674E-43E6-B53D-1D9E6842BD27}', 'MACAddress': 'D8:5E:D3:5E:8B:59', 'Name': 'Realtek Gaming GbE Family Controller', 'NetConnectionID': '以太网', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 2): {'Node': 'LIN-1111', 'Description': 'ASIX USB to Gigabit Ethernet Family Adapter', 'GUID': '{D64BED12-85F2-467D-9D3B-01C11038CACE}', 'MACAddress': '00:0E:C6:C2:C3:F9', 'Name': 'ASIX USB to Gigabit Ethernet Family Adapter', 'NetConnectionID': '以太网 2', 'NetConnectionStatus': '2'}
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 0): {'Node': 'LIN-1111', 'Description': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'GUID': '{983D53C6-E8C3-4B92-81B6-9B9FAA4295F7}', 'MACAddress': '', 'Name': 'Realtek 8188GU Wireless LAN 802.11n USB NIC', 'NetConnectionID': 'WLAN', 'NetConnectionStatus': '0'}
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:239 - 解析的网卡数据 (状态码: 7): {'Node': 'LIN-1111', 'Description': 'Bluetooth Device (Personal Area Network)', 'GUID': '{E9B4AED3-573D-4CDC-9C50-BD827A2CC106}', 'MACAddress': '00:1A:7D:DA:71:11', 'Name': 'Bluetooth Device (Personal Area Network)', 'NetConnectionID': '蓝牙网络连接', 'NetConnectionStatus': '7'}
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_discovery_service - DEBUG - adapter_discovery_service.py:328 - 成功找到网卡基本信息: 以太网 2
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:95 - [AdapterInfoRetriever] 开始执行操作: 获取网卡详细信息 (adapter_name=以太网 2)
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:114 - netsh命令执行成功，输出长度: 308 字符
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:240 - ipconfig输出长度: 3749 字符
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:259 - 找到网卡 以太网 2 的配置段落，长度: 726 字符
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:289 - 解析到IPv4地址: ['192.168.1.223']
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:312 - 解析到IPv6地址: ['fe80::ee03:aeb5:2b2e:c79b%23']
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:347 - 解析到子网掩码: ['255.255.255.0']
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:360 - 解析到默认网关: 192.168.1.1
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:398 - 解析到DNS服务器: ['192.168.1.1']
+2025-09-03 15:35:09 - AdapterConfigParser - DEBUG - adapter_config_parser.py:418 - 解析到DHCP状态: 已禁用
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: AdapterPerformanceService初始化 (无参数)
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: 获取链路速度 (adapter_name=以太网 2)
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:95 - [AdapterPerformanceService] 开始执行操作: 查询网卡描述 (adapter_name=以太网 2)
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:222 - 执行wmic查询命令: wmic path win32_networkadapter where "NetConnectionID='以太网 2'" get Description /format:csv
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:230 - wmic查询返回码: 0
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:237 - 解析到 1 行有效数据
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:241 - 处理第 1 行数据
+2025-09-03 15:35:09 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:106 - [AdapterPerformanceService] 操作成功完成: 查询网卡描述 - 找到描述: ASIX USB to Gigabit Ethernet Family Adapter
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ IP配置应用成功
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ IP配置应用成功
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ IP配置应用成功
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:480 - IP配置应用成功: 网卡 以太网 2 的IP配置已成功应用
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:94 - wmic nic输出行数: 3
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:95 - 目标网卡描述: 'ASIX USB to Gigabit Ethernet Family Adapter'
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:99 - 第1行解析: parts数量=3
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:105 - 网卡名称: 'Hyper-V Virtual Ethernet Adapter #3', 速度: '1000000000'
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:99 - 第2行解析: parts数量=3
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:105 - 网卡名称: 'Realtek Gaming GbE Family Controller', 速度: ''
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:99 - 第3行解析: parts数量=3
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:105 - 网卡名称: 'ASIX USB to Gigabit Ethernet Family Adapter', 速度: '1000000000'
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:113 - 完整描述匹配成功
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - adapter_performance_service.py:126 - 网卡匹配成功! 名称: ASIX USB to Gigabit Ethernet Family Adapter
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_performance_service - DEBUG - network_service_base.py:106 - [AdapterPerformanceService] 操作成功完成: 获取链路速度 - wmic解析: 1.0 Gbps
+2025-09-03 15:35:10 - AdapterConfigParser - DEBUG - adapter_config_parser.py:426 - 成功获取网卡 以太网 2 链路速度: 1.0 Gbps
+2025-09-03 15:35:10 - AdapterConfigParser - DEBUG - adapter_config_parser.py:208 - 成功使用ipconfig补充网卡 以太网 2 的完整配置信息
+2025-09-03 15:35:10 - AdapterDnsEnhancer - DEBUG - adapter_dns_enhancer.py:56 - netsh获取到网卡 以太网 2 的DNS服务器: ['192.168.1.1']
+2025-09-03 15:35:10 - AdapterDnsEnhancer - DEBUG - adapter_dns_enhancer.py:93 - 网卡 以太网 2 DNS配置已增强: ['192.168.1.1']
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:48 - 开始获取网卡 '以太网 2' 的状态信息
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:64 - 成功使用编码 utf-8 解析netsh输出
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:79 - netsh interface show interface 完整输出:
+
+管理员状态     状态           类型             接口名称
+-------------------------------------------------------------------------
+已启用            已断开连接          专用               本地连接
+已启用            已连接            专用               以太网 2
+已禁用            已断开连接          专用               WLAN
+已启用            已断开连接          专用               vEthernet (USB)
+已启用            已连接            专用               vEthernet (泰兴)
+已启用            已连接            专用               以太网
+
+
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:85 - 解析到 8 行输出，目标网卡: '以太网 2'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:98 - 🔍 可用接口列表: ['本地连接', '以太网 2', 'WLAN', 'vEthernet (USB)', 'vEthernet (泰兴)', '以太网']
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第0行解析: 接口名称='接口名称', 完整行='管理员状态     状态           类型             接口名称'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第2行解析: 接口名称='本地连接', 完整行='已启用            已断开连接          专用               本地连接'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:112 - 第3行解析: 接口名称='以太网 2', 完整行='已启用            已连接            专用               以太网 2'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:124 - 🔥 匹配成功: 网卡 '以太网 2' -> 接口 '以太网 2'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:125 - 🔥 原始行内容: '已启用            已连接            专用               以太网 2'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:126 - 🔥 解析结果: 管理状态='已启用', 连接状态='已连接'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:147 - 🔥 网卡 以太网 2 状态映射完成:
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:148 - 🔥   管理状态: '已启用' -> '已启用'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:149 - 🔥   连接状态: '已连接' -> '已连接'
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:199 - 状态判断结果: 网卡已启用且已连接
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - INFO - adapter_status_analyzer.py:156 - 🔥 最终状态判断: '已连接', 启用=True, 连接=True
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:199 - 状态判断结果: 网卡已启用且已连接
+2025-09-03 15:35:10 - AdapterStatusAnalyzer - DEBUG - adapter_status_analyzer.py:282 - 网卡 以太网 2 精确状态分析: 管理状态=已启用, 连接状态=已连接, 最终状态=已连接
+2025-09-03 15:35:10 - flowdesk.services.network.adapter_info_retriever - DEBUG - network_service_base.py:106 - [AdapterInfoRetriever] 操作成功完成: 获取网卡详细信息 - 网卡: 以太网 2
+2025-09-03 15:35:10 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:226 - 从详细信息中提取链路速度: 1.0 Gbps
+2025-09-03 15:35:10 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:243 - 发射adapter_info_updated信号 - 网卡ID: {D64BED12-85F2-467D-9D3B-01C11038CACE}
+2025-09-03 15:35:10 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:266 - 发射ip_info_updated信号，用于更新右侧输入框
+2025-09-03 15:35:10 - flowdesk.services.network.network_service - DEBUG - network_service.py:146 - NetworkService收到adapter_info_updated信号 - 网卡ID: {D64BED12-85F2-467D-9D3B-01C11038CACE}
+2025-09-03 15:35:10 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_ui_coordinator_service.py:283 - 发射空的extra_ips_updated信号，清空额外IP显示
+2025-09-03 15:35:10 - flowdesk.services.network.network_service - DEBUG - network_service.py:147 - NetworkService即将转发adapter_info_updated信号给UI层
+2025-09-03 15:35:10 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 刷新当前网卡 - 信息更新完成
+2025-09-03 15:35:10 - flowdesk.services.network.network_service - DEBUG - network_service.py:149 - 手动发射adapter_info_updated信号
+2025-09-03 15:35:10 - flowdesk.services.network.network_ui_coordinator_service - DEBUG - network_service_base.py:106 - [NetworkUICoordinatorService] 操作成功完成: 协调IP配置应用 - 配置应用成功并已刷新信息
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:102 - 🎯 收到adapter_info_updated信号，开始更新状态栏
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:116 - 📊 网卡信息 - 名称: 以太网 2, 状态: 已连接
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:132 - 状态栏已更新网卡切换最终状态: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:134 - [调试] _on_adapter_info_updated被调用，aggregated_info类型: <class 'flowdesk.models.common.AggregatedAdapterInfo'>
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:142 - [调试] 提取到detailed_info，类型: <class 'flowdesk.models.adapter_info.AdapterInfo'>
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:143 - [调试] detailed_info属性: status=已连接, link_speed=1.0 Gbps, dhcp_enabled=False
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:146 - [调试] 即将调用_update_status_badges_from_info
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:172 - 状态徽章更新已由Service层直接处理，跳过UI层处理
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:150 - [调试] 即将调用_update_ip_info_display_from_info
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:192 - IP信息展示区域已更新
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:153 - 网卡信息UI更新完成: ASIX USB to Gigabit Ethernet Family Adapter
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:102 - 🎯 收到adapter_info_updated信号，开始更新状态栏
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:116 - 📊 网卡信息 - 名称: 以太网 2, 状态: 已连接
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:105 - 🎯 StatusBarWidget收到status_updated信号: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:110 - 📱 应用状态已更新: 🟢 就绪
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:115 - 👤 用户操作状态已更新: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:10 - flowdesk.ui.widgets.status_bar_widget - DEBUG - status_bar_widget.py:121 - 🎯 主状态标签已更新: 🟢 就绪 | ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.network_status_events - DEBUG - network_status_events.py:132 - 状态栏已更新网卡切换最终状态: ✅ 已切换到 以太网 2 (已连接)
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:134 - [调试] _on_adapter_info_updated被调用，aggregated_info类型: <class 'flowdesk.models.common.AggregatedAdapterInfo'>
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:142 - [调试] 提取到detailed_info，类型: <class 'flowdesk.models.adapter_info.AdapterInfo'>
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:143 - [调试] detailed_info属性: status=已连接, link_speed=1.0 Gbps, dhcp_enabled=False
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:146 - [调试] 即将调用_update_status_badges_from_info
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:172 - 状态徽章更新已由Service层直接处理，跳过UI层处理
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:150 - [调试] 即将调用_update_ip_info_display_from_info
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:192 - IP信息展示区域已更新
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:153 - 网卡信息UI更新完成: ASIX USB to Gigabit Ethernet Family Adapter
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:291 - 📡 IP信息已更新: 192.168.1.223
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:224 - [调试] 准备更新IP配置输入框，IPConfigInfo对象: IPConfigInfo(adapter_id='{D64BED12-85F2-467D-9D3B-01C11038CACE}', ip_address='192.168.1.223', subnet_mask='255.255.255.0', gateway='192.168.1.1', dns_primary='192.168.1.1', dns_secondary='', dhcp_enabled=False)
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:226 - [调试] IP配置输入框更新完成
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:229 - IP配置界面更新完成: 192.168.1.223
+2025-09-03 15:35:10 - flowdesk.ui.main_window.network_events.ip_configuration_events - DEBUG - ip_configuration_events.py:449 - 额外IP列表已清空
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:259 - 格式化ExtraIP对象为字符串列表: []
+2025-09-03 15:35:10 - flowdesk.ui.main_window.ui_state_manager - DEBUG - ui_state_manager.py:264 - 额外IP列表已更新，共 0 个
+2025-09-03 15:35:10 - NetworkProgressDialog - DEBUG - network_progress_dialog.py:207 - 进度更新: 90% - 正在等待配置生效...
+2025-09-03 15:35:12 - NetworkProgressDialog - DEBUG - network_progress_dialog.py:207 - 进度更新: 95% - 正在刷新网卡信息...
+2025-09-03 15:35:12 - NetworkProgressDialog - INFO - network_progress_dialog.py:261 - 操作成功: 修改IP配置 - 耗时6秒
+2025-09-03 15:35:25 - flowdesk.services.tray_ui_service - DEBUG - tray_ui_service.py:40 - 托盘退出对话框初始化完成
+2025-09-03 15:35:26 - flowdesk.services.tray_ui_service - DEBUG - tray_ui_service.py:119 - 用户选择: exit
+2025-09-03 15:35:26 - flowdesk.ui.main_window.main_window_base - INFO - main_window.py:105 - 主窗口关闭请求已发射信号

@@ -1,0 +1,247 @@
+/*
+MAC地址修改弹窗样式文件 - 专门为MAC地址修改界面设计的视觉样式
+
+功能说明：
+• 定义MAC地址修改弹窗中所有组件的外观和交互效果
+• 实现Claymorphism设计风格，提供现代化的用户界面
+• 遵循UI四大铁律，确保样式的一致性和可维护性
+• 提供清晰的视觉反馈，帮助用户理解操作状态
+
+设计理念：
+• 语义化颜色：不同状态使用不同颜色提供视觉反馈
+• 自适应布局：组件尺寸随内容自动调整
+• 交互反馈：悬停和聚焦状态下的颜色变化，提升用户体验
+*/
+
+/* === MAC地址修改弹窗主容器 === */
+QDialog#modify_mac_dialog {
+    background-color: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+}
+
+/* === 弹窗标题样式 === */
+#dialog_title {
+    color: #2c3e50;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 8px 0px;
+    margin-bottom: 8px;
+}
+
+/* === 信息区域容器 === */
+#info_section_frame {
+    background-color: #e3f2fd;
+    border: 1px solid #90caf9;
+    border-radius: 8px;
+    margin: 4px 0px;
+}
+
+/* === 网卡信息标签样式 === */
+#adapter_info_label {
+    color: #1565c0;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 2px 0px;
+}
+
+#current_mac_label {
+    color: #0d47a1;
+    font-size: 12px;
+    font-family: "Consolas", "Monaco", monospace;
+    padding: 2px 0px;
+}
+
+#original_mac_label {
+    color: #424242;
+    font-size: 12px;
+    font-family: "Consolas", "Monaco", monospace;
+    padding: 2px 0px;
+}
+
+/* === 输入区域容器 === */
+#input_section_frame {
+    background-color: #fff3e0;
+    border: 1px solid #ffcc02;
+    border-radius: 8px;
+    margin: 4px 0px;
+}
+
+/* === 输入标签样式 === */
+#input_label {
+    color: #e65100;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 2px 0px;
+}
+
+/* === MAC地址输入框样式 === */
+#mac_address_input {
+    background-color: white;
+    border: 2px solid #ffb74d;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: "Consolas", "Monaco", monospace;
+    color: #d84315;
+    min-height: 20px;
+    margin: 4px 0px;
+}
+
+#mac_address_input:focus {
+    border-color: #ff9800;
+    background-color: #fffef7;
+}
+
+#mac_address_input:hover {
+    border-color: #ffa726;
+}
+
+/* === 格式提示标签 === */
+#format_hint_label {
+    color: #757575;
+    font-size: 11px;
+    padding: 2px 0px;
+    font-style: italic;
+}
+
+/* === 预览区域容器 === */
+#preview_section_frame {
+    background-color: #f3e5f5;
+    border: 1px solid #ce93d8;
+    border-radius: 8px;
+    margin: 4px 0px;
+}
+
+/* === 预览标题样式 === */
+#preview_title_label {
+    color: #7b1fa2;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 2px 0px;
+}
+
+/* === 预览内容样式 - 不同状态使用不同颜色 === */
+#preview_content_label {
+    color: #616161;
+    font-size: 12px;
+    font-family: "Consolas", "Monaco", monospace;
+    padding: 4px 0px;
+    line-height: 1.4;
+}
+
+#preview_content_valid {
+    color: #2e7d32;
+    font-size: 12px;
+    font-family: "Consolas", "Monaco", monospace;
+    font-weight: bold;
+    padding: 4px 0px;
+    line-height: 1.4;
+}
+
+#preview_content_restore {
+    color: #1976d2;
+    font-size: 12px;
+    font-family: "Consolas", "Monaco", monospace;
+    font-weight: bold;
+    padding: 4px 0px;
+    line-height: 1.4;
+}
+
+#preview_content_error {
+    color: #d32f2f;
+    font-size: 12px;
+    font-family: "Consolas", "Monaco", monospace;
+    font-weight: bold;
+    padding: 4px 0px;
+    line-height: 1.4;
+}
+
+/* === 按钮区域容器 === */
+#button_section_frame {
+    background-color: transparent;
+    border: none;
+    margin: 8px 0px 0px 0px;
+}
+
+/* === 恢复初始按钮 - 蓝色渐变 === */
+QDialog#modify_mac_dialog QPushButton#dialog_restore_button {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #42a5f5, stop:1 #1e88e5);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    min-width: 80px;
+    min-height: 16px;
+}
+
+QDialog#modify_mac_dialog QPushButton#dialog_restore_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #1e88e5, stop:1 #1565c0);
+}
+
+QDialog#modify_mac_dialog QPushButton#dialog_restore_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #1565c0, stop:1 #0d47a1);
+}
+
+QDialog#modify_mac_dialog QPushButton#dialog_restore_button:disabled {
+    background: #bdbdbd;
+    color: #757575;
+}
+
+/* === 取消按钮 - 红色渐变 === */
+QDialog#modify_mac_dialog QPushButton#dialog_cancel_button {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #ef5350, stop:1 #e53935);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    min-width: 80px;
+    min-height: 16px;
+}
+
+QDialog#modify_mac_dialog QPushButton#dialog_cancel_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #e53935, stop:1 #d32f2f);
+}
+
+QDialog#modify_mac_dialog QPushButton#dialog_cancel_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #d32f2f, stop:1 #c62828);
+}
+
+/* === 确定按钮 - 绿色渐变 === */
+QDialog#modify_mac_dialog QPushButton#dialog_ok_button {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #66bb6a, stop:1 #4caf50);
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+    min-width: 120px;
+    min-height: 16px;
+}
+
+QDialog#modify_mac_dialog QPushButton#dialog_ok_button:hover {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #4caf50, stop:1 #43a047);
+}
+
+QDialog#modify_mac_dialog QPushButton#dialog_ok_button:pressed {
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+        stop:0 #43a047, stop:1 #388e3c);
+}
+
+QDialog#modify_mac_dialog QPushButton#dialog_ok_button:disabled {
+    background: #bdbdbd;
+    color: #757575;
+}

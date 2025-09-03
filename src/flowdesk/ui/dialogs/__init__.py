@@ -21,8 +21,12 @@
 
 from .add_ip_dialog import AddIPDialog
 from .operation_result_dialog import OperationResultDialog
+from .network_progress_dialog import NetworkProgressDialog, NetworkOperationWorker, show_network_progress
 
 __all__ = [
     'AddIPDialog',
-    'OperationResultDialog'
+    'OperationResultDialog',
+    'NetworkProgressDialog',
+    'NetworkOperationWorker',
+    'show_network_progress'
 ]
